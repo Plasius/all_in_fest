@@ -1,12 +1,18 @@
-//import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  /*await Firebase.initializeApp(
-    //TODO: add Firebase project with command $ flutterfire configure
-    options: DefaultFirebaseOptions.currentPlatform,
-  );*/
+
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  } catch (err) {
+    //might have been initialized before
+  }
+
   runApp(const MyApp());
 }
 
