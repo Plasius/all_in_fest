@@ -1,4 +1,4 @@
-package com.example.all_in_fest
+package hu.bitclub.festival
 
 import io.flutter.embedding.android.FlutterActivity
 
