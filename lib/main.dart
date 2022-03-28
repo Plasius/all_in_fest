@@ -1,3 +1,4 @@
+import 'package:all_in_fest/pages/events_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -75,28 +76,26 @@ class _MyHomePageState extends State<MyHomePage> {
           // the App.build method, and use it to set our appbar title.
           title: Text(widget.title),
         ),
-        body: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('events').snapshots(),
-          builder:
-              (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else {
-              return ListView(
-                children: snapshot.data!.docs.map((document) {
-                  return Center(
-                    child: Container(
-                      width: MediaQuery.of(context).size.width / 1.2,
-                      height: MediaQuery.of(context).size.height / 6,
-                      child: Text("Title: " + document['name']),
-                    ),
-                  );
-                }).toList(),
-              );
-            }
-          },
+        body: Center(
+          child: Column(
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => EventsPage())),
+                child: Container(
+                  padding: EdgeInsets.all(15),
+                  child: Center(child: Text("Events page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(
+                      color: Colors.black
+                    )
+                  ),
+                ),
+              )
+            ],
+          ),
         ));
   }
 }
