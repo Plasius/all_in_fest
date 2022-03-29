@@ -69,8 +69,7 @@ class _EventsPageState extends State<EventsPage> {
                                                     document['name'],
                                                     style: TextStyle(
                                                         color: Colors.black,
-                                                        fontSize: 22,
-                                                        fontFamily: 'Schyler'),
+                                                        fontSize: 22,),
                                                   ),
                                                   Text(DateTime.now()
                                                       .year
@@ -92,8 +91,7 @@ class _EventsPageState extends State<EventsPage> {
                                                     style: TextStyle(
                                                         color: Colors.black
                                                             .withOpacity(0.3),
-                                                        fontSize: 14,
-                                                        fontFamily: 'Schyler'),
+                                                        fontSize: 14,),
                                                   ),
                                                   Icon(
                                                     Icons.chevron_right,
