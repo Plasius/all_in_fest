@@ -1,3 +1,4 @@
+import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/feed_page.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -99,6 +100,18 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   padding: const EdgeInsets.all(15),
                   child: const Center(child: Text("Feed page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const ChatPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Chat page")),
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
