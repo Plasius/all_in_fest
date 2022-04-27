@@ -25,6 +25,7 @@ class _ChatPageState extends State<ChatPage> {
             child: StreamBuilder(
           stream: FirebaseFirestore.instance
               .collection('tinder/userid1_userid2/messages')
+              .orderBy('time')
               .snapshots(includeMetadataChanges: true),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -35,86 +36,44 @@ class _ChatPageState extends State<ChatPage> {
             } else if (snapshot.connectionState == ConnectionState.waiting) {
               return const Text('Loading');
             } else {
-              return Column(children: [
-                ListView(
-                  physics: const NeverScrollableScrollPhysics(),
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  reverse: true,
-                  children: snapshot.data!.docs.map((document) {
-                    return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(children: [
-                          Text(
-                            document['id'],
-                            style: const TextStyle(
-                                color: Colors.black, fontSize: 22),
-                          ),
-                          Text(document['message'],
+              return Column(
+                children: [
+                  ListView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    reverse: true,
+                    children: snapshot.data!.docs.map((document) {
+                      return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(children: [
+                            Text(
+                              document['id'],
                               style: const TextStyle(
-                                  color: Colors.black, fontSize: 22))
-                        ]));
-                  }).toList(),
-                ),
-                if (isAdmin)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
+                                  color: Colors.black, fontSize: 22),
+                            ),
+                            Text(document['message'],
+                                style: const TextStyle(
+                                    color: Colors.black, fontSize: 22))
+                          ]));
+                    }).toList(),
+                  ),
+                  if (isAdmin)
+                    Column(children: [
+                      const Text('##ADMIN ZONE'),
+                      TextFormField(onChanged: (value) => alert = value),
+                      ElevatedButton(
                           onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Country List'),
-                                    content: setupAlertDialoadContainer(),
-                                  );
-                                });
+                            messages.add({
+                              'id': "user",
+                              'message': alert,
+                              'time': DateTime.now().millisecondsSinceEpoch
+                            });
                           },
-                          iconSize: 50,
-                          icon: const Icon(Icons.question_mark)),
-                      IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Country List'),
-                                    content: setupAlertDialoadContainer(),
-                                  );
-                                });
-                          },
-                          iconSize: 50,
-                          icon: const Icon(Icons.circle)),
-                      IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Country List'),
-                                    content: setupAlertDialoadContainer(),
-                                  );
-                                });
-                          },
-                          iconSize: 50,
-                          icon: const Icon(Icons.location_pin)),
-                      IconButton(
-                          onPressed: () {
-                            showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: const Text('Country List'),
-                                    content: setupAlertDialoadContainer(),
-                                  );
-                                });
-                          },
-                          iconSize: 50,
-                          icon: const Icon(Icons.timer))
-                    ],
-                  )
-              ]);
+                          child: const Text("Submit"))
+                    ]),
+                ],
+              );
             }
           },
         )));
