@@ -1,14 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-class MapPage extends StatefulWidget {
-  const MapPage({Key? key}) : super(key: key);
+class SwipePage extends StatefulWidget {
+  const SwipePage({Key? key}) : super(key: key);
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  State<SwipePage> createState() => _SwipePageState();
 }
 
-class _MapPageState extends State<MapPage> {
+class _SwipePageState extends State<SwipePage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -18,7 +18,7 @@ class _MapPageState extends State<MapPage> {
           title: const Text('Welcome to Flutter'),
         ),
         body: const Center(
-          child: Text('Hello World'),
+          child: Text('Swipe World'),
         ),
       ),
     );

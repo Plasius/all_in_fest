@@ -1,5 +1,9 @@
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
+import 'package:all_in_fest/pages/matches_page.dart';
+import 'package:all_in_fest/pages/login_page.dart';
+import 'package:all_in_fest/pages/register_page.dart';
+import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
@@ -82,6 +86,59 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             children: [
               GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const LoginPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Login page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RegisterPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Register page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const MatchesPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Matches page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
+              GestureDetector(
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => const ChatPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Chat page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
+              const SizedBox(height: 50),
+              GestureDetector(
                 onTap: () => Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -97,10 +154,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               GestureDetector(
                 onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => const ChatPage())),
+                    MaterialPageRoute(builder: (context) => const SwipePage())),
                 child: Container(
                   padding: const EdgeInsets.all(15),
-                  child: const Center(child: Text("Feed page")),
+                  child: const Center(child: Text("Swipe page")),
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
@@ -118,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       borderRadius: BorderRadius.circular(25),
                       border: Border.all(color: Colors.black)),
                 ),
-              )
+              ),
             ],
           ),
         ));
