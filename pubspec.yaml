@@ -39,6 +39,7 @@ dependencies:
   intl: ^0.17.0
   json_annotation: ^4.4.0
   cloud_firestore_odm: ^1.0.0-dev.12
+  firebase_auth: ^3.3.18
 
 dev_dependencies:
   flutter_test:
