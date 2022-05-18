@@ -103,10 +103,12 @@ class _DetailPageState extends State<DetailPage> {
             ),
             Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Text(
-                  "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed augue consectetur, dapibus neque sit amet, dictum mi. Mauris quis ex ac augue gravida pretium. Aliquam posuere eu odio pellentesque pellentesque. Vivamus interdum erat ac mauris consectetur, eu pharetra neque suscipit. Nunc id mi eu augue elementum condimentum ac non mauris. Nullam suscipit lacus et gravida gravida. Quisque condimentum vitae neque non fermentum. Vivamus ultricies vestibulum mi sit amet convallis. Aliquam nec arcu metus. Integer semper gravida odio, ut semper ipsum dapibus sed. Morbi ac ex eget quam iaculis congue. Maecenas laoreet dolor vel risus lacinia fermentum porttitor vel dolor. Quisque sit amet nunc hendrerit nunc luctus varius. In ac scelerisque arcu. Etiam at dignissim elit.", style: TextStyle(
-                color: Colors.white
-              ),),
+              child: SingleChildScrollView(
+                child: Text(
+                    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc sed augue consectetur, dapibus neque sit amet, dictum mi. Mauris quis ex ac augue gravida pretium. Aliquam posuere eu odio pellentesque pellentesque. Vivamus interdum erat ac mauris consectetur, eu pharetra neque suscipit. Nunc id mi eu augue elementum condimentum ac non mauris. Nullam suscipit lacus et gravida gravida. Quisque condimentum vitae neque non fermentum. Vivamus ultricies vestibulum mi sit amet convallis. Aliquam nec arcu metus. Integer semper gravida odio, ut semper ipsum dapibus sed. Morbi ac ex eget quam iaculis congue. Maecenas laoreet dolor vel risus lacinia fermentum porttitor vel dolor. Quisque sit amet nunc hendrerit nunc luctus varius. In ac scelerisque arcu. Etiam at dignissim elit.", style: TextStyle(
+                  color: Colors.white
+                ),),
+              ),
             )
           ],
         ),

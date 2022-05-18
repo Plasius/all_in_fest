@@ -42,215 +42,222 @@ class _EventsPageState extends State<EventsPage> {
           )
         ],
       ),
-      body: Stack(children: [
-        Container(
-          constraints: BoxConstraints.expand(),
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage("lib/assets/images/background.png"),
-                  fit: BoxFit.cover)),
-          child: StreamBuilder(
-            stream: FirebaseFirestore.instance.collection('events').snapshots(),
-            builder:
-                (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-              if (!snapshot.hasData) {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                return ListView(
-                  children: snapshot.data!.docs.map((document) {
-                    return Center(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: List.generate(
-                              1,
-                              (index) => Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 20, right: 20, top: 20),
-                                    child: Column(
-                                      children: [
-                                        GestureDetector(
-                                          child: Container(
-                                              child: Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Container(
-                                                    width: 10,
-                                                    height:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height /
-                                                            12,
-                                                    decoration: BoxDecoration(
-                                                        color: Color.fromRGBO(
-                                                            254, 192, 1, 1)),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.all(
-                                                            15.0),
-                                                    child: Column(
+      body: Container(
+        constraints: BoxConstraints.expand(),
+        decoration: BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("lib/assets/images/background.png"),
+                fit: BoxFit.cover)),
+        child: Stack(children: [
+          Container(
+            constraints: BoxConstraints.expand(),
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage("lib/assets/images/background.png"),
+                    fit: BoxFit.cover)),
+            child: StreamBuilder(
+              stream: FirebaseFirestore.instance.collection('events').snapshots(),
+              builder:
+                  (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return ListView(
+                    children: snapshot.data!.docs.map((document) {
+                      return Center(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(
+                                1,
+                                (index) => Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20, top: 20),
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            child: Container(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      width: 10,
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height /
+                                                              12,
+                                                      decoration: BoxDecoration(
+                                                          color: Color.fromRGBO(
+                                                              254, 192, 1, 1)),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            "Esemény neve",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          Text(
+                                                            "színpad",
+                                                            style: TextStyle(
+                                                                color:
+                                                                    Colors.white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
                                                       children: [
                                                         Text(
-                                                          "Esemény neve",
+                                                          "9:50-11:20",
                                                           style: TextStyle(
                                                               color:
-                                                                  Colors.white,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold),
+                                                                  Colors.white),
                                                         ),
-                                                        Text(
-                                                          "színpad",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .normal),
+                                                        Icon(
+                                                          Icons
+                                                              .favorite_border_sharp,
+                                                          color: Colors.white,
                                                         )
                                                       ],
-                                                    ),
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    children: [
-                                                      Text(
-                                                        "9:50-11:20",
-                                                        style: TextStyle(
-                                                            color:
-                                                                Colors.white),
-                                                      ),
-                                                      Icon(
-                                                        Icons
-                                                            .favorite_border_sharp,
-                                                        color: Colors.white,
-                                                      )
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                              decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                      image: AssetImage(
-                                                          "lib/assets/images/event_container.png"),
-                                                      fit: BoxFit.contain))),
-                                          onTap: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      DetailPage())),
-                                        ),
-                                      ],
-                                    ),
-                                  )),
+                                                    )
+                                                  ],
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            "lib/assets/images/event_container.png"),
+                                                        fit: BoxFit.contain))),
+                                            onTap: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailPage())),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                );
-              }
-            },
-          ),
-        ),
-        Container(
-            height: MediaQuery.of(context).size.height / 8,
-            decoration: BoxDecoration(
-              color: Color.fromRGBO(232, 107, 62, 1),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "csütörtök",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "25",
-                          style: TextStyle(color: Colors.black),
-                        ),
+          ),
+          Container(
+              height: MediaQuery.of(context).size.height / 8,
+              decoration: BoxDecoration(
+                color: Color.fromRGBO(232, 107, 62, 1),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "csütörtök",
+                        style: TextStyle(color: Colors.white),
                       ),
-                    )
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "péntek",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "26",
-                          style: TextStyle(color: Colors.black),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "25",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "péntek",
+                        style: TextStyle(color: Colors.white),
                       ),
-                    )
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "szombat",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "27",
-                          style: TextStyle(color: Colors.black),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "26",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "szombat",
+                        style: TextStyle(color: Colors.white),
                       ),
-                    )
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "vasárnap",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                          color: Colors.white, shape: BoxShape.circle),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          "28",
-                          style: TextStyle(color: Colors.black),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "27",
+                            style: TextStyle(color: Colors.black),
+                          ),
                         ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "vasárnap",
+                        style: TextStyle(color: Colors.white),
                       ),
-                    )
-                  ],
-                )
-              ],
-            )),
-      ]),
+                      Container(
+                        decoration: BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            "28",
+                            style: TextStyle(color: Colors.black),
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                ],
+              )),
+        ]),
+      ),
     );
   }
 }
