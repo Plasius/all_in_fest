@@ -53,22 +53,32 @@ class _MatchesPageState extends State<MatchesPage> {
           appBar: AppBar(
             title: const Text("Matches"),
           ),
-          body: Center(
-            child: SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                    matches.length,
-                    (index) => ElevatedButton(
-                        onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const ChatPage(),
-                              settings: RouteSettings(
-                                arguments: matches[index],
-                              ),
-                            )),
-                        child:
-                            Text(matches[index].toString().split(" ").last))),
+          body: SingleChildScrollView(
+            child: Column(
+              children: List.generate(
+                matches.length,
+                (index) => ListTile(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChatPage(),
+                          settings: RouteSettings(
+                            arguments: matches[index],
+                          ),
+                        )),
+                    title: Row(children: [
+                      const Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Image(
+                            fit: BoxFit.cover,
+                            width: 50,
+                            height: 50,
+                            image: NetworkImage(
+                                'https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/04/dogecoin.jpeg.jpg')),
+                      ),
+                      Text(matches[index].toString().split(" ").last,
+                          style: const TextStyle(fontWeight: FontWeight.bold))
+                    ])),
               ),
             ),
           ));
