@@ -86,9 +86,12 @@ class _DetailPageState extends State<DetailPage> {
                   decoration: BoxDecoration(
                     color: Colors.white
                   ),
-                  child: Image(
-                    image: AssetImage("lib/assets/images/artist.png"),
-                    fit: BoxFit.cover,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 10, top: 10, right: 10, bottom: 20),
+                    child: Image(
+                      image: AssetImage("lib/assets/images/artist.png"),
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
               ),
