@@ -15,6 +15,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   String partnerUID = "";
   String partnerName = "";
+  String partnerPhoto = "";
 
   late CollectionReference messages;
   late var messages_stream;
@@ -23,14 +24,13 @@ class _ChatPageState extends State<ChatPage> {
 
   final messageInput = TextEditingController();
 
-  final conversationController = ScrollController();
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     partnerUID = ModalRoute.of(context)!.settings.arguments as String;
-    partnerName = partnerUID.split(" ").last;
+    partnerName = partnerUID.split(" ")[1];
+    partnerPhoto = partnerUID.split(" ").last;
     partnerUID = partnerUID.split(" ").first;
 
     print(partnerName + partnerUID);
@@ -62,13 +62,6 @@ class _ChatPageState extends State<ChatPage> {
           partnerUID +
           '/messages');
     }
-    messages_stream.listen((snapshot) {
-      conversationController.animateTo(
-        433333.0,
-        duration: const Duration(seconds: 1),
-        curve: Curves.fastOutSlowIn,
-      );
-    });
   }
 
   @override
@@ -83,67 +76,63 @@ class _ChatPageState extends State<ChatPage> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height * 0.80,
             child: SingleChildScrollView(
-                controller: conversationController,
                 child: StreamBuilder(
-                  stream: messages_stream,
-                  builder: (BuildContext context,
-                      AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (!snapshot.hasData) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Text('Loading');
-                    } else {
-                      return Column(
-                        children: [
-                          ListView(
-                            physics: const NeverScrollableScrollPhysics(),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            children: snapshot.data!.docs.map((document) {
-                              if (document['user'] == partnerUID) {
-                                return Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          const Padding(
-                                            padding: EdgeInsets.all(8.0),
-                                            child: Image(
-                                                fit: BoxFit.cover,
-                                                width: 40,
-                                                height: 40,
-                                                image: NetworkImage(
-                                                    'https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/04/dogecoin.jpeg.jpg')),
-                                          ),
-                                          Text(document['message'],
-                                              textAlign: TextAlign.right,
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 22)),
-                                        ]));
-                              } else {
-                                return Align(
-                                    alignment: Alignment.topRight,
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Text(document['message'],
-                                              textAlign: TextAlign.right,
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 22))
-                                        ]));
-                              }
-                            }).toList(),
-                          )
-                        ],
-                      );
-                    }
-                  },
-                )),
+              stream: messages_stream,
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.connectionState ==
+                    ConnectionState.waiting) {
+                  return const Text('Loading');
+                } else {
+                  return Column(
+                    children: [
+                      ListView(
+                        physics: const NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        children: snapshot.data!.docs.map((document) {
+                          if (document['user'] == partnerUID) {
+                            return Align(
+                                alignment: Alignment.topLeft,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Image(
+                                            fit: BoxFit.cover,
+                                            width: 40,
+                                            height: 40,
+                                            image: NetworkImage(partnerPhoto)),
+                                      ),
+                                      Text(document['message'],
+                                          textAlign: TextAlign.right,
+                                          style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 22)),
+                                    ]));
+                          } else {
+                            return Align(
+                                alignment: Alignment.topRight,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(document['message'],
+                                          textAlign: TextAlign.right,
+                                          style: const TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 22))
+                                    ]));
+                          }
+                        }).toList(),
+                      )
+                    ],
+                  );
+                }
+              },
+            )),
           ),
           Align(
             alignment: Alignment.bottomCenter,
