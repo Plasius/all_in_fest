@@ -38,7 +38,7 @@ class _MatchesPageState extends State<MatchesPage> {
           .doc(matches[i])
           .get()
           .then((user) {
-        matches[i] = matches[i] + " " + user['name'];
+        matches[i] = matches[i] + " " + user['name'] + " " + user['photo'];
         ready = true;
         setState(() {});
       });
@@ -67,16 +67,16 @@ class _MatchesPageState extends State<MatchesPage> {
                           ),
                         )),
                     title: Row(children: [
-                      const Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Image(
+                      Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Image(
                             fit: BoxFit.cover,
                             width: 50,
                             height: 50,
                             image: NetworkImage(
-                                'https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/04/dogecoin.jpeg.jpg')),
-                      ),
-                      Text(matches[index].toString().split(" ").last,
+                                matches[index].toString().split(" ")[2]),
+                          )),
+                      Text(matches[index].toString().split(" ")[1],
                           style: const TextStyle(fontWeight: FontWeight.bold))
                     ])),
               ),

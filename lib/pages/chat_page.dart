@@ -15,6 +15,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   String partnerUID = "";
   String partnerName = "";
+  String partnerPhoto = "";
 
   late CollectionReference messages;
   late var messages_stream;
@@ -28,7 +29,8 @@ class _ChatPageState extends State<ChatPage> {
     super.didChangeDependencies();
 
     partnerUID = ModalRoute.of(context)!.settings.arguments as String;
-    partnerName = partnerUID.split(" ").last;
+    partnerName = partnerUID.split(" ")[1];
+    partnerPhoto = partnerUID.split(" ").last;
     partnerUID = partnerUID.split(" ").first;
 
     print(partnerName + partnerUID);
@@ -97,14 +99,13 @@ class _ChatPageState extends State<ChatPage> {
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
-                                      const Padding(
-                                        padding: EdgeInsets.all(8.0),
+                                      Padding(
+                                        padding: const EdgeInsets.all(8.0),
                                         child: Image(
                                             fit: BoxFit.cover,
                                             width: 40,
                                             height: 40,
-                                            image: NetworkImage(
-                                                'https://thumbor.forbes.com/thumbor/fit-in/900x510/https://www.forbes.com/advisor/wp-content/uploads/2021/04/dogecoin.jpeg.jpg')),
+                                            image: NetworkImage(partnerPhoto)),
                                       ),
                                       Text(document['message'],
                                           textAlign: TextAlign.right,
