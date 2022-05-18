@@ -1,31 +1,72 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({Key? key})
+      : super(
+          key: key,
+        );
 
   @override
   State<ChatPage> createState() => _ChatPageState();
 }
 
 class _ChatPageState extends State<ChatPage> {
-  CollectionReference messages =
-      FirebaseFirestore.instance.collection('tinder/userid1_userid2/messages');
-  var alert = '';
-  bool isAdmin = true;
+  String partnerUID = "";
+  String partnerName = "";
+
+  late CollectionReference messages;
+
+  var message = '';
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    partnerUID = ModalRoute.of(context)!.settings.arguments as String;
+    partnerName = partnerUID.split(" ").last;
+    partnerUID = partnerUID.split(" ").first;
+
+    print(partnerName + partnerUID);
+
+    if (partnerUID.compareTo(FirebaseAuth.instance.currentUser!.uid) < 0) {
+      messages = FirebaseFirestore.instance.collection('matches/' +
+          partnerUID +
+          '_' +
+          FirebaseAuth.instance.currentUser!.uid +
+          '/messages');
+      print('matches/' +
+          partnerUID +
+          '_' +
+          FirebaseAuth.instance.currentUser!.uid +
+          '/messages');
+    } else {
+      messages = FirebaseFirestore.instance.collection('matches/' +
+          FirebaseAuth.instance.currentUser!.uid +
+          '_' +
+          partnerUID +
+          '/messages');
+      print('matches/' +
+          FirebaseAuth.instance.currentUser!.uid +
+          '_' +
+          partnerUID +
+          '/messages');
+    }
+    build(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text('Feed'),
+          title: Text(partnerName),
         ),
         body: SingleChildScrollView(
             child: StreamBuilder(
-          stream: FirebaseFirestore.instance
-              .collection('tinder/userid1_userid2/messages')
-              .orderBy('time')
+          stream: messages
+              .orderBy('datetime')
               .snapshots(includeMetadataChanges: true),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -42,36 +83,35 @@ class _ChatPageState extends State<ChatPage> {
                     physics: const NeverScrollableScrollPhysics(),
                     scrollDirection: Axis.vertical,
                     shrinkWrap: true,
-                    reverse: true,
                     children: snapshot.data!.docs.map((document) {
                       return Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(children: [
-                            Text(
-                              document['id'],
-                              style: const TextStyle(
-                                  color: Colors.black, fontSize: 22),
-                            ),
+                            Text((() {
+                              if (document['user'] == partnerUID) {
+                                return partnerName;
+                              } else {
+                                return "Me";
+                              }
+                            })()),
                             Text(document['message'],
                                 style: const TextStyle(
                                     color: Colors.black, fontSize: 22))
                           ]));
                     }).toList(),
                   ),
-                  if (isAdmin)
-                    Column(children: [
-                      const Text('##ADMIN ZONE'),
-                      TextFormField(onChanged: (value) => alert = value),
-                      ElevatedButton(
-                          onPressed: () {
-                            messages.add({
-                              'id': "user",
-                              'message': alert,
-                              'time': DateTime.now().millisecondsSinceEpoch
-                            });
-                          },
-                          child: const Text("Submit"))
-                    ]),
+                  Column(children: [
+                    TextFormField(onChanged: (value) => message = value),
+                    ElevatedButton(
+                        onPressed: () {
+                          messages.add({
+                            'user': FirebaseAuth.instance.currentUser!.uid,
+                            'message': message,
+                            'datetime': DateTime.now().millisecondsSinceEpoch
+                          });
+                        },
+                        child: const Text("Submit"))
+                  ]),
                 ],
               );
             }

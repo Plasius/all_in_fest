@@ -57,14 +57,12 @@ class _LoginPageState extends State<LoginPage> {
     required BuildContext context,
   }) async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    User? user;
 
     try {
-      UserCredential userCredential = await auth.signInWithEmailAndPassword(
+      await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      user = userCredential.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -75,5 +73,7 @@ class _LoginPageState extends State<LoginPage> {
 
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const MatchesPage()));
+
+    return null;
   }
 }
