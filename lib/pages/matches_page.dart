@@ -1,4 +1,5 @@
 import 'package:all_in_fest/pages/chat_page.dart';
+import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,21 +54,24 @@ class _MatchesPageState extends State<MatchesPage> {
           appBar: AppBar(
             title: const Text("Matches"),
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: List.generate(
-                matches.length,
-                (index) => ListTile(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatPage(),
-                          settings: RouteSettings(
-                            arguments: matches[index],
-                          ),
-                        )),
-                    title: Row(children: [
-                      Padding(
+          body: Column(children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.80,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                    matches.length,
+                    (index) => ListTile(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const ChatPage(),
+                              settings: RouteSettings(
+                                arguments: matches[index],
+                              ),
+                            )),
+                        title: Row(children: [
+                          /*Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: Image(
                             fit: BoxFit.cover,
@@ -75,13 +79,42 @@ class _MatchesPageState extends State<MatchesPage> {
                             height: 50,
                             image: NetworkImage(
                                 matches[index].toString().split(" ")[2]),
-                          )),
-                      Text(matches[index].toString().split(" ")[1],
-                          style: const TextStyle(fontWeight: FontWeight.bold))
-                    ])),
+                          )),*/
+                          Text(matches[index].toString().split(" ")[1],
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold))
+                        ])),
+                  ),
+                ),
               ),
             ),
-          ));
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Colors.grey),
+                    ),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const SwipePage())),
+                    child: const Text("Swipe page",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey))),
+                ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.blue),
+                  ),
+                  onPressed: null,
+                  child: const Text("Matches page",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.white)),
+                )
+              ]),
+            )
+          ]));
     } else {
       return MaterialApp(
           title: 'Matches',

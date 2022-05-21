@@ -11,7 +11,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'Map',
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Welcome to Flutter'),

@@ -17,7 +17,7 @@ class _LoginPageState extends State<LoginPage> {
     String password = "";
 
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      title: 'Login',
       home: Scaffold(
         appBar: AppBar(
           title: const Text('Welcome to Flutter'),
