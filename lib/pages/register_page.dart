@@ -20,7 +20,16 @@ class _RegisterPageState extends State<RegisterPage> {
       title: 'Register',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
+          backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+          leading: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          title: const Image(
+            image: AssetImage("lib/assets/images/logo.png"),
+            height: 50,
+            fit: BoxFit.contain,
+          ),
         ),
         body: Center(
           child: Column(children: [
@@ -44,7 +53,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  static Future<User?> signInUsingEmailPassword({
+  void signInUsingEmailPassword({
     required String email,
     required String password,
     required BuildContext context,
@@ -56,6 +65,8 @@ class _RegisterPageState extends State<RegisterPage> {
         email: email,
         password: password,
       );
+      Navigator.push(context,
+          MaterialPageRoute(builder: (context) => const MatchesPage()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -63,10 +74,5 @@ class _RegisterPageState extends State<RegisterPage> {
         print('Wrong password provided.');
       }
     }
-
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const MatchesPage()));
-
-    return null;
   }
 }

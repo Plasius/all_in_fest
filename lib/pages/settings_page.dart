@@ -13,7 +13,16 @@ class _SettingsPageState extends State<SettingsPage> {
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+        leading: const Icon(
+          Icons.menu,
+          color: Colors.white,
+        ),
+        title: const Image(
+          image: const AssetImage("lib/assets/images/logo.png"),
+          height: 50,
+          fit: BoxFit.contain,
+        ),
       ),
       body: Align(
           alignment: Alignment.topLeft,
@@ -34,7 +43,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
 
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               //email
               const Align(
                   alignment: Alignment.topLeft, child: Text("Change email")),
@@ -50,7 +59,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ],
               ),
 
-              SizedBox(height: 50),
+              const SizedBox(height: 50),
               //password
               const Align(
                   alignment: Alignment.topLeft, child: Text("Change password")),

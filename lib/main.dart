@@ -79,9 +79,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+          leading: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          title: const Image(
+            image: AssetImage("lib/assets/images/logo.png"),
+            height: 50,
+            fit: BoxFit.contain,
+          ),
         ),
         body: Center(
           child: Column(

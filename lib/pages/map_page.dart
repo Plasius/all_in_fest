@@ -14,7 +14,16 @@ class _MapPageState extends State<MapPage> {
       title: 'Map',
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
+          backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+          leading: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          title: const Image(
+            image: AssetImage("lib/assets/images/logo.png"),
+            height: 50,
+            fit: BoxFit.contain,
+          ),
         ),
         body: const Center(
           child: Text('Hello World'),
