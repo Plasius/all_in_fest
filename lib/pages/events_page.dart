@@ -48,14 +48,7 @@ class _EventsPageState extends State<EventsPage> {
             image: DecorationImage(
                 image: AssetImage("lib/assets/images/background.png"),
                 fit: BoxFit.cover)),
-        child: Stack(children: [
-          Container(
-            constraints: BoxConstraints.expand(),
-            decoration: BoxDecoration(
-                image: DecorationImage(
-                    image: AssetImage("lib/assets/images/background.png"),
-                    fit: BoxFit.cover)),
-            child: StreamBuilder(
+        child: Stack(children: [StreamBuilder(
               stream: FirebaseFirestore.instance.collection('events').snapshots(),
               builder:
                   (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -161,7 +154,6 @@ class _EventsPageState extends State<EventsPage> {
                 }
               },
             ),
-          ),
           Container(
               height: MediaQuery.of(context).size.height / 8,
               decoration: BoxDecoration(

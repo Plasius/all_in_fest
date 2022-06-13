@@ -1,3 +1,5 @@
+import 'dart:js';
+
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -5,9 +7,11 @@ import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
+import 'models/favorite_model.dart';
 import 'pages/map_page.dart';
 import 'pages/settings_page.dart';
 
@@ -22,7 +26,11 @@ Future<void> main() async {
     //might have been initialized before
   }
 
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+        create: (context) => FavoriteModel(),
+        child: const MyApp())
+      );
 }
 
 class MyApp extends StatelessWidget {
