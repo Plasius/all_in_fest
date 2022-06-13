@@ -9,6 +9,7 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
 import 'pages/map_page.dart';
+import 'pages/settings_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -78,9 +79,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
         appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text(widget.title),
+          backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+          leading: const Icon(
+            Icons.menu,
+            color: Colors.white,
+          ),
+          title: const Image(
+            image: AssetImage("lib/assets/images/logo.png"),
+            height: 50,
+            fit: BoxFit.contain,
+          ),
         ),
         body: Center(
           child: Column(
@@ -137,7 +145,20 @@ class _MyHomePageState extends State<MyHomePage> {
                       border: Border.all(color: Colors.black)),
                 ),
               ),
-              const SizedBox(height: 50),
+              GestureDetector(
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsPage())),
+                child: Container(
+                  padding: const EdgeInsets.all(15),
+                  child: const Center(child: Text("Settings page")),
+                  width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(25),
+                      border: Border.all(color: Colors.black)),
+                ),
+              ),
               GestureDetector(
                 onTap: () => Navigator.push(
                     context,
