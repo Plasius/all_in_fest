@@ -1,6 +1,11 @@
+import 'package:all_in_fest/models/event_model.dart';
 import 'package:all_in_fest/pages/event_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/favorite_model.dart';
+import 'favorite_page.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -12,9 +17,9 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   Stream eventsStream =
       FirebaseFirestore.instance.collection('events').snapshots();
-
   @override
   Widget build(BuildContext context) {
+    var favoriteEvent = context.watch<FavoriteModel>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(232, 107, 62, 1),
@@ -32,9 +37,12 @@ class _EventsPageState extends State<EventsPage> {
             Icons.add_rounded,
             color: Colors.white,
           ),
-          Icon(
-            Icons.favorite_sharp,
-            color: Colors.white,
+          IconButton(
+            icon: Icon(Icons.favorite_sharp),
+            color: Colors.white, onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const FavoritePage())),
           ),
           Icon(
             Icons.filter_alt_outlined,
@@ -58,7 +66,7 @@ class _EventsPageState extends State<EventsPage> {
                   );
                 } else {
                   return ListView(
-                    children: snapshot.data!.docs.map((document) {
+                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
                       return Center(
                         child: SingleChildScrollView(
                           child: Column(
@@ -123,10 +131,11 @@ class _EventsPageState extends State<EventsPage> {
                                                               color:
                                                                   Colors.white),
                                                         ),
-                                                        Icon(
-                                                          Icons
-                                                              .favorite_border_sharp,
-                                                          color: Colors.white,
+                                                        IconButton(
+                                                          icon: Icon(Icons.favorite_border_sharp),
+                                                          color: Colors.white, onPressed: () {
+                                                            favoriteEvent.add(document);
+                                                        },
                                                         )
                                                       ],
                                                     )

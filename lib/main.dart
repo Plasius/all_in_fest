@@ -1,4 +1,4 @@
-//import 'dart:js';
+import 'dart:js';
 
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
@@ -6,7 +6,6 @@ import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
-import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -200,20 +199,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: Container(
                   padding: const EdgeInsets.all(15),
                   child: const Center(child: Text("Térkép")),
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border: Border.all(color: Colors.black)),
-                ),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfilePage())),
-                child: Container(
-                  padding: const EdgeInsets.all(15),
-                  child: const Center(child: Text("Profile page")),
                   width: MediaQuery.of(context).size.width,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(25),
