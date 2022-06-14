@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class _MapPageState extends State<MapPage> {
     return MaterialApp(
       title: 'Map',
       home: Scaffold(
-          appBar: AppBar(
+          /*appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             leading: const Icon(
               Icons.menu,
@@ -25,37 +26,16 @@ class _MapPageState extends State<MapPage> {
               height: 50,
               fit: BoxFit.contain,
             ),
-          ),
+          ),*/
           body: 
-          SingleChildScrollView(
-            child: Center(
-              child: Column(
-                children: [
-                  Align(
-                    alignment: Alignment.topLeft,
-                    child: const Text(
-                      'Térkép',
-                      /*textAlign: TextAlign.left,
-                      textDirection: TextDirection.rtl,*/
-                      style: TextStyle(
-                          fontFamily: 'Jost',
-                          //fontStyle: FontStyle.italic,
-                          fontSize: 42),
-                    ),
-                  ),
-                  const Text(
-                    'Térkép alcím',
-                    style: TextStyle(
-                        fontFamily: 'Jost',
-                        fontStyle: FontStyle.italic,
-                        fontSize: 22),
-                  ),
-                  Image.asset("lib/assets/images/angry-annoyed.gif",
-                      height: 500, width: 500)
-                ],
-              ),
-            ),
-          )),
-    );
+
+                  PhotoView(imageProvider: 
+                  AssetImage("lib/assets/images/terkep.png"))
+                  /*MediaQuery.of(context).size.height)*/                  
+                
+        ),
+      );
+          
+    
   }
 }
