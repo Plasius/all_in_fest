@@ -1,5 +1,3 @@
-import 'dart:js';
-
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -26,11 +24,8 @@ Future<void> main() async {
     //might have been initialized before
   }
 
-  runApp(
-    ChangeNotifierProvider(
-        create: (context) => FavoriteModel(),
-        child: const MyApp())
-      );
+  runApp(ChangeNotifierProvider(
+      create: (context) => FavoriteModel(), child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
