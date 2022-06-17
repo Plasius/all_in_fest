@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:date_field/date_field.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,6 +13,13 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   DateTime selectedDate = DateTime.now();
+  var photoURL = "lib/assets/images/mr_radev.jpeg";
+
+  void initState() {
+    super.initState();
+
+    loadImage();
+  }
 
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,9 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                                image: AssetImage(
-                                    "lib/assets/images/mr_radev.jpeg"),
-                                fit: BoxFit.cover),
+                                image: AssetImage(photoURL), fit: BoxFit.cover),
                             boxShadow: [
                               BoxShadow(
                                   spreadRadius: 2,
@@ -168,5 +174,11 @@ class _ProfilePageState extends State<ProfilePage> {
 
   uploadPhoto() {
     //logic to select photo and upload to firestorage
+  }
+
+  void loadImage() async {
+    final ref = FirebaseStorage.instance.ref().child("testimage.png");
+    final photoURL2 = await ref.getDownloadURL();
+    build(context);
   }
 }
