@@ -54,44 +54,44 @@ class _ProfilePageState extends State<ProfilePage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(top: 15),
-              child: Center(
-                child: GestureDetector(
-                  onTap: () => _showPicker(context),
+              child: GestureDetector(
+                onTap: () => _showPicker(context),
+                child: Center(
                   child: Stack(
-                    children: [
-                      Container(
-                        width: 130,
-                        height: 130,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(image: NetworkImage(photoURL)),
-                            boxShadow: [
-                              BoxShadow(
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                  color: Colors.grey.withOpacity(0.3))
-                            ]),
-                      ),
-                      Positioned(
-                        child: Container(
-                          height: 40,
-                          width: 40,
+                      children: [
+                        Container(
+                          width: 130,
+                          height: 130,
                           decoration: BoxDecoration(
-                              color: Colors.redAccent, shape: BoxShape.circle),
-                          child: Icon(
-                            MdiIcons.cameraPlus,
-                            color: Colors.white,
-                          ),
+                              shape: BoxShape.circle,
+                              image: DecorationImage(image: NetworkImage(photoURL)),
+                              boxShadow: [
+                                BoxShadow(
+                                    spreadRadius: 2,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3),
+                                    color: Colors.grey.withOpacity(0.3))
+                              ]),
                         ),
-                        bottom: 0,
-                        right: 0,
-                      )
-                    ],
+                        Positioned(
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                                color: Colors.redAccent, shape: BoxShape.circle),
+                            child: Icon(
+                              MdiIcons.cameraPlus,
+                              color: Colors.white,
+                            ),
+                          ),
+                          bottom: 0,
+                          right: 0,
+                        )
+                      ],
+                    ),
                   ),
-                ),
               ),
-            ),
+              ),
             SizedBox(
               height: 20,
             ),
@@ -227,7 +227,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
-  void _showPicker(context) {
+  void _showPicker(BuildContext context) {
     showModalBottomSheet(
         context: context,
         builder: (BuildContext bc) {
