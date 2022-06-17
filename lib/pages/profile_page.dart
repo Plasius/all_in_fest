@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:date_field/date_field.dart';
@@ -21,6 +22,10 @@ class _ProfilePageState extends State<ProfilePage> {
   var photoURL = "";
   File? _photo;
   final ImagePicker _picker = ImagePicker();
+
+  var nameController = new TextEditingController();
+
+  var bioController = new TextEditingController();
 
   @override
   void initState() {
@@ -105,7 +110,8 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               height: 20,
             ),
-            TextField(
+            TextFormField(
+              controller: nameController,
               decoration: InputDecoration(
                   labelText: 'Név',
                   labelStyle: TextStyle(
@@ -123,7 +129,8 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               height: 15,
             ),
-            TextField(
+            TextFormField(
+              controller: bioController,
               decoration: InputDecoration(
                   labelText: 'Bio',
                   labelStyle: TextStyle(
@@ -242,5 +249,16 @@ class _ProfilePageState extends State<ProfilePage> {
         });
   }
 
-  void saveProfile() {}
+  void saveProfile() {
+    //get user id
+    var uid = FirebaseAuth.instance.currentUser?.uid;
+    var instance = FirebaseFirestore.instance;
+    //update name
+    if (uid != null) {
+      instance
+          .collection('users')
+          .doc(uid)
+          .set({'name': nameController.text, 'bio': bioController.text});
+    }
+  }
 }
