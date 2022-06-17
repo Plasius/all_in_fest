@@ -13,12 +13,12 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   @override
   DateTime selectedDate = DateTime.now();
-  var photoURL = "lib/assets/images/mr_radev.jpeg";
+  var photoURL;
 
+  @override
   void initState() {
-    super.initState();
-
     loadImage();
+    super.initState();
   }
 
   Widget build(BuildContext context) {
@@ -57,8 +57,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 130,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            image: DecorationImage(
-                                image: AssetImage(photoURL), fit: BoxFit.cover),
+                            image:
+                                DecorationImage(image: NetworkImage(photoURL)),
                             boxShadow: [
                               BoxShadow(
                                   spreadRadius: 2,
@@ -177,8 +177,12 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void loadImage() async {
-    final ref = FirebaseStorage.instance.ref().child("testimage.png");
-    final photoURL2 = await ref.getDownloadURL();
+    final storageRef =
+        FirebaseStorage.instanceFor(bucket: "gs://festival-2e218.appspot.com")
+            .ref();
+    final pathReference = storageRef.child('testimage.png');
+
+    photoURL = await pathReference.getDownloadURL();
     build(context);
   }
 }
