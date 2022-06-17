@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:date_field/date_field.dart';
 
-
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -17,21 +16,19 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-        leading: const Icon(
-          Icons.menu,
-          color: Colors.white,
-        ),
-        title: const Image(
-          image: const AssetImage("lib/assets/images/logo.png"),
-          height: 50,
-          fit: BoxFit.contain,
-        ),
-      ),
-      body:
-        editBody()
-    ));
+            appBar: AppBar(
+              backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+              leading: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+              title: const Image(
+                image: const AssetImage("lib/assets/images/logo.png"),
+                height: 50,
+                fit: BoxFit.contain,
+              ),
+            ),
+            body: editBody()));
   }
 
   Widget editBody() {
@@ -45,21 +42,25 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Center(
                 child: Stack(
                   children: [
-                    Container(
-                      width: 130,
-                      height: 130,
-                      decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: AssetImage("lib/assets/images/mr_radev.jpeg"),
-                              fit: BoxFit.cover),
-                          boxShadow: [
-                            BoxShadow(
-                                spreadRadius: 2,
-                                blurRadius: 5,
-                                offset: Offset(0, 3),
-                                color: Colors.grey.withOpacity(0.3))
-                          ]),
+                    GestureDetector(
+                      onTap: () => {uploadPhoto()},
+                      child: Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                                image: AssetImage(
+                                    "lib/assets/images/mr_radev.jpeg"),
+                                fit: BoxFit.cover),
+                            boxShadow: [
+                              BoxShadow(
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                  color: Colors.grey.withOpacity(0.3))
+                            ]),
+                      ),
                     ),
                     Positioned(
                       child: Container(
@@ -79,11 +80,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-
             SizedBox(
               height: 20,
             ),
-
             TextField(
               decoration: InputDecoration(
                   labelText: 'Név',
@@ -99,11 +98,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
             ),
-
             SizedBox(
               height: 15,
             ),
-
             DateTimeField(
               onDateSelected: (DateTime value) => setState(() {
                 selectedDate = value;
@@ -126,11 +123,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontSize: 14,
                       fontWeight: FontWeight.bold)),
             ),
-
             SizedBox(
               height: 15,
             ),
-            
             TextField(
               decoration: InputDecoration(
                   labelText: 'Bio',
@@ -149,7 +144,6 @@ class _ProfilePageState extends State<ProfilePage> {
               maxLength: 500,
               maxLines: 10,
             ),
-
             SizedBox(
               height: 15,
             ),
@@ -172,4 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  uploadPhoto() {
+    //logic to select photo and upload to firestorage
+  }
 }
