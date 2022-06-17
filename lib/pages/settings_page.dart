@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:date_field/date_field.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 
 class SettingsPage extends StatefulWidget {
@@ -15,11 +13,6 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   DateTime selectedDate = DateTime.now();
-
-  var email_1 = new TextEditingController();
-  var email_2 = new TextEditingController();
-  var password_1 = new TextEditingController();
-  var password_2 = new TextEditingController();
 
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -35,14 +28,6 @@ class _SettingsPageState extends State<SettingsPage> {
           height: 50,
           fit: BoxFit.contain,
         ),
-        actions: [
-          IconButton(onPressed: null, icon: 
-            Icon(
-              Icons.save,
-              color: Colors.white,
-            ),
-          )
-        ],
       ),
       body:
         editBody()
@@ -56,14 +41,11 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Column(
           children: [
 
-
-
             SizedBox(
               height: 20,
             ),
 
-            TextFormField(
-              controller: email_1,
+            TextField(
               decoration: InputDecoration(
                   labelText: 'E-mail',
                   labelStyle: TextStyle(
@@ -80,41 +62,10 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
 
             SizedBox(
-              height: 20,
-            ),
-
-            TextFormField(
-              controller: email_2,
-              decoration: InputDecoration(
-                  labelText: 'E-mail újra',
-                  labelStyle: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'radev.anthony@uni-corvinus.hu',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-
-            SizedBox(
               height: 15,
             ),
 
-            ElevatedButton(
-              child: Text('Frissítés'),
-              onPressed: () => emailCsere(),
-            ),
-
-            SizedBox(
-              height: 15,
-            ),
-
-            TextFormField(
-              controller: password_1,
+            TextField(
               decoration: InputDecoration(
                   labelText: 'Jelszó',
                   labelStyle: TextStyle(
@@ -134,8 +85,7 @@ class _SettingsPageState extends State<SettingsPage> {
               height: 15,
             ),
 
-            TextFormField(
-              controller: password_2,
+            TextField(
               decoration: InputDecoration(
                   labelText: 'Jelszó újra',
                   labelStyle: TextStyle(
@@ -155,9 +105,9 @@ class _SettingsPageState extends State<SettingsPage> {
               height: 15,
             ),
 
-            ElevatedButton(
+            const ElevatedButton(
               child: Text('Frissítés'),
-              onPressed: () => jelszoCsere(),
+              onPressed: null,
             )
 
           ],
@@ -165,40 +115,5 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
     );
   }
-
-  void emailCsere() {
-    if(email_1.text == email_2.text && email_1.text != '')
-    {
-
-        User? firebaseUser = FirebaseAuth.instance.currentUser;
-        firebaseUser
-            ?.updateEmail(email_1.text)
-            .then(((value) =>
-              Fluttertoast.showToast(msg: "Sikeres módosítás")
-              )
-            )
-            .catchError(((value) =>
-              Fluttertoast.showToast(msg: "Sikertelen módosítás")
-              ));
-      
-    }
-  }
-
-  void jelszoCsere() {
-    if(password_1.text == password_2.text && password_1.text != '')
-    {
-        User? firebaseUser = FirebaseAuth.instance.currentUser;
-        firebaseUser
-            ?.updatePassword(password_1.text)
-            .then(((value) =>
-              Fluttertoast.showToast(msg: "Sikeres módosítás")
-              )
-            )
-            .catchError(((value) =>
-              Fluttertoast.showToast(msg: "Sikertelen módosítás")
-              )); 
-    }
-  }
-
 
 }
