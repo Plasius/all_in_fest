@@ -42,6 +42,15 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 50,
                 fit: BoxFit.contain,
               ),
+              actions: [
+                IconButton(
+                  onPressed: ((() => saveProfile())),
+                  icon: Icon(
+                    Icons.save,
+                    color: Colors.white,
+                  ),
+                )
+              ],
             ),
             body: editBody(context)));
   }
@@ -58,40 +67,41 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () => _showPicker(context),
                 child: Center(
                   child: Stack(
-                      children: [
-                        Container(
-                          width: 130,
-                          height: 130,
+                    children: [
+                      Container(
+                        width: 130,
+                        height: 130,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image:
+                                DecorationImage(image: NetworkImage(photoURL)),
+                            boxShadow: [
+                              BoxShadow(
+                                  spreadRadius: 2,
+                                  blurRadius: 5,
+                                  offset: Offset(0, 3),
+                                  color: Colors.grey.withOpacity(0.3))
+                            ]),
+                      ),
+                      Positioned(
+                        child: Container(
+                          height: 40,
+                          width: 40,
                           decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(image: NetworkImage(photoURL)),
-                              boxShadow: [
-                                BoxShadow(
-                                    spreadRadius: 2,
-                                    blurRadius: 5,
-                                    offset: Offset(0, 3),
-                                    color: Colors.grey.withOpacity(0.3))
-                              ]),
-                        ),
-                        Positioned(
-                          child: Container(
-                            height: 40,
-                            width: 40,
-                            decoration: BoxDecoration(
-                                color: Colors.redAccent, shape: BoxShape.circle),
-                            child: Icon(
-                              MdiIcons.cameraPlus,
-                              color: Colors.white,
-                            ),
+                              color: Colors.redAccent, shape: BoxShape.circle),
+                          child: Icon(
+                            MdiIcons.cameraPlus,
+                            color: Colors.white,
                           ),
-                          bottom: 0,
-                          right: 0,
-                        )
-                      ],
-                    ),
+                        ),
+                        bottom: 0,
+                        right: 0,
+                      )
+                    ],
                   ),
+                ),
               ),
-              ),
+            ),
             SizedBox(
               height: 20,
             ),
@@ -109,31 +119,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       fontWeight: FontWeight.normal),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            DateTimeField(
-              onDateSelected: (DateTime value) => setState(() {
-                selectedDate = value;
-              }),
-              selectedDate: selectedDate,
-              mode: DateTimeFieldPickerMode.date,
-              firstDate: DateTime(1922, 1),
-              lastDate: DateTime.now(),
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  ),
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  labelText: 'Születési Dátum',
-                  labelStyle: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold)),
             ),
             SizedBox(
               height: 15,
@@ -256,4 +241,6 @@ class _ProfilePageState extends State<ProfilePage> {
           );
         });
   }
+
+  void saveProfile() {}
 }
