@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'matches_page.dart';
 
@@ -99,5 +100,12 @@ class _RegisterPageState extends State<RegisterPage> {
       'photo': "",
       'since': DateTime.now().millisecondsSinceEpoch
     });
+
+    final prefs = await SharedPreferences.getInstance();
+
+    final int? counter = prefs.getInt('counter');
+    if (counter == null) {
+      await prefs.setInt('counter', 0);
+    }
   }
 }
