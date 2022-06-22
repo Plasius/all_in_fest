@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -11,11 +12,12 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  String email = "";
+  String password = "";
+  String name = "";
+
   @override
   Widget build(BuildContext context) {
-    String email = "";
-    String password = "";
-
     return MaterialApp(
       title: 'Register',
       home: Scaffold(
@@ -33,6 +35,10 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
         body: Center(
           child: Column(children: [
+            const Text("Name"),
+            TextFormField(onChanged: (value) {
+              name = value;
+            }),
             const Text("E-mail"),
             TextFormField(onChanged: (value) {
               email = value;
@@ -43,9 +49,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 password = value;
               },
             ),
-            const ElevatedButton(
-              child: Text('Submit'),
-              onPressed: null,
+            ElevatedButton(
+              child: const Text('Submit'),
+              onPressed: () => signInUsingEmailPassword(
+                  name: name,
+                  email: email,
+                  password: password,
+                  context: context),
             ),
           ]),
         ),
@@ -53,20 +63,22 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   void signInUsingEmailPassword({
+    required String name,
     required String email,
     required String password,
     required BuildContext context,
   }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-
     try {
-      await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const MatchesPage()));
+      await auth
+          .createUserWithEmailAndPassword(
+            email: email,
+            password: password,
+          )
+          .then((value) => {createFirestoreProfile()});
+      Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -74,5 +86,18 @@ class _RegisterPageState extends State<RegisterPage> {
         print('Wrong password provided.');
       }
     }
+  }
+
+  void createFirestoreProfile() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    await firebaseFirestore
+        .collection('users')
+        .doc(auth.currentUser?.uid.toString())
+        .set({
+      'name': name,
+      'bio': "",
+      'photo': "",
+      'since': DateTime.now().millisecondsSinceEpoch
+    });
   }
 }
