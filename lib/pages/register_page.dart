@@ -93,7 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     await firebaseFirestore
         .collection('users')
-        .doc(auth.currentUser?.uid.toString())
+        .doc(auth.currentUser!.uid.toString())
         .set({
       'name': name,
       'bio': "",

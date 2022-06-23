@@ -174,9 +174,13 @@ class _ProfilePageState extends State<ProfilePage> {
     final storageRef =
         FirebaseStorage.instanceFor(bucket: "gs://festival-2e218.appspot.com")
             .ref();
-    final pathReference = storageRef.child('testimage.png');
+    try {
+      final pathReference = storageRef
+          .child(FirebaseAuth.instance.currentUser!.uid.toString() + '.png');
 
-    photoURL = await pathReference.getDownloadURL();
+      photoURL = await pathReference.getDownloadURL();
+    } catch (e) {}
+
     setState(() {});
   }
 
@@ -208,12 +212,24 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future uploadFile() async {
     if (_photo == null) return;
-    final fileName = basename(_photo!.path);
-    final destination = 'files/$fileName';
+
+    var fileName = "";
+
+    if (FirebaseAuth.instance.currentUser?.uid.toString() != null)
+      fileName = FirebaseAuth.instance.currentUser!.uid.toString() + '.png';
+    else
+      var fileName = "";
+
+    final destination = fileName;
 
     try {
-      final ref = FirebaseStorage.instance.ref(destination).child('file/');
+      final ref = FirebaseStorage.instance.ref(destination);
       await ref.putFile(_photo!);
+
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid.toString())
+          .set({'photo': fileName});
     } catch (e) {
       print('error occured');
     }

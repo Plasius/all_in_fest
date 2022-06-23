@@ -40,7 +40,7 @@ class _SwipePageState extends State<SwipePage> {
 
     for (int i = 0; i < _profiles.length; i++) {
       _swipeItems.add(SwipeItem(
-          content: NetworkImage(_profiles[i]['photo']),
+          content: Text(_profiles[i]['photo']),
           likeAction: () => messageOptions(),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
@@ -104,10 +104,7 @@ class _SwipePageState extends State<SwipePage> {
           matchEngine: _matchEngine!,
           itemBuilder: (BuildContext context, int index) {
             return Center(
-              child: Container(
-                  decoration: BoxDecoration(
-                      image:
-                          DecorationImage(image: _swipeItems[index].content))),
+              child: Container(child: _swipeItems[index].content),
             );
           },
           onStackFinished: () => showHornyGif(),
