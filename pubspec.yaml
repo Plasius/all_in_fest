@@ -83,6 +83,7 @@ flutter:
     - lib/assets/images/angry-annoyed.gif
     - lib/assets/images/terkep.png
     - lib/assets/images/mr_radev.jpeg
+    - lib/assets/images/login_background.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
