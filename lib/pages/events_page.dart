@@ -39,10 +39,9 @@ class _EventsPageState extends State<EventsPage> {
           ),
           IconButton(
             icon: Icon(Icons.favorite_sharp),
-            color: Colors.white, onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => const FavoritePage())),
+            color: Colors.white,
+            onPressed: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const FavoritePage())),
           ),
           Icon(
             Icons.filter_alt_outlined,
@@ -56,113 +55,7 @@ class _EventsPageState extends State<EventsPage> {
             image: DecorationImage(
                 image: AssetImage("lib/assets/images/background.png"),
                 fit: BoxFit.cover)),
-        child: Stack(children: [StreamBuilder(
-              stream: FirebaseFirestore.instance.collection('events').snapshots(),
-              builder:
-                  (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return ListView(
-                    children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                      return Center(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(
-                                1,
-                                (index) => Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20, right: 20, top: 20),
-                                      child: Column(
-                                        children: [
-                                          GestureDetector(
-                                            child: Container(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 10,
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .height /
-                                                              12,
-                                                      decoration: BoxDecoration(
-                                                          color: Color.fromRGBO(
-                                                              254, 192, 1, 1)),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              15.0),
-                                                      child: Column(
-                                                        children: [
-                                                          Text(
-                                                            "Esemény neve",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
-                                                          ),
-                                                          Text(
-                                                            "színpad",
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      children: [
-                                                        Text(
-                                                          "9:50-11:20",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                        IconButton(
-                                                          icon: Icon(Icons.favorite_border_sharp),
-                                                          color: Colors.white, onPressed: () {
-                                                            favoriteEvent.add(document);
-                                                        },
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    image: DecorationImage(
-                                                        image: AssetImage(
-                                                            "lib/assets/images/event_container.png"),
-                                                        fit: BoxFit.contain))),
-                                            onTap: () => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailPage())),
-                                          ),
-                                        ],
-                                      ),
-                                    )),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-              },
-            ),
+        child: Column(children: [
           Container(
               height: MediaQuery.of(context).size.height / 8,
               decoration: BoxDecoration(
@@ -257,6 +150,120 @@ class _EventsPageState extends State<EventsPage> {
                   )
                 ],
               )),
+          Expanded(
+            child: StreamBuilder(
+              stream:
+                  FirebaseFirestore.instance.collection('events').snapshots(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (!snapshot.hasData) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                } else {
+                  return ListView(
+                    children:
+                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                      return Center(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: List.generate(
+                                1,
+                                (index) => Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 20, right: 20, top: 20),
+                                      child: Column(
+                                        children: [
+                                          GestureDetector(
+                                            child: Container(
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  children: [
+                                                    Container(
+                                                      width: 10,
+                                                      height:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height /
+                                                              12,
+                                                      decoration: BoxDecoration(
+                                                          color: Color.fromRGBO(
+                                                              254, 192, 1, 1)),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              15.0),
+                                                      child: Column(
+                                                        children: [
+                                                          Text(
+                                                            "Esemény neve",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold),
+                                                          ),
+                                                          Text(
+                                                            "színpad",
+                                                            style: TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .normal),
+                                                          )
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        Text(
+                                                          "9:50-11:20",
+                                                          style: TextStyle(
+                                                              color:
+                                                                  Colors.white),
+                                                        ),
+                                                        IconButton(
+                                                          icon: Icon(Icons
+                                                              .favorite_border_sharp),
+                                                          color: Colors.white,
+                                                          onPressed: () {
+                                                            favoriteEvent
+                                                                .add(document);
+                                                          },
+                                                        )
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    image: DecorationImage(
+                                                        image: AssetImage(
+                                                            "lib/assets/images/event_container.png"),
+                                                        fit: BoxFit.contain))),
+                                            onTap: () => Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        DetailPage())),
+                                          ),
+                                        ],
+                                      ),
+                                    )),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+              },
+            ),
+          ),
         ]),
       ),
     );
