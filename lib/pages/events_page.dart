@@ -1,6 +1,7 @@
 import 'package:all_in_fest/models/event_model.dart';
 import 'package:all_in_fest/pages/event_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -53,7 +54,8 @@ class _EventsPageState extends State<EventsPage> {
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage("lib/assets/images/background.png"),
+                image: AssetImage(
+                    "/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/background.png"),
                 fit: BoxFit.cover)),
         child: Column(children: [
           Container(
@@ -175,83 +177,90 @@ class _EventsPageState extends State<EventsPage> {
                                       child: Column(
                                         children: [
                                           GestureDetector(
-                                            child: Container(
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children: [
-                                                    Container(
-                                                      width: 10,
-                                                      height:
-                                                          MediaQuery.of(context)
-                                                                  .size
-                                                                  .height /
-                                                              12,
-                                                      decoration: BoxDecoration(
-                                                          color: Color.fromRGBO(
-                                                              254, 192, 1, 1)),
-                                                    ),
-                                                    Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              15.0),
-                                                      child: Column(
+                                              child: Container(
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Container(
+                                                        width: 10,
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height /
+                                                            12,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                                color: Color
+                                                                    .fromRGBO(
+                                                                        254,
+                                                                        192,
+                                                                        1,
+                                                                        1)),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(15.0),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              "Esemény neve",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold),
+                                                            ),
+                                                            Text(
+                                                              "színpad",
+                                                              style: TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .normal),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .end,
                                                         children: [
                                                           Text(
-                                                            "Esemény neve",
+                                                            "9:50-11:20",
                                                             style: TextStyle(
                                                                 color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold),
+                                                                    .white),
                                                           ),
-                                                          Text(
-                                                            "színpad",
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .normal),
+                                                          IconButton(
+                                                            icon: Icon(Icons
+                                                                .favorite_border_sharp),
+                                                            color: Colors.white,
+                                                            onPressed: () {
+                                                              favoriteEvent.add(
+                                                                  document);
+                                                            },
                                                           )
                                                         ],
-                                                      ),
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment.end,
-                                                      children: [
-                                                        Text(
-                                                          "9:50-11:20",
-                                                          style: TextStyle(
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                        IconButton(
-                                                          icon: Icon(Icons
-                                                              .favorite_border_sharp),
-                                                          color: Colors.white,
-                                                          onPressed: () {
-                                                            favoriteEvent
-                                                                .add(document);
-                                                          },
-                                                        )
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                                decoration: BoxDecoration(
-                                                    image: DecorationImage(
-                                                        image: AssetImage(
-                                                            "lib/assets/images/event_container.png"),
-                                                        fit: BoxFit.contain))),
-                                            onTap: () => Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        DetailPage())),
-                                          ),
+                                                      )
+                                                    ],
+                                                  ),
+                                                  decoration: BoxDecoration(
+                                                      image: DecorationImage(
+                                                          image: AssetImage(
+                                                              "lib/assets/images/event_container.png"),
+                                                          fit:
+                                                              BoxFit.contain))),
+                                              onTap: () =>
+                                                  showCupertinoModalPopup(
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          eventDetails(),
+                                                      context: context)),
                                         ],
                                       ),
                                     )),
@@ -265,6 +274,16 @@ class _EventsPageState extends State<EventsPage> {
             ),
           ),
         ]),
+      ),
+    );
+  }
+
+  Widget eventDetails() {
+    return CupertinoPopupSurface(
+      isSurfacePainted: true,
+      child: Container(
+        height: MediaQuery.of(context).size.height * 0.75,
+        decoration: BoxDecoration(color: Colors.white),
       ),
     );
   }

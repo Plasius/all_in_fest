@@ -46,189 +46,197 @@ class _FavoritePageState extends State<FavoritePage> {
         ],
       ),
       body: Container(
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
-            image: DecorationImage(
-                image: AssetImage("lib/assets/images/background.png"),
-                fit: BoxFit.cover)),
-        child: Column(children: [
-          Container(
-              height: MediaQuery.of(context).size.height / 8,
-              decoration: BoxDecoration(
-                color: Color.fromRGBO(232, 107, 62, 1),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "csütörtök",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "25",
-                            style: TextStyle(color: Colors.black),
-                          ),
+          constraints: BoxConstraints.expand(),
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage(
+                      "/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/background.png"),
+                  fit: BoxFit.cover)),
+          child: Column(children: [
+            Container(
+                height: MediaQuery.of(context).size.height / 8,
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(232, 107, 62, 1),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "csütörtök",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "péntek",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "26",
-                            style: TextStyle(color: Colors.black),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "25",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "péntek",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "szombat",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "27",
-                            style: TextStyle(color: Colors.black),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "26",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "szombat",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "vasárnap",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "28",
-                            style: TextStyle(color: Colors.black),
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "27",
+                              style: TextStyle(color: Colors.black),
+                            ),
                           ),
+                        )
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "vasárnap",
+                          style: TextStyle(color: Colors.white),
                         ),
-                      )
-                    ],
-                  )
-                ],
-              )),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: List.generate(
-                    favoriteEvent.events.length,
-                    (index) => Padding(
-                          padding:
-                              const EdgeInsets.only(left: 20, right: 20, top: 20),
-                          child: Column(
-                            children: [
-                              GestureDetector(
-                                child: Container(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          width: 10,
-                                          height:
-                                              MediaQuery.of(context).size.height /
-                                                  12,
-                                          decoration: BoxDecoration(
-                                              color:
-                                                  Color.fromRGBO(254, 192, 1, 1)),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.all(15.0),
-                                          child: Column(
+                        Container(
+                          decoration: BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "28",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                  ],
+                )),
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                      favoriteEvent.events.length,
+                      (index) => Padding(
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 20, top: 20),
+                            child: Column(
+                              children: [
+                                GestureDetector(
+                                  child: Container(
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                            width: 10,
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height /
+                                                12,
+                                            decoration: BoxDecoration(
+                                                color: Color.fromRGBO(
+                                                    254, 192, 1, 1)),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(15.0),
+                                            child: Column(
+                                              children: [
+                                                Text(
+                                                  favoriteEvent.events[index]
+                                                      ['name'],
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  //favoriteEvent.events[index]['place'],
+                                                  "place",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
                                               Text(
-                                                favoriteEvent.events[index]['name'],
+                                                //favoriteEvent.events[index]['date'].toString(),
+                                                "date",
                                                 style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.bold),
+                                                    color: Colors.white),
                                               ),
-                                              Text(
-                                                //favoriteEvent.events[index]['place'],
-                                                "place",
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontWeight: FontWeight.normal),
+                                              IconButton(
+                                                icon: Icon(Icons
+                                                    .favorite_border_sharp),
+                                                color: Colors.white,
+                                                onPressed: () {
+                                                  favoriteEvent.remove(
+                                                      favoriteEvent
+                                                          .events[index]);
+                                                },
                                               )
                                             ],
-                                          ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                              //favoriteEvent.events[index]['date'].toString(),
-                                              "date",
-                                              style: TextStyle(color: Colors.white),
-                                            ),
-                                            IconButton(
-                                              icon:
-                                                  Icon(Icons.favorite_border_sharp),
-                                              color: Colors.white,
-                                              onPressed: () {
-                                                favoriteEvent.remove(
-                                                    favoriteEvent.events[index]);
-                                              },
-                                            )
-                                          ],
-                                        )
-                                      ],
-                                    ),
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                            image: AssetImage(
-                                                "lib/assets/images/event_container.png"),
-                                            fit: BoxFit.contain))),
-                                onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => DetailPage())),
-                              ),
-                            ],
-                          ),
-                        )),
+                                          )
+                                        ],
+                                      ),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  "lib/assets/images/event_container.png"),
+                                              fit: BoxFit.contain))),
+                                  onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => DetailPage())),
+                                ),
+                              ],
+                            ),
+                          )),
+                ),
               ),
             ),
-          ),
-        ])),
-      
+          ])),
     );
   }
 }
