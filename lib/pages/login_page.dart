@@ -11,6 +11,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  bool _showPassword = false;
+  void _togglevisibility() {
+    setState(() {
+      _showPassword = !_showPassword;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     String email = "";
@@ -23,7 +30,8 @@ class _LoginPageState extends State<LoginPage> {
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage("lib/assets/images/login_background.png"),
+                  image: AssetImage(
+                      '/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/login_background.png'),
                   fit: BoxFit.cover)),
           child: Center(
             child: Padding(
@@ -40,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 10, top: 24),
+                        padding: const EdgeInsets.only(top: 24, bottom: 10),
                         child: Center(
                           child: const Text(
                             "Login",
@@ -51,36 +59,101 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ),
-                      const Text("E-mail"),
-                      TextFormField(
-                        onChanged: (value) {
-                          email = value;
-                        },
-                        decoration: InputDecoration(
-                            fillColor: Color.fromRGBO(255, 255, 255, 0.4),
-                            border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 3))),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16.0, bottom: 10),
+                        child: const Text(
+                          "E-mail",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 23,
+                              fontWeight: FontWeight.normal),
+                        ),
                       ),
-                      const Text("Password"),
-                      TextFormField(
-                        onChanged: (value) {
-                          password = value;
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 16, bottom: 32),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(255, 255, 255, 0.4),
+                              border: Border.all(color: Colors.white, width: 3),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                            onChanged: (value) => email = value,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              prefixIcon: Icon(
+                                Icons.mail_outlined,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      ElevatedButton(
-                        child: const Text('Submit'),
-                        onPressed: () {
-                          try {
-                            signInUsingEmailPassword(
-                                email: email,
-                                password: password,
-                                context: context);
-                          } catch (e) {
-                            print("whoops");
-                          }
-                        },
+                      Padding(
+                        padding: EdgeInsets.only(left: 16, bottom: 10),
+                        child: const Text(
+                          "Password",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 23,
+                              fontWeight: FontWeight.normal),
+                        ),
                       ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 16, bottom: 48),
+                        child: Container(
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(255, 255, 255, 0.4),
+                              border: Border.all(color: Colors.white, width: 3),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: TextFormField(
+                              onChanged: (value) => password = value,
+                              obscureText: _showPassword ? false : true,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                prefixIcon: Icon(
+                                  Icons.lock_outline,
+                                  color: Colors.white,
+                                ),
+                                suffixIcon: GestureDetector(
+                                  onTap: () {
+                                    _togglevisibility();
+                                  },
+                                  child: Icon(
+                                    _showPassword
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )),
+                        ),
+                      ),
+                      Center(
+                        child: GestureDetector(
+                          onTap: () => signInUsingEmailPassword(
+                              context: context,
+                              email: email,
+                              password: password),
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Color.fromRGBO(254, 192, 1, 1),
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0, horizontal: 48),
+                              child: const Text(
+                                "Login",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 34),
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
                     ]),
               ),
             ),
