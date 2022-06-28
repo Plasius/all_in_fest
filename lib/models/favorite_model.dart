@@ -7,20 +7,29 @@ import 'package:flutter/material.dart';
 class FavoriteModel extends ChangeNotifier {
   final List<DocumentSnapshot> _events = [];
 
-  UnmodifiableListView<DocumentSnapshot> get events => UnmodifiableListView(_events);
+  UnmodifiableListView<DocumentSnapshot> get events =>
+      UnmodifiableListView(_events);
 
-  void add(DocumentSnapshot event){
+  void add(DocumentSnapshot event) {
     _events.add(event);
     notifyListeners();
   }
 
-  void remove(DocumentSnapshot event){
+  void remove(DocumentSnapshot event) {
     _events.remove(event);
     notifyListeners();
   }
 
-  void clear(){
+  void clear() {
     _events.clear();
     notifyListeners();
+  }
+
+  bool isFavoriteEvent(DocumentSnapshot event) {
+    if (_events.contains(event) == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

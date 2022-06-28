@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:all_in_fest/models/event_model.dart';
 import 'package:all_in_fest/pages/event_details.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,6 +20,12 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   Stream eventsStream =
       FirebaseFirestore.instance.collection('events').snapshots();
+
+  bool _isFavorite = false;
+  void _toggleIconColor() {
+    _isFavorite = !_isFavorite;
+  }
+
   @override
   Widget build(BuildContext context) {
     var favoriteEvent = context.watch<FavoriteModel>();
@@ -257,10 +265,12 @@ class _EventsPageState extends State<EventsPage> {
                                                               BoxFit.contain))),
                                               onTap: () =>
                                                   showCupertinoModalPopup(
+                                                      context: context,
                                                       builder: (BuildContext
                                                               context) =>
-                                                          eventDetails(),
-                                                      context: context)),
+                                                          eventDetails(
+                                                              favoriteEvent,
+                                                              document))),
                                         ],
                                       ),
                                     )),
@@ -278,13 +288,88 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget eventDetails() {
+  Widget eventDetails(var favorite, DocumentSnapshot document) {
+    favorite = context.watch<FavoriteModel>();
     return CupertinoPopupSurface(
-      isSurfacePainted: true,
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.75,
-        decoration: BoxDecoration(color: Colors.white),
-      ),
-    );
+        isSurfacePainted: true,
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.74,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(232, 107, 62, 1),
+                Color.fromRGBO(97, 42, 122, 1)
+              ],
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: const Text(
+                          "Fellépő neve",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10, left: 15),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Nap",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.5,
+                                    fontWeight: FontWeight.normal),
+                              ),
+                              SizedBox(width: 20),
+                              const Text(
+                                "9:50-11:20",
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.5,
+                                    fontWeight: FontWeight.normal),
+                              )
+                            ]),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 20, left: 15),
+                        child: const Text(
+                          "Helyszín",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.normal,
+                              fontSize: 16.5),
+                        ),
+                      )
+                    ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 35.0),
+                    child: GestureDetector(
+                        child: Icon(
+                          _isFavorite == true
+                              ? CupertinoIcons.heart_fill
+                              : CupertinoIcons.heart,
+                          color: Colors.white,
+                          size: 40,
+                        ),
+                        onTap: () => _toggleIconColor()),
+                  )
+                ],
+              ),
+            ],
+          ),
+        ));
   }
 }
