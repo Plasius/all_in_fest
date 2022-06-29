@@ -49,8 +49,7 @@ class _FavoritePageState extends State<FavoritePage> {
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage(
-                      "/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/background.png"),
+                  image: AssetImage("lib/assets/background.png"),
                   fit: BoxFit.cover)),
           child: Column(children: [
             Container(

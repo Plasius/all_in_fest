@@ -31,8 +31,7 @@ class _LoginPageState extends State<LoginPage> {
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
               image: DecorationImage(
-                  image: AssetImage(
-                      '/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/login_background.png'),
+                  image: AssetImage("lib/assets/LOGIN.png"),
                   fit: BoxFit.cover)),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
