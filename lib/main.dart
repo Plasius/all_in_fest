@@ -89,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
             color: Colors.white,
           ),
           title: const Image(
-            image: AssetImage("lib/assets/images/logo.png"),
+            image: AssetImage("lib/assets/logo.png"),
             height: 50,
             fit: BoxFit.contain,
           ),

@@ -17,14 +17,11 @@ class _EventsPageState extends State<EventsPage> {
   Stream eventsStream =
       FirebaseFirestore.instance.collection('events').snapshots();
 
-  bool _isFavorite = false;
-  void _toggleIconColor() {
-    _isFavorite = !_isFavorite;
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    var favoriteEvent = context.watch<FavoriteModel>();
+    var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(232, 107, 62, 1),
@@ -33,7 +30,7 @@ class _EventsPageState extends State<EventsPage> {
           color: Colors.white,
         ),
         title: Image(
-          image: AssetImage("lib/assets/images/logo.png"),
+          image: AssetImage("lib/assets/logo.png"),
           height: 50,
           fit: BoxFit.contain,
         ),
@@ -58,8 +55,7 @@ class _EventsPageState extends State<EventsPage> {
         constraints: BoxConstraints.expand(),
         decoration: BoxDecoration(
             image: DecorationImage(
-                image: AssetImage(
-                    "/Users/dezsenyigyorgy/Documents/GitHub/all_in_fest/lib/assets/background.png"),
+                image: AssetImage("lib/assets/background.png"),
                 fit: BoxFit.cover)),
         child: Column(children: [
           Container(
@@ -256,7 +252,7 @@ class _EventsPageState extends State<EventsPage> {
                                                   decoration: BoxDecoration(
                                                       image: DecorationImage(
                                                           image: AssetImage(
-                                                              "lib/assets/images/event_container.png"),
+                                                              "lib/assets/event_container.png"),
                                                           fit:
                                                               BoxFit.contain))),
                                               onTap: () =>
@@ -346,21 +342,12 @@ class _EventsPageState extends State<EventsPage> {
                                                                                 const EdgeInsets.only(right: 35.0),
                                                                             child: Consumer<FavoriteModel>(builder: (context, favoriteEvent, child) {
                                                                               return GestureDetector(
-                                                                                  child:
-                                                                                      Icon(
-                                                                                    favoriteEvent.isFavoriteEvent == true ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
+                                                                                  child: Icon(
+                                                                                    favoriteEvent.checkFavorite(document) == true ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
                                                                                     color: Colors.white,
                                                                                     size: 40,
                                                                                   ),
-                                                                                  onTap: () => favoriteEvent.isFavoriteEvent == true
-                                                                                      ? {
-                                                                                          favoriteEvent.remove(document),
-                                                                                          favoriteEvent.changeFavorite(document)
-                                                                                        }
-                                                                                      : {
-                                                                                          favoriteEvent.add(document),
-                                                                                          favoriteEvent.changeFavorite(document)
-                                                                                        });
+                                                                                  onTap: () => favoriteEvent.checkFavorite(document) == true ? favoriteEvent.remove(document) : favoriteEvent.add(document));
                                                                             }))
                                                                       ],
                                                                     ),
@@ -384,7 +371,7 @@ class _EventsPageState extends State<EventsPage> {
     );
   }
 
-  Widget eventDetails(var favorite, DocumentSnapshot document) {
+  /*Widget eventDetails(var favorite, DocumentSnapshot document) {
     favorite = context.watch<FavoriteModel>();
     return CupertinoPopupSurface(
         isSurfacePainted: true,
@@ -467,5 +454,5 @@ class _EventsPageState extends State<EventsPage> {
             ],
           ),
         ));
-  }
+  }*/
 }

@@ -24,7 +24,7 @@ class _FavoritePageState extends State<FavoritePage> {
           color: Colors.white,
         ),
         title: Image(
-          image: AssetImage("lib/assets/images/logo.png"),
+          image: AssetImage("lib/assets/logo.png"),
           height: 50,
           fit: BoxFit.contain,
         ),
@@ -222,7 +222,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                       decoration: BoxDecoration(
                                           image: DecorationImage(
                                               image: AssetImage(
-                                                  "lib/assets/images/event_container.png"),
+                                                  "lib/assets/event_container.png"),
                                               fit: BoxFit.contain))),
                                   onTap: () => Navigator.push(
                                       context,

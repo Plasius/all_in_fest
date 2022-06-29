@@ -5,18 +5,19 @@ import 'package:flutter/material.dart';
 
 class FavoriteModel extends ChangeNotifier {
   final List<DocumentSnapshot> _events = [];
-  bool? isFavoriteEvent;
 
   UnmodifiableListView<DocumentSnapshot> get events =>
       UnmodifiableListView(_events);
 
   void add(DocumentSnapshot event) {
     _events.add(event);
+    checkFavorite(event);
     notifyListeners();
   }
 
   void remove(DocumentSnapshot event) {
     _events.remove(event);
+    checkFavorite(event);
     notifyListeners();
   }
 
@@ -25,7 +26,11 @@ class FavoriteModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void changeFavorite(DocumentSnapshot event) {
-    _events.contains(event) ? isFavoriteEvent = true : isFavoriteEvent = false;
+  bool? checkFavorite(DocumentSnapshot event){
+    if(events.contains(event)){
+      return true;
+    } else{
+      return false;
+    }
   }
 }
