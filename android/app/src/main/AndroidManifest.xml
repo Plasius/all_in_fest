@@ -3,7 +3,7 @@
    <application
         android:label="all_in_fest"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/all_in_launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
