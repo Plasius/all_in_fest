@@ -40,7 +40,7 @@ class _SwipePageState extends State<SwipePage> {
 
     for (int i = 0; i < _profiles.length; i++) {
       _swipeItems.add(SwipeItem(
-          content: Text(_profiles[i]['photo']),
+          content: Image(image: NetworkImage(_profiles[i]['photo'])),
           likeAction: () => messageOptions(),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
@@ -68,7 +68,7 @@ class _SwipePageState extends State<SwipePage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/images/logo.png"),
+                image: const AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
@@ -86,7 +86,7 @@ class _SwipePageState extends State<SwipePage> {
                   color: Colors.white,
                 ),
                 title: const Image(
-                  image: const AssetImage("lib/assets/images/logo.png"),
+                  image: const AssetImage("lib/assets/logo.png"),
                   height: 50,
                   fit: BoxFit.contain,
                 ),
@@ -96,18 +96,30 @@ class _SwipePageState extends State<SwipePage> {
 
   Widget swipeBody() {
     var size = MediaQuery.of(context).size;
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: size.height,
-        child: SwipeCards(
-          matchEngine: _matchEngine!,
-          itemBuilder: (BuildContext context, int index) {
-            return Center(
-              child: Container(child: _swipeItems[index].content),
-            );
-          },
-          onStackFinished: () => showHornyGif(),
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: BoxDecoration(
+        image: DecorationImage(
+          image: AssetImage("lib/assets/LOGIN.png"),
+          fit: BoxFit.cover
+        )
+      ),
+      child: Padding(
+        padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/5, horizontal: 8.0,),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(97, 42, 122, 1)
+          ),
+          height: MediaQuery.of(context).size.height/2,
+          child: SwipeCards(
+            matchEngine: _matchEngine!,
+            itemBuilder: (BuildContext context, int index) {
+              return Center(
+                child: Container(child: _swipeItems[index].content),
+              );
+            },
+            onStackFinished: () => showHornyGif(),
+          ),
         ),
       ),
     );
