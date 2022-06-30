@@ -1,5 +1,7 @@
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
@@ -15,43 +17,52 @@ class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   List<DocumentSnapshot> _profiles = [];
+  List<String> _photoURLs = [];
+  /*Future<List<String>> _photoURLs () async {
+    List<String> urls = [];
+    return urls;
+  };*/
+  String? photoURL;
+  String userID ="";
 
   void getProfiles() async {
     //final prefs = await SharedPreferences.getInstance();
-
     //int? counter = prefs.getInt('counter');
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     await firebaseFirestore
         .collection('users')
+        //.where('name', isNotEqualTo: "Peti")
         //.orderBy('since')
         //.startAfter([counter])
         //.limit(2)
         .get()
         .then((QuerySnapshot querySnapshot) => {
-              print('running' + querySnapshot.docs[0].toString()),
-              querySnapshot.docs.forEach((doc) {
+              querySnapshot.docs.forEach((doc) async {
                 _profiles.add(doc);
+                print(doc.id);
                 print('added');
               })
             });
 
     print(_profiles.length);
+    print(_photoURLs.length);
 
     for (int i = 0; i < _profiles.length; i++) {
+      //print(photoURL);
       _swipeItems.add(SwipeItem(
-          content: Image(image: NetworkImage(_profiles[i]['photo'])),
+          content: NetworkImage(await FirebaseStorage.instanceFor(bucket: "gs://festival-2e218.appspot.com")
+              .ref().child(_profiles[i].id+'.png').getDownloadURL()),
           likeAction: () => messageOptions(),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
-
     setState(() {});
   }
 
   void initState() {
     super.initState();
-    _matchEngine = new MatchEngine(swipeItems: _swipeItems);
+    _matchEngine = MatchEngine(swipeItems: _swipeItems);
     getProfiles();
   }
 
@@ -99,23 +110,23 @@ class _SwipePageState extends State<SwipePage> {
     return Container(
       constraints: BoxConstraints.expand(),
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("lib/assets/LOGIN.png"),
-          fit: BoxFit.cover
-        )
-      ),
+          image: DecorationImage(
+              image: AssetImage("lib/assets/LOGIN.png"), fit: BoxFit.cover)),
       child: Padding(
-        padding:  EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height/5, horizontal: 8.0,),
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height / 5,
+          horizontal: 8.0,
+        ),
         child: Container(
-          decoration: BoxDecoration(
-            color: Color.fromRGBO(97, 42, 122, 1)
-          ),
-          height: MediaQuery.of(context).size.height/2,
+          decoration: BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
           child: SwipeCards(
             matchEngine: _matchEngine!,
             itemBuilder: (BuildContext context, int index) {
               return Center(
-                child: Container(child: _swipeItems[index].content),
+                child: Padding(
+                  padding: const EdgeInsets.all(48.0),
+                  child: Container(decoration: BoxDecoration(image: DecorationImage(image: _swipeItems[index].content, fit: BoxFit.cover))),
+                ),
               );
             },
             onStackFinished: () => showHornyGif(),
@@ -130,4 +141,7 @@ class _SwipePageState extends State<SwipePage> {
   void showNopeGif() {}
 
   void showHornyGif() {}
+
+
+
 }
