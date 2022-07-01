@@ -229,7 +229,7 @@ class _ProfilePageState extends State<ProfilePage> {
       FirebaseFirestore.instance
           .collection('users')
           .doc(FirebaseAuth.instance.currentUser!.uid.toString())
-          .set({'photo': fileName});
+          .update({'photo': fileName});
     } catch (e) {
       print('error occured');
     }
