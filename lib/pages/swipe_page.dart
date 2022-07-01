@@ -17,53 +17,108 @@ class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   List<SwipeItem> _swipeItems = <SwipeItem>[];
   List<DocumentSnapshot> _profiles = [];
-  List<String> _photoURLs = [];
-  /*Future<List<String>> _photoURLs () async {
-    List<String> urls = [];
-    return urls;
-  };*/
-  String? photoURL;
-  String userID ="";
+  List<DocumentSnapshot> _unneccessaryProfiles = [];
+  List<DocumentSnapshot> _matches = [];
 
   void getProfiles() async {
     //final prefs = await SharedPreferences.getInstance();
     //int? counter = prefs.getInt('counter');
-
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
     await firebaseFirestore
         .collection('users')
-        //.where('name', isNotEqualTo: "Peti")
+        .where('userID', isNotEqualTo: auth.currentUser?.uid)
         //.orderBy('since')
         //.startAfter([counter])
         //.limit(2)
         .get()
         .then((QuerySnapshot querySnapshot) => {
               querySnapshot.docs.forEach((doc) async {
-                _profiles.add(doc);
-                print(doc.id);
-                print('added');
+                doc['photo'] != ""
+                    ? _profiles.add(doc)
+                    : _unneccessaryProfiles.add(doc);
               })
             });
 
     print(_profiles.length);
-    print(_photoURLs.length);
+    print(_matches.length);
 
     for (int i = 0; i < _profiles.length; i++) {
-      //print(photoURL);
+      print(_profiles[i]['photo']);
       _swipeItems.add(SwipeItem(
-          content: NetworkImage(await FirebaseStorage.instanceFor(bucket: "gs://festival-2e218.appspot.com")
-              .ref().child(_profiles[i].id+'.png').getDownloadURL()),
-          likeAction: () => messageOptions(),
+          content: _profiles.isNotEmpty
+              ? Container(
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Text(
+                          "in/Touch",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 32, right: 32, top: 10, bottom: 10),
+                        child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 3,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        await FirebaseStorage.instanceFor(
+                                                bucket:
+                                                    "gs://festival-2e218.appspot.com")
+                                            .ref()
+                                            .child(_profiles[i].id + '.png')
+                                            .getDownloadURL()),
+                                    fit: BoxFit.cover))),
+                      ),
+                      Text(
+                        _profiles[i]['name'],
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25),
+                      )
+                    ],
+                  ))
+              : Text('No profiles found'),
+          likeAction: () => messageOptions(_profiles[i].id),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
     setState(() {});
   }
 
+  void getMatches() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    await firebaseFirestore
+        .collection('matches')
+        //.orderBy('since')
+        //.startAfter([counter])
+        //.limit(2)
+        .get()
+        .then((QuerySnapshot querySnapshot) => {
+              querySnapshot.docs.forEach((doc) async {
+                _matches.add(doc);
+              })
+            });
+    setState(() {});
+  }
+
   void initState() {
     super.initState();
     _matchEngine = MatchEngine(swipeItems: _swipeItems);
+    //getMatches();
     getProfiles();
+    //getMatches();
   }
 
   @override
@@ -117,31 +172,44 @@ class _SwipePageState extends State<SwipePage> {
           vertical: MediaQuery.of(context).size.height / 5,
           horizontal: 8.0,
         ),
-        child: Container(
-          decoration: BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
-          child: SwipeCards(
-            matchEngine: _matchEngine!,
-            itemBuilder: (BuildContext context, int index) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(48.0),
-                  child: Container(decoration: BoxDecoration(image: DecorationImage(image: _swipeItems[index].content, fit: BoxFit.cover))),
-                ),
-              );
-            },
-            onStackFinished: () => showHornyGif(),
-          ),
+        child: SwipeCards(
+          matchEngine: _matchEngine!,
+          itemBuilder: (BuildContext context, int index) {
+            return _swipeItems[index].content
+                /*Center(
+              child: Padding(
+                padding: const EdgeInsets.all(48.0),
+                child: Container(
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: _swipeItems[index].content,
+                            fit: BoxFit.cover))),
+              ),
+            )*/
+                ;
+          },
+          onStackFinished: () => showHornyGif(),
+          upSwipeAllowed: true,
         ),
       ),
     );
   }
 
-  void messageOptions() {}
+  void messageOptions(String otherUser) async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    FirebaseAuth auth = FirebaseAuth.instance;
+
+    await firebaseFirestore
+        .collection('matches')
+        .doc(auth.currentUser!.uid.toString() + otherUser)
+        .set({
+      'user1': auth.currentUser?.uid,
+      'user2': otherUser,
+      'timestamp': DateTime.now().millisecondsSinceEpoch
+    });
+  }
 
   void showNopeGif() {}
 
   void showHornyGif() {}
-
-
-
 }
