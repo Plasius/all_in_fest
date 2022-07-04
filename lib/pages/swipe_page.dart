@@ -168,28 +168,56 @@ class _SwipePageState extends State<SwipePage> {
           image: DecorationImage(
               image: AssetImage("lib/assets/LOGIN.png"), fit: BoxFit.cover)),
       child: Padding(
-        padding: EdgeInsets.symmetric(
-          vertical: MediaQuery.of(context).size.height / 5,
-          horizontal: 8.0,
-        ),
-        child: SwipeCards(
-          matchEngine: _matchEngine!,
-          itemBuilder: (BuildContext context, int index) {
-            return _swipeItems[index].content
-                /*Center(
-              child: Padding(
-                padding: const EdgeInsets.all(48.0),
-                child: Container(
-                    decoration: BoxDecoration(
-                        image: DecorationImage(
-                            image: _swipeItems[index].content,
-                            fit: BoxFit.cover))),
+        padding: EdgeInsets.only(
+            top: MediaQuery.of(context).size.height / 5,
+            left: 8.0,
+            right: 8,
+            bottom: MediaQuery.of(context).size.height / 25),
+        child: Column(
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height / 2,
+              width: MediaQuery.of(context).size.width,
+              child: SwipeCards(
+                matchEngine: _matchEngine!,
+                itemBuilder: (BuildContext context, int index) {
+                  return _swipeItems[index].content
+                      /*Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(48.0),
+                      child: Container(
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                                  image: _swipeItems[index].content,
+                                  fit: BoxFit.cover))),
+                    ),
+                  )*/
+                      ;
+                },
+                onStackFinished: () => showHornyGif(),
+                upSwipeAllowed: true,
               ),
-            )*/
-                ;
-          },
-          onStackFinished: () => showHornyGif(),
-          upSwipeAllowed: true,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: GestureDetector(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MatchesPage())),
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.24,
+                  height: MediaQuery.of(context).size.height * 0.067,
+                  decoration: BoxDecoration(
+                      color: Color.fromRGBO(97, 42, 122, 1),
+                      border: Border.all(
+                          color: Color.fromRGBO(254, 254, 254, 1), width: 1),
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30),
+                    child: Image.asset("lib/assets/chat_icon.png"),
+                  ),
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
