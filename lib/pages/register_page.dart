@@ -341,8 +341,7 @@ class _RegisterPageState extends State<RegisterPage> {
       'name': name,
       'bio': "",
       'photo': "",
-      'since': DateTime.now().millisecondsSinceEpoch,
-      'userID': auth.currentUser?.uid
+      'since': DateTime.now().millisecondsSinceEpoch
     });
 
     final prefs = await SharedPreferences.getInstance();
