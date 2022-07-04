@@ -93,6 +93,8 @@ flutter:
     - lib/assets/terkep.png
     - lib/assets/mr_radev.jpeg
     - lib/assets/LOGIN.png
+    - lib/assets/in_touch.png
+    - lib/assets/chat.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
