@@ -47,103 +47,47 @@ class _SwipePageState extends State<SwipePage> {
       print(_profiles[i]['photo']);
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
-              ? Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Container(
-                        decoration: BoxDecoration(
-                            color: Color.fromRGBO(97, 42, 122, 1)),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
-                              child: Text(
-                                "in/Touch",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 32, right: 32, top: 10, bottom: 10),
-                              child: Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height:
-                                      MediaQuery.of(context).size.height / 3,
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: NetworkImage(
-                                              await FirebaseStorage.instanceFor(
-                                                      bucket:
-                                                          "gs://festival-2e218.appspot.com")
-                                                  .ref()
-                                                  .child(
-                                                      _profiles[i].id + '.png')
-                                                  .getDownloadURL()),
-                                          fit: BoxFit.cover))),
-                            ),
-                            Text(
-                              _profiles[i]['name'],
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 25),
-                            )
-                          ],
-                        )),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: GestureDetector(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width*0.24,
-                              height: MediaQuery.of(context).size.height*0.067,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(97, 42, 122, 1),
-                                  border: Border.all(
-                                      color: Color.fromRGBO(254, 254, 254, 1),
-                                      width: 1),
-                              borderRadius: BorderRadius.circular(10)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 28),
-                                child: Image(
-                                  image: AssetImage("lib/assets/in_touch.png"),
-                                  height: MediaQuery.of(context).size.height*0.045,
-                                ),
-                              ),
-                            ),
-                          ),
+              ? Container(
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Text(
+                          "in/Touch",
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: GestureDetector(
-                            child: Container(
-                              width: MediaQuery.of(context).size.width*0.24,
-                              height: MediaQuery.of(context).size.height*0.067,
-                              decoration: BoxDecoration(
-                                  color: Color.fromRGBO(97, 42, 122, 1),
-                                  border: Border.all(
-                                      color: Color.fromRGBO(254, 254, 254, 1),
-                                      width: 1),
-                                  borderRadius: BorderRadius.circular(10)),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 28),
-                                child: Image(
-                                  image: const AssetImage("lib/assets/chat.png"),
-                                  height: MediaQuery.of(context).size.height*0.045,
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-
-                      ],
-                    )
-                  ],
-                )
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 32, right: 32, top: 10, bottom: 10),
+                        child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 3,
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: NetworkImage(
+                                        await FirebaseStorage.instanceFor(
+                                                bucket:
+                                                    "gs://festival-2e218.appspot.com")
+                                            .ref()
+                                            .child(_profiles[i].id + '.png')
+                                            .getDownloadURL()),
+                                    fit: BoxFit.cover))),
+                      ),
+                      Text(
+                        _profiles[i]['name'],
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 25),
+                      )
+                    ],
+                  ))
               : Text('No profiles found'),
           likeAction: () => messageOptions(_profiles[i].id),
           nopeAction: () => showNopeGif(),
@@ -224,11 +168,9 @@ class _SwipePageState extends State<SwipePage> {
           image: DecorationImage(
               image: AssetImage("lib/assets/LOGIN.png"), fit: BoxFit.cover)),
       child: Padding(
-        padding: EdgeInsets.only(
-          top: MediaQuery.of(context).size.height / 5,
-          left: 8.0,
-          right: 8,
-          bottom: MediaQuery.of(context).size.height/8
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height / 5,
+          horizontal: 8.0,
         ),
         child: SwipeCards(
           matchEngine: _matchEngine!,
