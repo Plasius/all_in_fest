@@ -190,8 +190,8 @@ class _ChatPageState extends State<ChatPage> {
                                 );
                               } else {
                                 return Padding(
-                                  padding: EdgeInsets.only(
-                                      right: MediaQuery.of(context).size.width *
+                                  padding: EdgeInsets.all(
+                                       MediaQuery.of(context).size.width *
                                           0.05),
                                   child: Align(
                                       alignment: Alignment.topRight,
