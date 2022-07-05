@@ -151,6 +151,7 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               height: 15,
             ),
+            IconButton(onPressed: () => FirebaseAuth.instance.signOut(), icon: Icon(Icons.exit_to_app))
 
             /*Center(
               child: Text(

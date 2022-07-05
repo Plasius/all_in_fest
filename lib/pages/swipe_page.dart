@@ -56,6 +56,7 @@ class _SwipePageState extends State<SwipePage> {
 
     print(_profiles.length);
     print(_matches.length);
+    print(_unneccessaryProfiles.length);
 
     for (int i = 0; i < _profiles.length; i++) {
       //print(_profiles[i]['photo']);
