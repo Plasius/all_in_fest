@@ -137,6 +137,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       border: Border.all(color: Colors.black)),
                 ),
               ),
+/*
               GestureDetector(
                 onTap: () => Navigator.push(context,
                     MaterialPageRoute(builder: (context) => const ChatPage())),
@@ -149,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       border: Border.all(color: Colors.black)),
                 ),
               ),
+*/
               GestureDetector(
                 onTap: () => Navigator.push(
                     context,

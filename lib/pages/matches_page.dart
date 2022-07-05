@@ -86,66 +86,76 @@ class _MatchesPageState extends State<MatchesPage> {
                 child: Column(
                   children: List.generate(
                       matches.length,
-                      (index) => Column(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: size.width * 0.065,
-                                    right: size.width * 0.065,
-                                    top: size.width * 0.065,
-                                    bottom: size.width * 0.01625),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      height: size.height * 0.11,
-                                      width: size.width * 0.24,
-                                      decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                              image: NetworkImage(
-                                                  photoURLs[index].toString()),
-                                              fit: BoxFit.cover),
-                                          shape: BoxShape.circle),
-                                    ),
-                                    Padding(
-                                      padding:
-                                          EdgeInsets.all(size.width * 0.0325),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                bottom: size.width * 0.01625),
-                                            child: Text(
-                                              matchedProfiles[index]['name'],
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 20),
-                                            ),
-                                          ),
-                                          const Text(
-                                            "Üzenet",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.normal,
-                                                fontSize: 16),
-                                          )
-                                        ],
+                      (index) => GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ChatPage(
+                                          chatPartner: matchedProfiles[index],
+                                          photo: photoURLs[index],
+                                        ))),
+                            child: Column(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                      left: size.width * 0.065,
+                                      right: size.width * 0.065,
+                                      top: size.width * 0.065,
+                                      bottom: size.width * 0.01625),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        height: size.height * 0.11,
+                                        width: size.width * 0.24,
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    photoURLs[index]
+                                                        .toString()),
+                                                fit: BoxFit.cover),
+                                            shape: BoxShape.circle),
                                       ),
-                                    )
-                                  ],
+                                      Padding(
+                                        padding:
+                                            EdgeInsets.all(size.width * 0.0325),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  bottom: size.width * 0.01625),
+                                              child: Text(
+                                                matchedProfiles[index]['name'],
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
+                                              ),
+                                            ),
+                                            const Text(
+                                              "Üzenet",
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.normal,
+                                                  fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Divider(
-                                color: Colors.white,
-                                indent: size.width * 0.077,
-                                endIndent: size.width * 0.077,
-                                thickness: size.height * 0.0011,
-                              )
-                            ],
+                                Divider(
+                                  color: Colors.white,
+                                  indent: size.width * 0.077,
+                                  endIndent: size.width * 0.077,
+                                  thickness: size.height * 0.0011,
+                                )
+                              ],
+                            ),
                           )),
                 ),
               ),

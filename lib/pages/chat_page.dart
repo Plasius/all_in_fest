@@ -3,8 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key})
-      : super(
+  final String photo;
+  final DocumentSnapshot chatPartner;
+  const ChatPage({
+    Key? key,
+    required this.chatPartner,
+    required this.photo,
+  }) : super(
           key: key,
         );
 
@@ -13,9 +18,9 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
-  String partnerUID = "";
-  String partnerName = "";
-  String partnerPhoto = "";
+  String? partnerUID;
+  String? partnerName;
+  String? partnerPhoto;
 
   CollectionReference? messages;
   Stream<QuerySnapshot<Object?>>? messages_stream;
@@ -29,17 +34,23 @@ class _ChatPageState extends State<ChatPage> {
     super.didChangeDependencies();
 
     try {
-      partnerUID = ModalRoute.of(context)!.settings.arguments as String;
+      partnerUID = widget.chatPartner.id;
+      partnerName = widget.chatPartner['name'];
+      partnerPhoto = widget.photo;
 
-      partnerName = partnerUID.split(" ")[1];
-      partnerPhoto = partnerUID.split(" ").last;
-      partnerUID = partnerUID.split(" ").first;
+      print(partnerName! + partnerUID!);
 
-      print(partnerName + partnerUID);
+      messages = FirebaseFirestore.instance
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('messages');
 
-      if (partnerUID.compareTo(FirebaseAuth.instance.currentUser!.uid) < 0) {
+      messages_stream =
+          messages?.orderBy('datetime').snapshots(includeMetadataChanges: true);
+
+      /*if (partnerUID?.compareTo(FirebaseAuth.instance.currentUser!.uid) != 0) {
         messages = FirebaseFirestore.instance.collection('matches/' +
-            partnerUID +
+            partnerUID! +
             '_' +
             FirebaseAuth.instance.currentUser!.uid +
             '/messages');
@@ -65,7 +76,7 @@ class _ChatPageState extends State<ChatPage> {
             '_' +
             partnerUID +
             '/messages');
-      }
+      }*/
     } catch (e) {
       print("no internet");
     }
@@ -94,107 +105,213 @@ class _ChatPageState extends State<ChatPage> {
       return Scaffold(
           resizeToAvoidBottomInset: false,
           appBar: AppBar(
-            title: Text(partnerName),
+            backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+            title: Text(partnerName!),
           ),
-          body: Stack(children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * 0.80,
-              child: SingleChildScrollView(
-                  child: StreamBuilder(
-                stream: messages_stream,
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return const Text('Loading');
-                  } else {
-                    return Column(
-                      children: [
-                        ListView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          children: snapshot.data!.docs.map((document) {
-                            if (document['user'] == partnerUID) {
-                              return Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Image(
-                                              fit: BoxFit.cover,
-                                              width: 40,
-                                              height: 40,
-                                              image:
-                                                  NetworkImage(partnerPhoto)),
-                                        ),
-                                        Text(document['message'],
-                                            textAlign: TextAlign.right,
-                                            style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 22)),
-                                      ]));
-                            } else {
-                              return Align(
-                                  alignment: Alignment.topRight,
-                                  child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        Text(document['message'],
-                                            textAlign: TextAlign.right,
-                                            style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 22))
-                                      ]));
-                            }
-                          }).toList(),
-                        )
-                      ],
-                    );
-                  }
-                },
-              )),
-            ),
-            /*CHATBOX AND SEND BUTTON*/
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Container(
-                    decoration: const BoxDecoration(
-                      border: Border(
-                        top: BorderSide(width: 1.0, color: Color(0xFF000000)),
-                        left: BorderSide(width: 1.0, color: Color(0xFF000000)),
-                        right: BorderSide(width: 1.0, color: Color(0xFF000000)),
-                        bottom:
-                            BorderSide(width: 1.0, color: Color(0xFF000000)),
+          body: Container(
+            decoration: const BoxDecoration(
+                gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(232, 107, 62, 1),
+                Color.fromRGBO(97, 42, 122, 1)
+              ],
+            )),
+            child: Stack(children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height * 0.80,
+                child: SingleChildScrollView(
+                    child: StreamBuilder(
+                  stream: messages_stream,
+                  builder: (BuildContext context,
+                      AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.connectionState ==
+                        ConnectionState.waiting) {
+                      return const Text('Loading');
+                    } else {
+                      return Column(
+                        children: [
+                          ListView(
+                            physics: const NeverScrollableScrollPhysics(),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            children: snapshot.data!.docs.map((document) {
+                              if (document['from'] == partnerUID) {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      left: MediaQuery.of(context).size.width *
+                                          0.05),
+                                  child: Align(
+                                      alignment: Alignment.topLeft,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  right: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.043),
+                                              child: Image(
+                                                  fit: BoxFit.cover,
+                                                  width: 40,
+                                                  height: 40,
+                                                  image: NetworkImage(
+                                                      partnerPhoto!)),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.036,
+                                                    vertical:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.018),
+                                                child: Text(document['message'],
+                                                    textAlign: TextAlign.right,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 22)),
+                                              ),
+                                            ),
+                                          ])),
+                                );
+                              } else {
+                                return Padding(
+                                  padding: EdgeInsets.only(
+                                      right: MediaQuery.of(context).size.width *
+                                          0.05),
+                                  child: Align(
+                                      alignment: Alignment.topRight,
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  color: Color.fromRGBO(
+                                                      187, 229, 243, 1)),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.036,
+                                                    vertical:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.018),
+                                                child: Text(document['message'],
+                                                    textAlign: TextAlign.right,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 22)),
+                                              ),
+                                            )
+                                          ])),
+                                );
+                              }
+                            }).toList(),
+                          )
+                        ],
+                      );
+                    }
+                  },
+                )),
+              ),
+              /*CHATBOX AND SEND BUTTON*/
+              Padding(
+                padding:
+                    EdgeInsets.all(MediaQuery.of(context).size.width * 0.065),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.036),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Color.fromRGBO(254, 254, 254, 1),
+                                width: 1),
+                            borderRadius: BorderRadius.circular(5)),
+                        width: MediaQuery.of(context).size.width * 0.68,
+                        height: MediaQuery.of(context).size.height * 0.045,
+                        child: TextField(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(254, 254, 254, 1),
+                                      width: 1),
+                                  borderRadius: BorderRadius.circular(5)),
+                              fillColor: Color.fromRGBO(97, 42, 122, 1),
+                              hintText: "Üzenet írása...",
+                              hintStyle: TextStyle(
+                                  color: Colors.white.withOpacity(0.5),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                              contentPadding: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width *
+                                      0.0325)),
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                          controller: messageInput,
+                          onChanged: (value) => message = value,
+                        ),
                       ),
                     ),
-                    width: MediaQuery.of(context).size.width * 0.80,
-                    child: TextField(
-                        controller: messageInput,
-                        onChanged: (value) => message = value)),
-                SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.20,
-                    child: ElevatedButton(
-                        onPressed: () {
+                    GestureDetector(
+                        onTap: () {
                           messages?.add({
-                            'user': FirebaseAuth.instance.currentUser!.uid,
+                            'from': FirebaseAuth.instance.currentUser!.uid,
                             'message': message,
                             'datetime': DateTime.now().millisecondsSinceEpoch
                           });
 
                           messageInput.clear();
                         },
-                        child: const Text("Send"))),
-              ]),
-            )
-          ]));
+                        child: Container(
+                          width: MediaQuery.of(context).size.width * 0.145,
+                          height: MediaQuery.of(context).size.height * 0.045,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(97, 42, 122, 1),
+                              border: Border.all(
+                                  color: Color.fromRGBO(254, 254, 254, 1),
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(5)),
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.043,
+                                vertical:
+                                    MediaQuery.of(context).size.height * 0.011),
+                            child: const Image(
+                              image: AssetImage('lib/assets/send_message.png'),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        )),
+                  ]),
+                ),
+              )
+            ]),
+          ));
     }
   }
 }

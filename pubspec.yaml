@@ -95,6 +95,7 @@ flutter:
     - lib/assets/LOGIN.png
     - lib/assets/chat_icon.png
     - lib/assets/matches_icon.png
+    - lib/assets/send_message.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
