@@ -1,6 +1,7 @@
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -13,38 +14,35 @@ class MatchesPage extends StatefulWidget {
 
 class _MatchesPageState extends State<MatchesPage> {
   var matches = [];
+  var photoURLs = [];
+  var matchedProfiles = [];
   bool ready = false;
 
   void loadMatches() async {
-    try {
-      await FirebaseFirestore.instance
-          .collection("users/")
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .get()
-          .then((user) {
-        for (String match in user['matches']) {
-          matches.add(match);
-        }
-      });
-    } catch (e) {
-      print("Internet?");
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('matches')
+        .get()
+        .then((QuerySnapshot snapshot) => snapshot.docs.forEach((doc) async {
+              matches.add(doc);
+            }));
+    for (int i = 0; i < matches.length; i++) {
+      photoURLs.add(await FirebaseStorage.instanceFor(
+              bucket: "gs://festival-2e218.appspot.com")
+          .ref()
+          .child(matches[i]['user2'] + '.png')
+          .getDownloadURL());
     }
-
-    try {
-      for (int i = 0; i < matches.length; i++) {
-        await FirebaseFirestore.instance
-            .collection("users/")
-            .doc(matches[i])
-            .get()
-            .then((user) {
-          matches[i] = matches[i] + " " + user['name'] + " " + user['photo'];
-          ready = true;
-          setState(() {});
-        });
-      }
-    } catch (e) {
-      print("internet?2");
+    for (int j = 0; j < matches.length; j++) {
+      final user = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(matches[j]['user2'])
+          .get();
+      matchedProfiles.add(user);
     }
+    print(photoURLs[0]);
+    setState(() {});
   }
 
   @override
@@ -55,6 +53,7 @@ class _MatchesPageState extends State<MatchesPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
@@ -66,80 +65,90 @@ class _MatchesPageState extends State<MatchesPage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/images/logo.png"),
+                image: const AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
             ),
-            body: Column(children: [
-              if (matches.isEmpty)
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.80,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              else
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.80,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: List.generate(
-                        matches.length,
-                        (index) => ListTile(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const ChatPage(),
-                                  settings: RouteSettings(
-                                    arguments: matches[index],
-                                  ),
-                                )),
-                            title: Row(children: [
-                              /*Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Image(
-                            fit: BoxFit.cover,
-                            width: 50,
-                            height: 50,
-                            image: NetworkImage(
-                                matches[index].toString().split(" ")[2]),
-                          )),*/
-                              Text(matches[index].toString().split(" ")[1],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold))
-                            ])),
-                      ),
-                    ),
-                  ),
+            body: Container(
+              constraints: BoxConstraints.expand(),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(232, 107, 62, 1),
+                    Color.fromRGBO(97, 42, 122, 1)
+                  ],
                 ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  ElevatedButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(Colors.grey),
-                      ),
-                      onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const SwipePage())),
-                      child: const Text("Swipe page",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.blueGrey))),
-                  ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(
-                          const Color.fromRGBO(232, 107, 62, 1)),
-                    ),
-                    onPressed: null,
-                    child: const Text("Matches page",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, color: Colors.white)),
-                  )
-                ]),
-              )
-            ])));
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(
+                      matches.length,
+                      (index) => Column(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: size.width * 0.065,
+                                    right: size.width * 0.065,
+                                    top: size.width * 0.065,
+                                    bottom: size.width * 0.01625),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      height: size.height * 0.11,
+                                      width: size.width * 0.24,
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: NetworkImage(
+                                                  photoURLs[index].toString()),
+                                              fit: BoxFit.cover),
+                                          shape: BoxShape.circle),
+                                    ),
+                                    Padding(
+                                      padding:
+                                          EdgeInsets.all(size.width * 0.0325),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: size.width * 0.01625),
+                                            child: Text(
+                                              matchedProfiles[index]['name'],
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20),
+                                            ),
+                                          ),
+                                          const Text(
+                                            "Üzenet",
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.normal,
+                                                fontSize: 16),
+                                          )
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Divider(
+                                color: Colors.white,
+                                indent: size.width * 0.077,
+                                endIndent: size.width * 0.077,
+                                thickness: size.height * 0.0011,
+                              )
+                            ],
+                          )),
+                ),
+              ),
+            )));
   }
 }

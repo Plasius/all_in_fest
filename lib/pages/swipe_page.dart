@@ -34,9 +34,23 @@ class _SwipePageState extends State<SwipePage> {
         .get()
         .then((QuerySnapshot querySnapshot) => {
               querySnapshot.docs.forEach((doc) async {
-                doc['photo'] != ""
-                    ? _profiles.add(doc)
-                    : _unneccessaryProfiles.add(doc);
+                if(_matches.isNotEmpty){
+                  for(int i=0; i<_matches.length; i++){
+                    if(doc.id==_matches[i]['user2']){
+                      _unneccessaryProfiles.add(doc);
+                    }
+                    else{
+                      doc['photo'] != ""
+                          ? _profiles.add(doc)
+                          : _unneccessaryProfiles.add(doc);
+                    }
+                  }
+                }
+                else{
+                  doc['photo'] != ""
+                      ? _profiles.add(doc)
+                      : _unneccessaryProfiles.add(doc);
+                }
               })
             });
 
@@ -44,7 +58,7 @@ class _SwipePageState extends State<SwipePage> {
     print(_matches.length);
 
     for (int i = 0; i < _profiles.length; i++) {
-      print(_profiles[i]['photo']);
+      //print(_profiles[i]['photo']);
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
@@ -100,17 +114,16 @@ class _SwipePageState extends State<SwipePage> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     await firebaseFirestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
         .collection('matches')
-        //.orderBy('since')
-        //.startAfter([counter])
-        //.limit(2)
         .get()
         .then((QuerySnapshot querySnapshot) => {
               querySnapshot.docs.forEach((doc) async {
                 _matches.add(doc);
               })
             });
-    setState(() {});
+    //setState(() {});
   }
 
   void initState() {
@@ -118,12 +131,12 @@ class _SwipePageState extends State<SwipePage> {
     _matchEngine = MatchEngine(swipeItems: _swipeItems);
     //getMatches();
     getProfiles();
-    //getMatches();
+    getMatches();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_profiles.length != 0)
+    if (_profiles.isNotEmpty)
       return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
@@ -201,7 +214,8 @@ class _SwipePageState extends State<SwipePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GestureDetector(
-                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (context) => MatchesPage())),
+                onTap: () => Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => MatchesPage())),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.24,
                   height: MediaQuery.of(context).size.height * 0.067,
@@ -211,7 +225,8 @@ class _SwipePageState extends State<SwipePage> {
                           color: Color.fromRGBO(254, 254, 254, 1), width: 1),
                       borderRadius: BorderRadius.circular(10)),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 30),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 10.0, horizontal: 30),
                     child: Image.asset("lib/assets/chat_icon.png"),
                   ),
                 ),
@@ -228,12 +243,27 @@ class _SwipePageState extends State<SwipePage> {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     await firebaseFirestore
+        .collection('users')
+        .doc(auth.currentUser!.uid)
         .collection('matches')
         .doc(auth.currentUser!.uid.toString() + otherUser)
         .set({
       'user1': auth.currentUser?.uid,
       'user2': otherUser,
       'timestamp': DateTime.now().millisecondsSinceEpoch
+    });
+
+    await firebaseFirestore
+        .collection('users')
+        .doc(otherUser)
+        .collection('matches')
+        .doc(otherUser + auth.currentUser!.uid.toString())
+        .set({
+      'user1': otherUser,
+      'user2': auth.currentUser?.uid,
+      'timestamp': DateTime
+          .now()
+          .millisecondsSinceEpoch
     });
   }
 
