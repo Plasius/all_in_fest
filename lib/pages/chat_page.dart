@@ -139,12 +139,16 @@ class _ChatPageState extends State<ChatPage> {
                             physics: const NeverScrollableScrollPhysics(),
                             scrollDirection: Axis.vertical,
                             shrinkWrap: true,
-                            children: snapshot.data!.docs.map((document) {
+                            children: snapshot.data!.docs
+                                .where((element) => element
+                                    .get('users')
+                                    .toString()
+                                    .contains(partnerUID!))
+                                .map((document) {
                               if (document['from'] == partnerUID) {
                                 return Padding(
-                                  padding: EdgeInsets.only(
-                                      left: MediaQuery.of(context).size.width *
-                                          0.05),
+                                  padding: EdgeInsets.all(
+                                      MediaQuery.of(context).size.width * 0.05),
                                   child: Align(
                                       alignment: Alignment.topLeft,
                                       child: Row(
@@ -157,16 +161,22 @@ class _ChatPageState extends State<ChatPage> {
                                                           .size
                                                           .width *
                                                       0.043),
-                                              child: Image(
-                                                  fit: BoxFit.cover,
-                                                  width: 40,
-                                                  height: 40,
-                                                  image: NetworkImage(
-                                                      partnerPhoto!)),
+                                              child: Container(
+                                                width: 40,
+                                                height: 40,
+                                                decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    image: DecorationImage(
+                                                        image: NetworkImage(
+                                                            partnerPhoto!),
+                                                        fit: BoxFit.cover)),
+
+                                              ),
                                             ),
                                             Container(
                                               decoration: BoxDecoration(
-                                                  color: Colors.white),
+                                                  color: Colors.white,
+                                              borderRadius: BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal:
@@ -191,8 +201,7 @@ class _ChatPageState extends State<ChatPage> {
                               } else {
                                 return Padding(
                                   padding: EdgeInsets.all(
-                                       MediaQuery.of(context).size.width *
-                                          0.05),
+                                      MediaQuery.of(context).size.width * 0.05),
                                   child: Align(
                                       alignment: Alignment.topRight,
                                       child: Row(
@@ -202,7 +211,8 @@ class _ChatPageState extends State<ChatPage> {
                                             Container(
                                               decoration: BoxDecoration(
                                                   color: Color.fromRGBO(
-                                                      187, 229, 243, 1)),
+                                                      187, 229, 243, 1),
+                                              borderRadius: BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal:
@@ -280,10 +290,22 @@ class _ChatPageState extends State<ChatPage> {
                         onTap: () {
                           messages?.add({
                             'from': FirebaseAuth.instance.currentUser!.uid,
+                            'users': partnerUID! +
+                                FirebaseAuth.instance.currentUser!.uid,
                             'message': message,
                             'datetime': DateTime.now().millisecondsSinceEpoch
                           });
-
+                          FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(partnerUID)
+                              .collection('messages')
+                              .add({
+                            'from': FirebaseAuth.instance.currentUser!.uid,
+                            'users': partnerUID! +
+                                FirebaseAuth.instance.currentUser!.uid,
+                            'message': message,
+                            'datetime': DateTime.now().millisecondsSinceEpoch
+                          });
                           messageInput.clear();
                         },
                         child: Container(
