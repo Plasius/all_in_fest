@@ -30,7 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     //String email = "";
     //String password = "";
-
+    var size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
@@ -45,13 +45,16 @@ class _RegisterPageState extends State<RegisterPage> {
             children: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 8.0, right: 8, top: 30, bottom: 0),
+                  padding: EdgeInsets.only(
+                      left: MediaQuery.of(context).size.width * 0.019,
+                      right: MediaQuery.of(context).size.width * 0.019,
+                      top: MediaQuery.of(context).size.height * 0.033,
+                      bottom: 0),
                   child: Container(
                     decoration: BoxDecoration(
                         color: Color.fromRGBO(97, 42, 122, 1),
                         borderRadius: BorderRadius.circular(5)),
-                    height: MediaQuery.of(context).size.height * 0.80,
+                    height: MediaQuery.of(context).size.height * 0.72,
                     width: MediaQuery.of(context).size.width,
                     child: SingleChildScrollView(
                       child: Column(
@@ -59,7 +62,11 @@ class _RegisterPageState extends State<RegisterPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 24, bottom: 20),
+                              padding: EdgeInsets.only(
+                                  top: MediaQuery.of(context).size.height *
+                                      0.027,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.022),
                               child: Center(
                                 child: const Text(
                                   "Regisztráció",
@@ -71,8 +78,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding:
-                              const EdgeInsets.only(left: 16.0, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "Név",
                                 style: TextStyle(
@@ -82,13 +92,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 24),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.041),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                    Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                   onChanged: (value) => name = value,
@@ -103,8 +115,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16.0, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "E-mail cím",
                                 style: TextStyle(
@@ -114,13 +129,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 24),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.041),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                        Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                   onChanged: (value) => email = value,
@@ -135,7 +152,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 16, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                  MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "Jelszó",
                                 style: TextStyle(
@@ -145,13 +166,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 24),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.041),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                        Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                     onChanged: (value) => password = value,
@@ -177,7 +200,11 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 16, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                  MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "Jelszó újra",
                                 style: TextStyle(
@@ -187,13 +214,15 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 24),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.0205),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                        Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                     onChanged: (value) => password = value,
@@ -231,14 +260,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                   checkedValue = newValue!;
                                 });
                               },
-                              controlAffinity: ListTileControlAffinity
-                                  .leading,
+                              controlAffinity: ListTileControlAffinity.leading,
                               activeColor: Colors.white,
                               checkColor: Colors.orange,
                               side: BorderSide(
-                                color: Colors.white,
-                                width: 3
-                              ),//  <-- leading Checkbox
+                                  color: Colors.white,
+                                  width: 3), //  <-- leading Checkbox
                             ),
                             Center(
                               child: GestureDetector(
@@ -252,8 +279,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       color: Color.fromRGBO(254, 192, 1, 1),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 48),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: size.height*0.009, horizontal: size.width*0.065),
                                     child: const Text(
                                       "Regisztráció",
                                       style: TextStyle(
@@ -271,14 +298,14 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 24.0, right: 10),
+                padding: EdgeInsets.only(top: size.height*0.04, right: size.height*0.022),
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: EdgeInsets.only(bottom: size.height*0.013),
                           child: const Text("Már van fiókod?",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20)),
@@ -315,10 +342,8 @@ class _RegisterPageState extends State<RegisterPage> {
     required BuildContext context,
   }) async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: email,
-          password: password
-      );
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(email: email, password: password);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         print('The password provided is too weak.');

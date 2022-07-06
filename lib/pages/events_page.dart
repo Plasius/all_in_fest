@@ -16,8 +16,43 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   Stream eventsStream =
       FirebaseFirestore.instance.collection('events').snapshots();
+  String _selectedStage = "";
+  String _selectedDate = "";
+  List<Text> stages = [
+    const Text("1. stage"),
+    const Text("2. stage"),
+    const Text("3. stage"),
+    const Text("4. stage"),
+    const Text("5. stage"),
+  ];
 
-
+/*
+  void addEvents() async {
+    int stageNumber;
+    for (int i = 0; i < 51; i++) {
+      stageNumber = i % 5 + 1;
+      await FirebaseFirestore.instance
+          .collection('events')
+          .doc('event' + i.toString())
+          .set({
+        'id': i,
+        'bio': "",
+        'name': "event" + i.toString(),
+        'datetime': stageNumber == 1
+            ? "augusztus 25."
+            : stageNumber == 2
+                ? "augusztus 26."
+                : stageNumber == 3
+                    ? "augusztus 27."
+                    : stageNumber == 4
+                        ? "augusztus 28."
+                        : stageNumber == 5 ? "augusztus 25." : "",
+        'photo': "",
+        'stage': stageNumber.toString() + ". " + "stage"
+      });
+    }
+  }
+*/
 
   @override
   Widget build(BuildContext context) {
@@ -35,19 +70,27 @@ class _EventsPageState extends State<EventsPage> {
           fit: BoxFit.contain,
         ),
         actions: [
-          Icon(
-            Icons.add_rounded,
+/*
+          IconButton(
+            icon: Icon(Icons.add_rounded),
             color: Colors.white,
+            onPressed: () {
+              addEvents();
+            },
           ),
+*/
           IconButton(
             icon: Icon(Icons.favorite_sharp),
             color: Colors.white,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const FavoritePage())),
           ),
-          Icon(
-            Icons.filter_alt_outlined,
+          IconButton(
+            icon: Icon(Icons.filter_alt_outlined),
             color: Colors.white,
+            onPressed: () {
+              showFilter();
+            },
           )
         ],
       ),
@@ -66,89 +109,153 @@ class _EventsPageState extends State<EventsPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "csütörtök",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "25",
-                            style: TextStyle(color: Colors.black),
-                          ),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      _selectedDate == "augusztus 25."
+                          ? _selectedDate = ""
+                          : _selectedDate = "augusztus 25.";
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "csütörtök",
+                          style: TextStyle(
+                              color: _selectedDate == "augusztus 25."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white),
                         ),
-                      )
-                    ],
+                        Container(
+                          decoration: BoxDecoration(
+                              color: _selectedDate == "augusztus 25."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white,
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "25",
+                              style: TextStyle(
+                                  color: _selectedDate == "augusztus 25."
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "péntek",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "26",
-                            style: TextStyle(color: Colors.black),
-                          ),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      _selectedDate == "augusztus 26."
+                          ? _selectedDate = ""
+                          :_selectedDate = "augusztus 26.";
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "péntek",
+                          style: TextStyle(
+                              color: _selectedDate == "augusztus 26."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white),
                         ),
-                      )
-                    ],
+                        Container(
+                          decoration: BoxDecoration(
+                              color: _selectedDate == "augusztus 26."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white,
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "26",
+                              style: TextStyle(
+                                  color: _selectedDate == "augusztus 26."
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "szombat",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "27",
-                            style: TextStyle(color: Colors.black),
-                          ),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      _selectedDate == "augusztus 27."
+                          ? _selectedDate = ""
+                          :_selectedDate = "augusztus 27.";
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "szombat",
+                          style: TextStyle(
+                              color: _selectedDate == "augusztus 27."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white),
                         ),
-                      )
-                    ],
+                        Container(
+                          decoration: BoxDecoration(
+                              color: _selectedDate == "augusztus 27."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white,
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "27",
+                              style: TextStyle(
+                                  color: _selectedDate == "augusztus 27."
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "vasárnap",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white, shape: BoxShape.circle),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            "28",
-                            style: TextStyle(color: Colors.black),
-                          ),
+                  GestureDetector(
+                    onTap: () => setState(() {
+                      _selectedDate == "augusztus 28."
+                          ? _selectedDate = ""
+                          :_selectedDate = "augusztus 28.";
+                    }),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          "vasárnap",
+                          style: TextStyle(
+                              color: _selectedDate == "augusztus 28."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white),
                         ),
-                      )
-                    ],
+                        Container(
+                          decoration: BoxDecoration(
+                              color: _selectedDate == "augusztus 28."
+                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  : Colors.white,
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              "28",
+                              style: TextStyle(
+                                  color: _selectedDate == "augusztus 28."
+                                      ? Colors.white
+                                      : Colors.black),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   )
                 ],
               )),
@@ -164,8 +271,16 @@ class _EventsPageState extends State<EventsPage> {
                   );
                 } else {
                   return ListView(
-                    children:
-                        snapshot.data!.docs.map((DocumentSnapshot document) {
+                    children: snapshot.data!.docs
+                        .where((element) => element
+                            .get('stage')
+                            .toString()
+                            .contains(_selectedStage))
+                        .where((element) => element
+                            .get('datetime')
+                            .toString()
+                            .contains(_selectedDate))
+                        .map((DocumentSnapshot document) {
                       return Center(
                         child: SingleChildScrollView(
                           child: Column(
@@ -205,7 +320,7 @@ class _EventsPageState extends State<EventsPage> {
                                                         child: Column(
                                                           children: [
                                                             Text(
-                                                              "Esemény neve",
+                                                              document['name'],
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .white,
@@ -214,7 +329,7 @@ class _EventsPageState extends State<EventsPage> {
                                                                           .bold),
                                                             ),
                                                             Text(
-                                                              "színpad",
+                                                              document['stage'],
                                                               style: TextStyle(
                                                                   color: Colors
                                                                       .white,
@@ -231,7 +346,8 @@ class _EventsPageState extends State<EventsPage> {
                                                                 .end,
                                                         children: [
                                                           Text(
-                                                            "9:50-11:20",
+                                                            document[
+                                                                'datetime'],
                                                             style: TextStyle(
                                                                 color: Colors
                                                                     .white),
@@ -317,21 +433,21 @@ class _EventsPageState extends State<EventsPage> {
                                                                             Padding(
                                                                               padding: EdgeInsets.only(top: 10, left: 15),
                                                                               child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                                                                const Text(
-                                                                                  "Nap",
+                                                                                Text(
+                                                                                  document['datetime'],
                                                                                   style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
                                                                                 ),
                                                                                 SizedBox(width: 20),
-                                                                                const Text(
-                                                                                  "9:50-11:20",
+                                                                                Text(
+                                                                                  document['datetime'],
                                                                                   style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
                                                                                 )
                                                                               ]),
                                                                             ),
                                                                             Padding(
                                                                               padding: EdgeInsets.only(top: 20, left: 15),
-                                                                              child: const Text(
-                                                                                "Helyszín",
+                                                                              child: Text(
+                                                                                document['stage'],
                                                                                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 16.5),
                                                                               ),
                                                                             )
@@ -369,6 +485,30 @@ class _EventsPageState extends State<EventsPage> {
         ]),
       ),
     );
+  }
+
+  void showFilter() {
+    showCupertinoModalPopup(
+        context: context,
+        builder: (BuildContext builder) {
+          return Container(
+              height: MediaQuery.of(context).copyWith().size.height * 0.25,
+              color: Colors.white,
+              child: CupertinoPicker(
+                children: stages,
+                onSelectedItemChanged: (value) {
+                  Text text = stages[value];
+                  setState(() {
+                    _selectedStage = text.data.toString();
+                  });
+                },
+                itemExtent: 25,
+                diameterRatio: 1,
+                useMagnifier: true,
+                magnification: 1.3,
+                looping: false,
+              ));
+        });
   }
 
   /*Widget eventDetails(var favorite, DocumentSnapshot document) {

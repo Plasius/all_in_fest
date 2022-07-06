@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     String email = "";
     String password = "";
-
+    var size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
@@ -38,13 +38,16 @@ class _LoginPageState extends State<LoginPage> {
             children: [
               Center(
                 child: Padding(
-                  padding: const EdgeInsets.only(
-                      left: 8.0, right: 8, top: 178, bottom: 0),
+                  padding: EdgeInsets.only(
+                      left: size.width * 0.0386,
+                      right: size.width * 0.0386,
+                      top: size.height * 0.25,
+                      bottom: size.height * 0.1),
                   child: Container(
                     decoration: BoxDecoration(
                         color: Color.fromRGBO(97, 42, 122, 1),
                         borderRadius: BorderRadius.circular(5)),
-                    height: MediaQuery.of(context).size.height * 0.52,
+                    height: MediaQuery.of(context).size.height * 0.46,
                     width: MediaQuery.of(context).size.width,
                     child: SingleChildScrollView(
                       child: Column(
@@ -52,7 +55,9 @@ class _LoginPageState extends State<LoginPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 24, bottom: 20),
+                              padding: EdgeInsets.only(
+                                  top: size.height * 0.037,
+                                  bottom: size.height * 0.022),
                               child: Center(
                                 child: const Text(
                                   "Bejelentkezés",
@@ -64,8 +69,11 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             Padding(
-                              padding:
-                                  const EdgeInsets.only(left: 16.0, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "E-mail cím",
                                 style: TextStyle(
@@ -75,13 +83,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 32),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.041),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                        Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                   onChanged: (value) => email = value,
@@ -96,7 +106,11 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 16, bottom: 10),
+                              padding: EdgeInsets.only(
+                                  left:
+                                      MediaQuery.of(context).size.width * 0.043,
+                                  bottom: MediaQuery.of(context).size.height *
+                                      0.011),
                               child: const Text(
                                 "Jelszó",
                                 style: TextStyle(
@@ -106,13 +120,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 16, right: 16, bottom: 48),
+                              padding: EdgeInsets.only(
+                                  left: size.width * 0.041,
+                                  right: size.width * 0.041,
+                                  bottom: size.width * 0.082),
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border:
-                                        Border.all(color: Colors.white, width: 3),
+                                    border: Border.all(
+                                        color: Colors.white, width: 3),
                                     borderRadius: BorderRadius.circular(5)),
                                 child: TextFormField(
                                     onChanged: (value) => password = value,
@@ -148,8 +164,9 @@ class _LoginPageState extends State<LoginPage> {
                                       color: Color.fromRGBO(254, 192, 1, 1),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0, horizontal: 48),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: size.height * 0.009,
+                                        horizontal: size.width * 0.065),
                                     child: const Text(
                                       "Belépés",
                                       style: TextStyle(
@@ -167,14 +184,15 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(top: 48.0, right: 10),
+                padding: EdgeInsets.only(
+                    top: size.height * 0.035, right: size.height * 0.022),
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
+                          padding: EdgeInsets.only(bottom: size.height * 0.013),
                           child: const Text("Még nincs fiókod?",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20)),
