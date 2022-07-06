@@ -25,6 +25,7 @@ class _SwipePageState extends State<SwipePage> {
     //int? counter = prefs.getInt('counter');
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
+    //getMatches();
     await firebaseFirestore
         .collection('users')
         .where('userID', isNotEqualTo: auth.currentUser?.uid)
@@ -33,25 +34,28 @@ class _SwipePageState extends State<SwipePage> {
         //.limit(2)
         .get()
         .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) async {
-                if(_matches.isNotEmpty){
-                  for(int i=0; i<_matches.length; i++){
-                    if(doc.id==_matches[i]['user2']){
-                      _unneccessaryProfiles.add(doc);
+              if (_matches.isNotEmpty)
+                {
+                  for (int i = 0; i < _matches.length; i++)
+                    {
+                      if (_matches[i]['user2'] == querySnapshot.docs[i].id)
+                        {_unneccessaryProfiles.add(querySnapshot.docs[i])}
+                      else
+                        {
+                          querySnapshot.docs[i]['photo'] != ""
+                              ? _profiles.add(querySnapshot.docs[i])
+                              : _unneccessaryProfiles.add(querySnapshot.docs[i])
+                        }
                     }
-                    else{
-                      doc['photo'] != ""
-                          ? _profiles.add(doc)
-                          : _unneccessaryProfiles.add(doc);
-                    }
-                  }
                 }
-                else{
-                  doc['photo'] != ""
-                      ? _profiles.add(doc)
-                      : _unneccessaryProfiles.add(doc);
+              else
+                {
+                  querySnapshot.docs.forEach((element) {
+                    element['photo'] != ""
+                        ? _profiles.add(element)
+                        : _unneccessaryProfiles.add(element);
+                  })
                 }
-              })
             });
 
     print(_profiles.length);
@@ -262,9 +266,7 @@ class _SwipePageState extends State<SwipePage> {
         .set({
       'user1': otherUser,
       'user2': auth.currentUser?.uid,
-      'timestamp': DateTime
-          .now()
-          .millisecondsSinceEpoch
+      'timestamp': DateTime.now().millisecondsSinceEpoch
     });
   }
 
