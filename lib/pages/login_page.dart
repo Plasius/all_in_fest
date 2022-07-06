@@ -241,6 +241,9 @@ class _LoginPageState extends State<LoginPage> {
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided.');
       }
+      else{
+        print(e.code);
+      }
     }
   }
 }
