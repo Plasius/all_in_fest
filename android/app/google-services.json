@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "230888413088",
+    "firebase_url": "https://festival-2e218-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "festival-2e218",
     "storage_bucket": "festival-2e218.appspot.com"
   },
@@ -29,6 +30,14 @@
             {
               "client_id": "230888413088-ce8j0ijk92gaqinca88f0hiuh1lc1qjl.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "230888413088-lfhuaa309v9mtspevp4lufeftgr84m54.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "hu.bitclub.allinfest",
+                "app_store_id": "1631167801"
+              }
             }
           ]
         }

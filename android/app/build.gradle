@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 def keystoreProperties = new Properties()
    def keystorePropertiesFile = rootProject.file('key.properties')
    if (keystorePropertiesFile.exists()) {
-       keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+       keystoreProperties.load(FileInputStream(keystorePropertiesFile))
    }
 
 apply plugin: 'com.android.application'
@@ -81,4 +81,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    //implementation("com.google.android.gms:play-services-base:17.6.0"){ force = true }
 }

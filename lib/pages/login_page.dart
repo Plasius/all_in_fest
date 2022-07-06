@@ -13,6 +13,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _showPassword = false;
+  String email = "";
+  String password = "";
   void _togglevisibility() {
     setState(() {
       _showPassword = !_showPassword;
@@ -21,8 +23,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    String email = "";
-    String password = "";
+
     var size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Login',
@@ -228,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     try {
-      final userCredential = await auth.signInWithEmailAndPassword(
+      await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -242,7 +243,7 @@ class _LoginPageState extends State<LoginPage> {
         print('Wrong password provided.');
       }
       else{
-        print(e.code);
+        print(e);
       }
     }
   }
