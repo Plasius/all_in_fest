@@ -26,10 +26,16 @@ class FavoriteModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool? checkFavorite(DocumentSnapshot event){
-    if(events.contains(event)){
+  void filterEvents(String datetime, String stage) {
+    _events
+        .where((element) => element['datetime'].toString().contains(datetime))
+        .where((element) => element['stage'].toString().contains(stage));
+  }
+
+  bool? checkFavorite(DocumentSnapshot event) {
+    if (events.contains(event)) {
       return true;
-    } else{
+    } else {
       return false;
     }
   }

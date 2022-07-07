@@ -34,6 +34,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(

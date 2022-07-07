@@ -28,6 +28,7 @@ class _LoginPageState extends State<LoginPage> {
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
+        resizeToAvoidBottomInset: false,
         body: Container(
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(

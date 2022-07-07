@@ -1,3 +1,4 @@
+import 'package:all_in_fest/main.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -43,7 +44,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/images/logo.png"),
+                image: const AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
@@ -151,7 +152,16 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(
               height: 15,
             ),
-            IconButton(onPressed: () => FirebaseAuth.instance.signOut(), icon: Icon(Icons.exit_to_app))
+            IconButton(
+                onPressed: () => {
+                      FirebaseAuth.instance.signOut(),
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MyHomePage(title: "Exited")))
+                    },
+                icon: Icon(Icons.exit_to_app))
 
             /*Center(
               child: Text(
@@ -192,6 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
         uploadFile();
+        //loadImage();
       } else {
         print('No image selected.');
       }
@@ -205,6 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
       if (pickedFile != null) {
         _photo = File(pickedFile.path);
         uploadFile();
+        //loadImage();
       } else {
         print('No image selected.');
       }
@@ -234,6 +246,8 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       print('error occured');
     }
+    loadImage();
+    //setState(() {});
   }
 
   void _showPicker(BuildContext context) {
@@ -275,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage> {
       instance
           .collection('users')
           .doc(uid)
-          .set({'name': nameController.text, 'bio': bioController.text});
+          .update({'name': nameController.text, 'bio': bioController.text});
     }
   }
 }
