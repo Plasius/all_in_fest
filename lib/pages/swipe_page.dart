@@ -26,25 +26,68 @@ class _SwipePageState extends State<SwipePage> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
     //getMatches();
-    await firebaseFirestore
+    _profiles = await firebaseFirestore
         .collection('users')
         .where('userID', isNotEqualTo: auth.currentUser?.uid)
-        //.orderBy('since')
+        .orderBy('userID')
         //.startAfter([counter])
         //.limit(2)
         .get()
+        .then((QuerySnapshot querySnapshot) => querySnapshot.docs.toList());
+
+    if (_matches.isNotEmpty)
+    {
+      for(int i=0; i<_profiles.length; i++){
+        for(int j=0; j<_matches.length;j++){
+          if(_matches[j]['user2']==_profiles[i].id){
+            _profiles.remove(_profiles[i]);
+          }
+        }
+      }
+    }
+/*
         .then((QuerySnapshot querySnapshot) => {
               if (_matches.isNotEmpty)
                 {
                   for (int i = 0; i < _matches.length; i++)
                     {
-                      if (_matches[i]['user2'] == querySnapshot.docs[i].id)
-                        {_unneccessaryProfiles.add(querySnapshot.docs[i])}
-                      else
+                      for (int j = 0; j < querySnapshot.docs.length; j++)
                         {
-                          querySnapshot.docs[i]['photo'] != ""
-                              ? _profiles.add(querySnapshot.docs[i])
-                              : _unneccessaryProfiles.add(querySnapshot.docs[i])
+                          print(querySnapshot.docs[j].id),
+                          print(_matches[i].id),
+                          if (_matches[i]
+                                  .id
+                                  .toString()
+                                  .contains(querySnapshot.docs[j].id) &&
+                              _profiles.contains(querySnapshot.docs[j]) ==
+                                  false)
+                            {
+                              //print(_matches[j].id),
+                              //print(querySnapshot.docs[i].id),
+                              print("im in"),
+                              _unneccessaryProfiles.add(querySnapshot.docs[i])
+                            }
+                          else if (_profiles.contains(querySnapshot.docs[j]))
+                            {
+                              print("im here"),
+                              _unneccessaryProfiles.add(querySnapshot.docs[j])
+                            }
+                          else
+                            {
+                              if (querySnapshot.docs[j]['photo']
+                                  .toString()
+                                  .isNotEmpty)
+                                {
+                                  _profiles.add(querySnapshot.docs[j]),
+                                  print("added"),
+                                  print(querySnapshot.docs[j].id)
+                                }
+                              else
+                                {
+                                  _unneccessaryProfiles
+                                      .add(querySnapshot.docs[j])
+                                }
+                            }
                         }
                     }
                 }
@@ -57,6 +100,7 @@ class _SwipePageState extends State<SwipePage> {
                   })
                 }
             });
+*/
 
     print(_profiles.length);
     print(_matches.length);
@@ -122,6 +166,7 @@ class _SwipePageState extends State<SwipePage> {
         .collection('users')
         .doc(auth.currentUser!.uid)
         .collection('matches')
+        .orderBy('user2')
         .get()
         .then((QuerySnapshot querySnapshot) => {
               querySnapshot.docs.forEach((doc) async {
