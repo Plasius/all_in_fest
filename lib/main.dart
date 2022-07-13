@@ -11,12 +11,13 @@ import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
 import 'models/favorite_model.dart';
+import 'models/mongo_connect.dart';
 import 'pages/map_page.dart';
 import 'pages/settings_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await MongoDatabase.connect();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,

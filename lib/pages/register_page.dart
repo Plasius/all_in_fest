@@ -1,8 +1,10 @@
+import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 import 'matches_page.dart';
 
@@ -155,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             Padding(
                               padding: EdgeInsets.only(
                                   left:
-                                  MediaQuery.of(context).size.width * 0.043,
+                                      MediaQuery.of(context).size.width * 0.043,
                                   bottom: MediaQuery.of(context).size.height *
                                       0.011),
                               child: const Text(
@@ -203,7 +205,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             Padding(
                               padding: EdgeInsets.only(
                                   left:
-                                  MediaQuery.of(context).size.width * 0.043,
+                                      MediaQuery.of(context).size.width * 0.043,
                                   bottom: MediaQuery.of(context).size.height *
                                       0.011),
                               child: const Text(
@@ -281,7 +283,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       borderRadius: BorderRadius.circular(5)),
                                   child: Padding(
                                     padding: EdgeInsets.symmetric(
-                                        vertical: size.height*0.009, horizontal: size.width*0.065),
+                                        vertical: size.height * 0.009,
+                                        horizontal: size.width * 0.065),
                                     child: const Text(
                                       "Regisztráció",
                                       style: TextStyle(
@@ -299,14 +302,15 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.only(top: size.height*0.04, right: size.height*0.022),
+                padding: EdgeInsets.only(
+                    top: size.height * 0.04, right: size.height * 0.022),
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(bottom: size.height*0.013),
+                          padding: EdgeInsets.only(bottom: size.height * 0.013),
                           child: const Text("Már van fiókod?",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20)),
@@ -359,7 +363,18 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void createFirestoreProfile() async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+    try {
+      MongoDatabase.users.insertOne({
+        'name': name,
+        'bio': "",
+        'photo': "",
+        'since': DateTime.now().millisecondsSinceEpoch,
+        'userID': auth.currentUser?.uid
+      });
+    } catch (e) {
+      print(e.runtimeType);
+    }
+    /*FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     await firebaseFirestore
         .collection('users')
         .doc(auth.currentUser!.uid.toString())
@@ -369,7 +384,7 @@ class _RegisterPageState extends State<RegisterPage> {
       'photo': "",
       'since': DateTime.now().millisecondsSinceEpoch,
       'userID': auth.currentUser?.uid
-    });
+    });*/
 
     final prefs = await SharedPreferences.getInstance();
 
