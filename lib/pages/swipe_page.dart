@@ -1,10 +1,13 @@
+import 'dart:convert';
+
+import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
@@ -16,98 +19,14 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   List<SwipeItem> _swipeItems = <SwipeItem>[];
-  List<DocumentSnapshot> _profiles = [];
-  List<DocumentSnapshot> _unneccessaryProfiles = [];
-  List<DocumentSnapshot> _matches = [];
+  List<Map<String, dynamic>> _profiles = [];
+  List<Map<String, dynamic>> _matches = [];
 
   void getProfiles() async {
-    //final prefs = await SharedPreferences.getInstance();
-    //int? counter = prefs.getInt('counter');
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    //getMatches();
-    _profiles = await firebaseFirestore
-        .collection('users')
-        .where('userID', isNotEqualTo: auth.currentUser?.uid)
-        .orderBy('userID')
-        //.startAfter([counter])
-        //.limit(2)
-        .get()
-        .then((QuerySnapshot querySnapshot) => querySnapshot.docs.toList());
-
-    if (_matches.isNotEmpty)
-    {
-      for(int i=0; i<_profiles.length; i++){
-        for(int j=0; j<_matches.length;j++){
-          if(_matches[j]['user2']==_profiles[i].id){
-            _profiles.remove(_profiles[i]);
-          }
-        }
-      }
-    }
-/*
-        .then((QuerySnapshot querySnapshot) => {
-              if (_matches.isNotEmpty)
-                {
-                  for (int i = 0; i < _matches.length; i++)
-                    {
-                      for (int j = 0; j < querySnapshot.docs.length; j++)
-                        {
-                          print(querySnapshot.docs[j].id),
-                          print(_matches[i].id),
-                          if (_matches[i]
-                                  .id
-                                  .toString()
-                                  .contains(querySnapshot.docs[j].id) &&
-                              _profiles.contains(querySnapshot.docs[j]) ==
-                                  false)
-                            {
-                              //print(_matches[j].id),
-                              //print(querySnapshot.docs[i].id),
-                              print("im in"),
-                              _unneccessaryProfiles.add(querySnapshot.docs[i])
-                            }
-                          else if (_profiles.contains(querySnapshot.docs[j]))
-                            {
-                              print("im here"),
-                              _unneccessaryProfiles.add(querySnapshot.docs[j])
-                            }
-                          else
-                            {
-                              if (querySnapshot.docs[j]['photo']
-                                  .toString()
-                                  .isNotEmpty)
-                                {
-                                  _profiles.add(querySnapshot.docs[j]),
-                                  print("added"),
-                                  print(querySnapshot.docs[j].id)
-                                }
-                              else
-                                {
-                                  _unneccessaryProfiles
-                                      .add(querySnapshot.docs[j])
-                                }
-                            }
-                        }
-                    }
-                }
-              else
-                {
-                  querySnapshot.docs.forEach((element) {
-                    element['photo'] != ""
-                        ? _profiles.add(element)
-                        : _unneccessaryProfiles.add(element);
-                  })
-                }
-            });
-*/
-
+    _profiles = await MongoDatabase.users.find(mongo.where.ne('userID', FirebaseAuth.instance.currentUser?.uid)).toList();
     print(_profiles.length);
-    print(_matches.length);
-    print(_unneccessaryProfiles.length);
-
     for (int i = 0; i < _profiles.length; i++) {
-      //print(_profiles[i]['photo']);
+      var img = await MongoDatabase.bucket.chunks.findOne(mongo.where.eq('user', _profiles[i]["userID"]));
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
@@ -133,13 +52,7 @@ class _SwipePageState extends State<SwipePage> {
                             height: MediaQuery.of(context).size.height / 3,
                             decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image: NetworkImage(
-                                        await FirebaseStorage.instanceFor(
-                                                bucket:
-                                                    "gs://festival-2e218.appspot.com")
-                                            .ref()
-                                            .child(_profiles[i].id + '.png')
-                                            .getDownloadURL()),
+                                    image: MemoryImage(base64Decode(img["data"])),
                                     fit: BoxFit.cover))),
                       ),
                       Text(
@@ -152,7 +65,7 @@ class _SwipePageState extends State<SwipePage> {
                     ],
                   ))
               : Text('No profiles found'),
-          likeAction: () => messageOptions(_profiles[i].id),
+          likeAction: () => messageOptions(_profiles[i]["userID"]),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
@@ -160,20 +73,8 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void getMatches() async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
-    await firebaseFirestore
-        .collection('users')
-        .doc(auth.currentUser!.uid)
-        .collection('matches')
-        .orderBy('user2')
-        .get()
-        .then((QuerySnapshot querySnapshot) => {
-              querySnapshot.docs.forEach((doc) async {
-                _matches.add(doc);
-              })
-            });
-    //setState(() {});
+    await MongoDatabase.matches.find(mongo.where.within('_id', auth.currentUser?.uid));
   }
 
   void initState() {
@@ -289,29 +190,12 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void messageOptions(String otherUser) async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     FirebaseAuth auth = FirebaseAuth.instance;
 
-    await firebaseFirestore
-        .collection('users')
-        .doc(auth.currentUser!.uid)
-        .collection('matches')
-        .doc(auth.currentUser!.uid.toString() + otherUser)
-        .set({
-      'user1': auth.currentUser?.uid,
-      'user2': otherUser,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
-    });
-
-    await firebaseFirestore
-        .collection('users')
-        .doc(otherUser)
-        .collection('matches')
-        .doc(otherUser + auth.currentUser!.uid.toString())
-        .set({
-      'user1': otherUser,
-      'user2': auth.currentUser?.uid,
-      'timestamp': DateTime.now().millisecondsSinceEpoch
+    await MongoDatabase.matches.insertOne({
+      "_id": "${auth.currentUser?.uid}"+otherUser,
+      "user1": auth.currentUser?.uid,
+      "user2": otherUser
     });
   }
 

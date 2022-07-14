@@ -1,12 +1,9 @@
 import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/pages/login_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
-import 'matches_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -30,8 +27,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    //String email = "";
-    //String password = "";
     var size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Login',
@@ -358,33 +353,21 @@ class _RegisterPageState extends State<RegisterPage> {
     } catch (e) {
       print(e);
     }
-    createFirestoreProfile();
+    createUserProfile();
     Navigator.pop(context);
   }
 
-  void createFirestoreProfile() async {
+  void createUserProfile() async {
     try {
       MongoDatabase.users.insertOne({
         'name': name,
         'bio': "",
-        'photo': "",
         'since': DateTime.now().millisecondsSinceEpoch,
         'userID': auth.currentUser?.uid
       });
     } catch (e) {
       print(e.runtimeType);
     }
-    /*FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    await firebaseFirestore
-        .collection('users')
-        .doc(auth.currentUser!.uid.toString())
-        .set({
-      'name': name,
-      'bio': "",
-      'photo': "",
-      'since': DateTime.now().millisecondsSinceEpoch,
-      'userID': auth.currentUser?.uid
-    });*/
 
     final prefs = await SharedPreferences.getInstance();
 

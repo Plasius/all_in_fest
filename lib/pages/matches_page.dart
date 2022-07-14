@@ -1,9 +1,12 @@
+import 'dart:convert';
+
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
+
+import '../models/mongo_connect.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({Key? key}) : super(key: key);
@@ -19,30 +22,15 @@ class _MatchesPageState extends State<MatchesPage> {
   bool ready = false;
 
   void loadMatches() async {
-    await FirebaseFirestore.instance
-        .collection('users')
-        .doc(FirebaseAuth.instance.currentUser!.uid)
-        .collection('matches')
-        .get()
-        .then((QuerySnapshot snapshot) => snapshot.docs.forEach((doc) async {
-              matches.add(doc);
-            }));
-    for (int i = 0; i < matches.length; i++) {
-      photoURLs.add(await FirebaseStorage.instanceFor(
-              bucket: "gs://festival-2e218.appspot.com")
-          .ref()
-          .child(matches[i]['user2'] + '.png')
-          .getDownloadURL());
-    }
-    for (int j = 0; j < matches.length; j++) {
-      final user = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(matches[j]['user2'])
-          .get();
-      matchedProfiles.add(user);
-    }
-    print(photoURLs[0]);
-    setState(() {});
+    FirebaseAuth auth = FirebaseAuth.instance;
+    matches = await MongoDatabase.matches
+        .find(mongo.where.match('_id', "${auth.currentUser?.uid}"))
+        .toList();
+    print(matches.length);
+    print(photoURLs.length);
+    print(matchedProfiles.length);
+    setState(() {
+    });
   }
 
   @override
@@ -91,7 +79,12 @@ class _MatchesPageState extends State<MatchesPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ChatPage(
-                                          chatPartner: matchedProfiles[index],
+                                          chatPartner: matches[index]
+                                                      ["user2"] ==
+                                                  FirebaseAuth
+                                                      .instance.currentUser?.uid
+                                              ? matches[index]["user1"]
+                                              : matches[index]["user2"],
                                           photo: photoURLs[index],
                                         ))),
                             child: Column(
@@ -108,11 +101,6 @@ class _MatchesPageState extends State<MatchesPage> {
                                         height: size.height * 0.11,
                                         width: size.width * 0.24,
                                         decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    photoURLs[index]
-                                                        .toString()),
-                                                fit: BoxFit.cover),
                                             shape: BoxShape.circle),
                                       ),
                                       Padding(
@@ -128,7 +116,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: size.width * 0.01625),
                                               child: Text(
-                                                matchedProfiles[index]['name'],
+                                                matches[index]["user2"],
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,

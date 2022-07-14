@@ -1,11 +1,11 @@
+import 'dart:convert';
+
 import 'package:all_in_fest/main.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:date_field/date_field.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io';
-import 'package:path/path.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,8 +21,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   DateTime selectedDate = DateTime.now();
   var photoURL = "";
-  File? _photo;
   final ImagePicker _picker = ImagePicker();
+  var _cmpressed_image;
+  ImageProvider? provider;
+  var flag = false;
 
   var nameController = new TextEditingController();
 
@@ -30,8 +32,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void initState() {
-    loadImage();
     super.initState();
+    loadImage();
   }
 
   Widget build(BuildContext context) {
@@ -79,8 +81,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 130,
                         decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            image:
-                                DecorationImage(image: NetworkImage(photoURL)),
+                            image: provider != null
+                                ? DecorationImage(image: provider!)
+                                : null,
                             boxShadow: [
                               BoxShadow(
                                   spreadRadius: 2,
@@ -181,73 +184,82 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  void loadImage() async {
-    final storageRef =
-        FirebaseStorage.instanceFor(bucket: "gs://festival-2e218.appspot.com")
-            .ref();
-    try {
-      final pathReference = storageRef
-          .child(FirebaseAuth.instance.currentUser!.uid.toString() + '.png');
-
-      photoURL = await pathReference.getDownloadURL();
-    } catch (e) {}
-
-    setState(() {});
-  }
 
   Future imgFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      print("im in");
+      try {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.jpeg,
+            quality: 70);
+      } catch (e) {
+        print(e.runtimeType);
+      }
+    } else {
+      print('No image selected.');
+    }
+
+    Map<String, dynamic> image = {
+      "_id": pickedFile?.path.split("/").last,
+      "data": base64Encode(_cmpressed_image),
+      "user": FirebaseAuth.instance.currentUser?.uid
+    };
+
+    var img = await MongoDatabase.bucket.chunks
+        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+    var res = img == null
+        ? await MongoDatabase.bucket.chunks.insert(image)
+        : await MongoDatabase.bucket.chunks.updateOne(
+            mongo.where.eq('user', FirebaseAuth.instance.currentUser?.uid),
+            mongo.modify.set('data', base64Encode(_cmpressed_image)));
+
+    img = await MongoDatabase.bucket.chunks
+        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
 
     setState(() {
-      if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        uploadFile();
-        //loadImage();
-      } else {
-        print('No image selected.');
-      }
+      provider = MemoryImage(base64Decode(img["data"]));
+      flag = true;
     });
   }
 
   Future imgFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      print("im in");
+      try {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.heic,
+            quality: 70);
+      } catch (e) {
+        print(e.runtimeType);
+      }
+    } else {
+      print('No image selected.');
+    }
+
+    Map<String, dynamic> image = {
+      "_id": pickedFile?.path.split("/").last,
+      "data": base64Encode(_cmpressed_image),
+      "user": FirebaseAuth.instance.currentUser?.uid
+    };
+    var img = await MongoDatabase.bucket.chunks
+        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+    var res = img == null
+        ? await MongoDatabase.bucket.chunks.insert(image)
+        : await MongoDatabase.bucket.chunks.updateOne(
+            mongo.where.eq('user', FirebaseAuth.instance.currentUser?.uid),
+            mongo.modify.set('data', base64Encode(_cmpressed_image)));
+
+    img = await MongoDatabase.bucket.chunks
+        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
 
     setState(() {
-      if (pickedFile != null) {
-        _photo = File(pickedFile.path);
-        uploadFile();
-        //loadImage();
-      } else {
-        print('No image selected.');
-      }
+      provider = MemoryImage(base64Decode(img["data"]));
+      flag = true;
     });
-  }
-
-  Future uploadFile() async {
-    if (_photo == null) return;
-
-    var fileName = "";
-
-    if (FirebaseAuth.instance.currentUser?.uid.toString() != null)
-      fileName = FirebaseAuth.instance.currentUser!.uid.toString() + '.png';
-    else
-      var fileName = "";
-
-    final destination = fileName;
-
-    try {
-      final ref = FirebaseStorage.instance.ref(destination);
-      await ref.putFile(_photo!);
-
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid.toString())
-          .update({'photo': fileName});
-    } catch (e) {
-      print('error occured');
-    }
-    loadImage();
-    //setState(() {});
   }
 
   void _showPicker(BuildContext context) {
@@ -283,13 +295,35 @@ class _ProfilePageState extends State<ProfilePage> {
   void saveProfile() {
     //get user id
     var uid = FirebaseAuth.instance.currentUser?.uid;
-    var instance = FirebaseFirestore.instance;
     //update name
     if (uid != null) {
-      instance
-          .collection('users')
-          .doc(uid)
-          .update({'name': nameController.text, 'bio': bioController.text});
+      if (nameController.text.isNotEmpty && bioController.text.isNotEmpty) {
+        MongoDatabase.users.updateOne(
+            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.modify.set('name', nameController.text),
+            mongo.modify.set('bio', bioController.text));
+        print("Succeful update");
+      } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
+        MongoDatabase.users.updateOne(
+            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.modify.set('name', nameController.text));
+        print("Name updated");
+      } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
+        MongoDatabase.users.updateOne(
+            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.modify.set('bio', bioController.text));
+        print("Bio updated");
+      } else {
+        print("Please provide new name or bio");
+      }
     }
+  }
+
+  Future<void> loadImage() async {
+    var img = await MongoDatabase.bucket.chunks
+        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+    setState(() {
+      provider = MemoryImage(base64Decode(img["data"]));
+    });
   }
 }

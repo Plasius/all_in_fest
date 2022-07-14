@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {
-  final String photo;
+  final ImageProvider photo;
   final DocumentSnapshot chatPartner;
   const ChatPage({
     Key? key,
@@ -20,7 +20,7 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   String? partnerUID;
   String? partnerName;
-  String? partnerPhoto;
+  ImageProvider? partnerPhoto;
 
   CollectionReference? messages;
   Stream<QuerySnapshot<Object?>>? messages_stream;
@@ -167,8 +167,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 decoration: BoxDecoration(
                                                     shape: BoxShape.circle,
                                                     image: DecorationImage(
-                                                        image: NetworkImage(
-                                                            partnerPhoto!),
+                                                        image: partnerPhoto!,
                                                         fit: BoxFit.cover)),
 
                                               ),

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:date_field/date_field.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -30,7 +28,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/images/logo.png"),
+                image: const AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
@@ -141,7 +139,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void emailCsere() {
-    if (email_1.text == email_2.text && email_1.text != '') {
+    if (email_1.text == email_2.text && email_1.text != "") {
       User? firebaseUser = FirebaseAuth.instance.currentUser;
       firebaseUser
           ?.updateEmail(email_1.text)

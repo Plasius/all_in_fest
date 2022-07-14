@@ -52,6 +52,7 @@ dependencies:
   flutterfire_cli: ^0.2.2+2
 
   mongo_dart: ^0.7.4+1
+  flutter_image_compress: ^1.1.0
 
 
 dev_dependencies:
