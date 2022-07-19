@@ -2,6 +2,7 @@ import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
+import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
@@ -17,11 +18,11 @@ import 'pages/settings_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MongoDatabase.connect();
   try {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await MongoDatabase.connect();
   } catch (err) {
     //might have been initialized before
   }
@@ -83,12 +84,14 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
+      drawer: MenuBar(
+          imageProvider: MongoDatabase.picture != null
+              ? MongoDatabase.picture!
+              : AssetImage("lib/assets/user.png"),
+          userName: "név", //MongoDatabase.currentUser["name"],
+          email: "example@bit.hu"),//MongoDatabase.email!),
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-          leading: const Icon(
-            Icons.menu,
-            color: Colors.white,
-          ),
           title: const Image(
             image: AssetImage("lib/assets/logo.png"),
             height: 50,

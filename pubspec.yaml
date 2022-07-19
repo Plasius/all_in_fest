@@ -100,6 +100,9 @@ flutter:
     - lib/assets/chat_icon.png
     - lib/assets/matches_icon.png
     - lib/assets/send_message.png
+    - lib/assets/profile.png
+    - lib/assets/user.png
+    - lib/assets/logout.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 

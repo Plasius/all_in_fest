@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/mongo_connect.dart';
+import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -23,8 +24,12 @@ class _ProfilePageState extends State<ProfilePage> {
   var photoURL = "";
   final ImagePicker _picker = ImagePicker();
   var _cmpressed_image;
-  ImageProvider? provider;
+  ImageProvider? provider = const AssetImage("lib/assets/user.png");
   var flag = false;
+  String? userName = "Név";
+  String? email = FirebaseAuth.instance.currentUser != null
+      ? FirebaseAuth.instance.currentUser?.email
+      : "example@bit.hu";
 
   var nameController = new TextEditingController();
 
@@ -34,17 +39,21 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     loadImage();
+    loadProfile();
   }
 
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
+            resizeToAvoidBottomInset: false,
+            drawer: MenuBar(
+                imageProvider: MongoDatabase.picture != null
+                    ? MongoDatabase.picture!
+                    : AssetImage("lib/assets/user.png"),
+                userName: MongoDatabase.currentUser,
+                email: MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              leading: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
               title: const Image(
                 image: const AssetImage("lib/assets/logo.png"),
                 height: 50,
@@ -64,126 +73,158 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget editBody(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
+    var size = MediaQuery.of(context).size;
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("lib/assets/profile.png"), fit: BoxFit.cover)),
+      child: SingleChildScrollView(
+        child: Stack(
           children: [
             Padding(
-              padding: const EdgeInsets.only(top: 15),
-              child: GestureDetector(
-                onTap: () => _showPicker(context),
-                child: Center(
-                  child: Stack(
-                    children: [
-                      Container(
-                        width: 130,
-                        height: 130,
-                        decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: provider != null
-                                ? DecorationImage(image: provider!)
-                                : null,
-                            boxShadow: [
-                              BoxShadow(
-                                  spreadRadius: 2,
-                                  blurRadius: 5,
-                                  offset: Offset(0, 3),
-                                  color: Colors.grey.withOpacity(0.3))
-                            ]),
-                      ),
-                      Positioned(
-                        child: Container(
-                          height: 40,
-                          width: 40,
+              padding: EdgeInsets.only(
+                  right: MediaQuery.of(context).size.width * 0.04,
+                  left: MediaQuery.of(context).size.width * 0.04,
+                  top: MediaQuery.of(context).size.height * 0.15,
+                  bottom: MediaQuery.of(context).size.height * 0.026),
+              child: Container(
+                height: MediaQuery.of(context).size.height * 0.65,
+                decoration: BoxDecoration(
+                    color: Color.fromRGBO(97, 42, 122, 1),
+                    borderRadius: BorderRadius.circular(5)),
+              ),
+            ),
+            Center(
+              child: Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: size.width * 0.061,
+                          right: size.width * 0.061,
+                          bottom: size.width * 0.041,
+                          top: size.width * 0.041),
+                      child: Stack(children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.55,
+                          height: MediaQuery.of(context).size.width * 0.55,
                           decoration: BoxDecoration(
-                              color: Colors.redAccent, shape: BoxShape.circle),
-                          child: Icon(
-                            MdiIcons.cameraPlus,
-                            color: Colors.white,
+                              shape: BoxShape.circle,
+                              image: provider != null
+                                  ? DecorationImage(
+                                      image: provider!, fit: BoxFit.cover)
+                                  : DecorationImage(
+                                      image: AssetImage("lib/assets/user.png"),
+                                      fit: BoxFit.cover),
+                              border: Border.all(color: Colors.white, width: 8)),
+                        ),
+                        Positioned(
+                          child: Container(
+                            height: size.width*0.125,
+                            width: size.width*0.125,
+                            decoration: BoxDecoration(
+                                color: Colors.redAccent, shape: BoxShape.circle),
+                            child: Icon(
+                              MdiIcons.cameraPlus,
+                              color: Colors.white,
+                            ),
+                          ),
+                          bottom: size.width*0,
+                          right: size.width*0.04,
+                        )
+                      ]),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: size.width * 0.061,
+                          right: size.width * 0.061,
+                          bottom: size.width * 0.041,
+                          top: size.width * 0.041),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Color.fromRGBO(255, 255, 255, 0.4),
+                            border: Border.all(color: Colors.white, width: 3),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: TextFormField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Név",
+                              hintStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 22),
+                              contentPadding: EdgeInsets.only(
+                                  left: MediaQuery.of(context).size.width *
+                                      0.0325)),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(
+                          left: size.width * 0.061,
+                          right: size.width * 0.061,
+                          bottom: size.width * 0.061,
+                          top: size.width * 0.041),
+                      child: Container(
+                        decoration: BoxDecoration(
+                            color: Color.fromRGBO(255, 255, 255, 0.4),
+                            border: Border.all(color: Colors.white, width: 3),
+                            borderRadius: BorderRadius.circular(5)),
+                        child: TextFormField(
+                          controller: bioController,
+                          decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Bio",
+                              hintStyle: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                  fontSize: 22),
+                              contentPadding: EdgeInsets.all(
+                                  MediaQuery.of(context).size.width * 0.0325)),
+                          maxLines: 9,
+                          maxLength: 500,
+                        ),
+                      ),
+                    ),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => {
+                          FirebaseAuth.instance.signOut(),
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      MyHomePage(title: "Exited")))
+                        },
+                        child: Container(
+                          width: size.width * 0.119,
+                          height: size.width * 0.119,
+                          decoration: BoxDecoration(
+                              color: Color.fromRGBO(232, 107, 62, 1),
+                              shape: BoxShape.circle),
+                          child: Padding(
+                            padding: EdgeInsets.all(size.width * 0.025),
+                            child: Image(
+                              image: AssetImage("lib/assets/logout.png"),
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        bottom: 0,
-                        right: 0,
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              controller: nameController,
-              decoration: InputDecoration(
-                  labelText: 'Név',
-                  labelStyle: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'Anthony Radev',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            TextFormField(
-              controller: bioController,
-              decoration: InputDecoration(
-                  labelText: 'Bio',
-                  labelStyle: TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'Rólam',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15),
-                  )),
-              maxLength: 500,
-              maxLines: 10,
-            ),
-            SizedBox(
-              height: 15,
-            ),
-            IconButton(
-                onPressed: () => {
-                      FirebaseAuth.instance.signOut(),
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  MyHomePage(title: "Exited")))
-                    },
-                icon: Icon(Icons.exit_to_app))
-
-            /*Center(
-              child: Text(
-                'My interests',
-                style: TextStyle(
-                    color: Colors.redAccent,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(
-              height: 15,
-            ),*/
           ],
         ),
       ),
     );
   }
-
 
   Future imgFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -324,6 +365,15 @@ class _ProfilePageState extends State<ProfilePage> {
         .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
     setState(() {
       provider = MemoryImage(base64Decode(img["data"]));
+    });
+  }
+
+  void loadProfile() async {
+    var user = await MongoDatabase.users.findOne(
+        mongo.where.eq("userID", FirebaseAuth.instance.currentUser?.uid));
+    print(user["name"]);
+    setState(() {
+      userName = user["name"];
     });
   }
 }

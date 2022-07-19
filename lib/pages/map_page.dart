@@ -30,7 +30,7 @@ class _MapPageState extends State<MapPage> {
           body: 
 
                   PhotoView(imageProvider: 
-                  AssetImage("lib/assets/images/terkep.png"))
+                  AssetImage("lib/assets/terkep.png"))
                   /*MediaQuery.of(context).size.height)*/                  
                 
         ),
