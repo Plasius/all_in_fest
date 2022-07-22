@@ -1,17 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 import '../models/mongo_connect.dart';
 import 'menu_sidebar.dart';
 
 class ChatPage extends StatefulWidget {
   final ImageProvider photo;
-  final DocumentSnapshot chatPartner;
+  final String chatPartnerID;
+  final String chatPartnerName;
   const ChatPage({
     Key? key,
-    required this.chatPartner,
+    required this.chatPartnerID,
     required this.photo,
+    required this.chatPartnerName
   }) : super(
           key: key,
         );
@@ -25,7 +28,8 @@ class _ChatPageState extends State<ChatPage> {
   String? partnerName;
   ImageProvider? partnerPhoto;
 
-  CollectionReference? messages;
+  var match;
+  var messages=[];
   Stream<QuerySnapshot<Object?>>? messages_stream;
 
   var message = '';
@@ -33,23 +37,20 @@ class _ChatPageState extends State<ChatPage> {
   final messageInput = TextEditingController();
 
   @override
-  void didChangeDependencies() {
+  Future<void> didChangeDependencies() async {
     super.didChangeDependencies();
-
+    FirebaseAuth auth = FirebaseAuth.instance;
     try {
-      partnerUID = widget.chatPartner.id;
-      partnerName = widget.chatPartner['name'];
+      partnerUID = widget.chatPartnerID;
+      partnerName = widget.chatPartnerName;
       partnerPhoto = widget.photo;
 
       print(partnerName! + partnerUID!);
 
-      messages = FirebaseFirestore.instance
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection('messages');
+      match = MongoDatabase.matches.findOne(mongo.where.match("_id", partnerUID!));
+      messages=match["messages"].find;
 
-      messages_stream =
-          messages?.orderBy('datetime').snapshots(includeMetadataChanges: true);
+      messages.sort((a, b) => a["datetime"].compareTo(b["datetime"]));
 
       /*if (partnerUID?.compareTo(FirebaseAuth.instance.currentUser!.uid) != 0) {
         messages = FirebaseFirestore.instance.collection('matches/' +

@@ -27,11 +27,26 @@ class _MatchesPageState extends State<MatchesPage> {
     matches = await MongoDatabase.matches
         .find(mongo.where.match('_id', "${auth.currentUser?.uid}"))
         .toList();
-    print(matches.length);
-    print(photoURLs.length);
-    print(matchedProfiles.length);
-    setState(() {
-    });
+    for (var element in matches){
+      print(FirebaseAuth.instance.currentUser?.uid);
+      print(element["user1"]);
+      print(element["user2"]);
+      var partner;
+      element["user2"] == FirebaseAuth.instance.currentUser?.uid
+          ? partner= element["user1"]
+          : partner=element["user2"];
+      print(partner);
+      var matchedProfile = await MongoDatabase.users.findOne(
+          mongo.where.eq("userID", partner));
+      print(matchedProfile["name"]);
+      matchedProfiles.add(matchedProfile);
+      print(matchedProfiles.length);
+
+      var partnerPhoto = await MongoDatabase.bucket.chunks.findOne(mongo.where.eq("user", partner));
+      photoURLs.add(partnerPhoto != null ? MemoryImage(base64Decode(partnerPhoto["data"])) : AssetImage("lib/assets/user.png"));
+      print(photoURLs.length);
+    }
+    setState(() {});
   }
 
   @override
@@ -50,8 +65,12 @@ class _MatchesPageState extends State<MatchesPage> {
                 imageProvider: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+                userName: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.currentUser["name"]
+                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+                email: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.email!
+                    : ""), //MongoDatabase.email!),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
@@ -86,13 +105,13 @@ class _MatchesPageState extends State<MatchesPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => ChatPage(
-                                          chatPartner: matches[index]
+                                          chatPartnerID: matches[index]
                                                       ["user2"] ==
                                                   FirebaseAuth
                                                       .instance.currentUser?.uid
                                               ? matches[index]["user1"]
                                               : matches[index]["user2"],
-                                          photo: photoURLs[index],
+                                          photo: photoURLs[index], chatPartnerName: matchedProfiles[index]["name"],
                                         ))),
                             child: Column(
                               children: [
@@ -108,7 +127,10 @@ class _MatchesPageState extends State<MatchesPage> {
                                         height: size.height * 0.11,
                                         width: size.width * 0.24,
                                         decoration: BoxDecoration(
-                                            shape: BoxShape.circle),
+                                            shape: BoxShape.circle,
+                                        image: DecorationImage(
+                                          image: photoURLs[index]
+                                        )),
                                       ),
                                       Padding(
                                         padding:
@@ -123,7 +145,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: size.width * 0.01625),
                                               child: Text(
-                                                matches[index]["user2"],
+                                                matchedProfiles[index]["name"],
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
