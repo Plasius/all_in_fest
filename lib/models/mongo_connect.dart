@@ -27,11 +27,14 @@ class MongoDatabase {
     bucket = GridFS(db, "images");
 
     currentUser = await users
-        .findOne(where.eq("userID", FirebaseAuth.instance.currentUser?.uid))["name"];
+        .findOne(where.eq("userID", FirebaseAuth.instance.currentUser?.uid));
 
-    currentProfilePic =
-        await bucket.chunks.findOne(where.eq("user", currentUser["userID"]));
-    picture = MemoryImage(base64Decode(currentProfilePic["data"]));
+    currentProfilePic = FirebaseAuth.instance.currentUser != null
+        ? await bucket.chunks.findOne(where.eq("user", currentUser["userID"]))
+        : null;
+    picture = currentProfilePic != null
+        ? MemoryImage(base64Decode(currentProfilePic["data"]))
+        : null;
 
     email = FirebaseAuth.instance.currentUser != null
         ? FirebaseAuth.instance.currentUser?.email

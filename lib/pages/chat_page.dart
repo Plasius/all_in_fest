@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../models/mongo_connect.dart';
+import 'menu_sidebar.dart';
+
 class ChatPage extends StatefulWidget {
   final ImageProvider photo;
   final DocumentSnapshot chatPartner;
@@ -86,6 +89,12 @@ class _ChatPageState extends State<ChatPage> {
   Widget build(BuildContext context) {
     if (messages == null) {
       return Scaffold(
+          drawer: MenuBar(
+              imageProvider: FirebaseAuth.instance.currentUser != null
+                  ? MongoDatabase.picture!
+                  : AssetImage("lib/assets/user.png"),
+              userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+              email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
           appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             leading: const Icon(

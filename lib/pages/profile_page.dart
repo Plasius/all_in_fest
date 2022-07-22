@@ -47,11 +47,11 @@ class _ProfilePageState extends State<ProfilePage> {
         home: Scaffold(
             resizeToAvoidBottomInset: false,
             drawer: MenuBar(
-                imageProvider: MongoDatabase.picture != null
+                imageProvider: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
-                userName: MongoDatabase.currentUser,
-                email: MongoDatabase.email!),
+                userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+                email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: const Image(

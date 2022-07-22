@@ -6,6 +6,7 @@ import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -22,10 +23,10 @@ Future<void> main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    await MongoDatabase.connect();
   } catch (err) {
     //might have been initialized before
   }
+  await MongoDatabase.connect();
 
   runApp(ChangeNotifierProvider(
       create: (context) => FavoriteModel(), child: const MyApp()));
@@ -51,7 +52,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: FirebaseAuth.instance.currentUser!=null ? const MyHomePage(title: 'Flutter Demo Home Page') : LoginPage(),
     );
   }
 }
@@ -85,11 +86,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       drawer: MenuBar(
-          imageProvider: MongoDatabase.picture != null
+          imageProvider: FirebaseAuth.instance.currentUser != null
               ? MongoDatabase.picture!
               : AssetImage("lib/assets/user.png"),
-          userName: "név", //MongoDatabase.currentUser["name"],
-          email: "example@bit.hu"),//MongoDatabase.email!),
+          userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+          email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
           title: const Image(

@@ -1,7 +1,11 @@
+import 'package:all_in_fest/pages/menu_sidebar.dart';
+import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../main.dart';
+import '../models/mongo_connect.dart';
 import 'matches_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -23,12 +27,21 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-
     var size = MediaQuery.of(context).size;
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
         resizeToAvoidBottomInset: false,
+        drawer: MenuBar(
+            imageProvider: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.picture!
+                : AssetImage("lib/assets/user.png"),
+            userName: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.currentUser["name"]
+                : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+            email: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.email!
+                : ""),
         body: Container(
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
@@ -236,14 +249,13 @@ class _LoginPageState extends State<LoginPage> {
       );
 
       Navigator.push(context,
-          MaterialPageRoute(builder: (context) => const MatchesPage()));
+          MaterialPageRoute(builder: (context) => ProfilePage()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
       } else if (e.code == 'wrong-password') {
         print('Wrong password provided.');
-      }
-      else{
+      } else {
         print(e);
       }
     }

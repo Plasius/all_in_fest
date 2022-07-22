@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
+import 'menu_sidebar.dart';
+
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
 
@@ -23,10 +25,13 @@ class _SwipePageState extends State<SwipePage> {
   List<Map<String, dynamic>> _matches = [];
 
   void getProfiles() async {
-    _profiles = await MongoDatabase.users.find(mongo.where.ne('userID', FirebaseAuth.instance.currentUser?.uid)).toList();
+    _profiles = await MongoDatabase.users
+        .find(mongo.where.ne('userID', FirebaseAuth.instance.currentUser?.uid))
+        .toList();
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
-      var img = await MongoDatabase.bucket.chunks.findOne(mongo.where.eq('user', _profiles[i]["userID"]));
+      var img = await MongoDatabase.bucket.chunks
+          .findOne(mongo.where.eq('user', _profiles[i]["userID"]));
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
@@ -52,7 +57,8 @@ class _SwipePageState extends State<SwipePage> {
                             height: MediaQuery.of(context).size.height / 3,
                             decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image: MemoryImage(base64Decode(img["data"])),
+                                    image:
+                                        MemoryImage(base64Decode(img["data"])),
                                     fit: BoxFit.cover))),
                       ),
                       Text(
@@ -74,7 +80,8 @@ class _SwipePageState extends State<SwipePage> {
 
   void getMatches() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    await MongoDatabase.matches.find(mongo.where.within('_id', auth.currentUser?.uid));
+    await MongoDatabase.matches
+        .find(mongo.where.within('_id', auth.currentUser?.uid));
   }
 
   void initState() {
@@ -87,10 +94,20 @@ class _SwipePageState extends State<SwipePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_profiles.isNotEmpty)
+    if (_profiles.isNotEmpty) {
       return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
+            drawer: MenuBar(
+                imageProvider: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.picture!
+                    : AssetImage("lib/assets/user.png"),
+                userName: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.currentUser["name"]
+                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+                email: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.email!
+                    : ""), //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               leading: const Icon(
@@ -105,7 +122,7 @@ class _SwipePageState extends State<SwipePage> {
             ),
             body: swipeBody()),
       );
-    else
+    } else
       return MaterialApp(
           title: 'Welcome to Flutter',
           home: Scaffold(
@@ -193,7 +210,7 @@ class _SwipePageState extends State<SwipePage> {
     FirebaseAuth auth = FirebaseAuth.instance;
 
     await MongoDatabase.matches.insertOne({
-      "_id": "${auth.currentUser?.uid}"+otherUser,
+      "_id": "${auth.currentUser?.uid}" + otherUser,
       "user1": auth.currentUser?.uid,
       "user2": otherUser
     });

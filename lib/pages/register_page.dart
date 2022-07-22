@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'menu_sidebar.dart';
+
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -31,6 +33,12 @@ class _RegisterPageState extends State<RegisterPage> {
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
+        drawer: MenuBar(
+            imageProvider: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.picture!
+                : AssetImage("lib/assets/user.png"),
+            userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+            email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
         resizeToAvoidBottomInset: false,
         body: Container(
           constraints: BoxConstraints.expand(),

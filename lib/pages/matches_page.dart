@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
 import '../models/mongo_connect.dart';
+import 'menu_sidebar.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({Key? key}) : super(key: key);
@@ -45,6 +46,12 @@ class _MatchesPageState extends State<MatchesPage> {
     return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
+            drawer: MenuBar(
+                imageProvider: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.picture!
+                    : AssetImage("lib/assets/user.png"),
+                userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+                email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),

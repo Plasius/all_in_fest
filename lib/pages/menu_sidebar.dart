@@ -38,6 +38,17 @@ class MenuBar extends StatelessWidget {
             ),
           ),
           ListTile(
+            title: Text('Home'),
+            leading: Icon(Icons.home),
+            onTap: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                      const MyHomePage(title: "Home")))
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.login),
             title: Text('Login'),
             onTap: () => Navigator.push(

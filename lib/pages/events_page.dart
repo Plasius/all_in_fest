@@ -1,10 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/favorite_model.dart';
+import '../models/mongo_connect.dart';
 import 'favorite_page.dart';
+import 'menu_sidebar.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -58,6 +61,12 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
+      drawer: MenuBar(
+          imageProvider: FirebaseAuth.instance.currentUser != null
+              ? MongoDatabase.picture!
+              : AssetImage("lib/assets/user.png"),
+          userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+          email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(232, 107, 62, 1),
         leading: Icon(
