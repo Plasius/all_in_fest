@@ -20,11 +20,15 @@ class _MapPageState extends State<MapPage> {
       title: 'Map',
       home: Scaffold(
           drawer: MenuBar(
-              imageProvider: FirebaseAuth.instance.currentUser != null
+              imageProvider: MongoDatabase.picture != null
                   ? MongoDatabase.picture!
                   : AssetImage("lib/assets/user.png"),
-              userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-              email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+              userName: FirebaseAuth.instance.currentUser != null
+                  ? MongoDatabase.currentUser["name"]
+                  : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+              email: FirebaseAuth.instance.currentUser != null
+                  ? MongoDatabase.email!
+                  : ""), //MongoDatabase.email!),
           /*appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             leading: const Icon(
@@ -37,15 +41,10 @@ class _MapPageState extends State<MapPage> {
               fit: BoxFit.contain,
             ),
           ),*/
-          body: 
+          body: PhotoView(imageProvider: AssetImage("lib/assets/terkep.png"))
+          /*MediaQuery.of(context).size.height)*/
 
-                  PhotoView(imageProvider: 
-                  AssetImage("lib/assets/terkep.png"))
-                  /*MediaQuery.of(context).size.height)*/                  
-                
-        ),
-      );
-          
-    
+          ),
+    );
   }
 }

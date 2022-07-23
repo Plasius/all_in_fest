@@ -52,7 +52,9 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: FirebaseAuth.instance.currentUser!=null ? const MyHomePage(title: 'Flutter Demo Home Page') : LoginPage(),
+      home: FirebaseAuth.instance.currentUser != null
+          ? const MyHomePage(title: 'Flutter Demo Home Page')
+          : LoginPage(),
     );
   }
 }
@@ -85,12 +87,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      drawer: MenuBar(
-          imageProvider: FirebaseAuth.instance.currentUser != null
-              ? MongoDatabase.picture!
-              : AssetImage("lib/assets/user.png"),
-          userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-          email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+        drawer: MenuBar(
+            imageProvider: MongoDatabase.picture != null
+                ? MongoDatabase.picture!
+                : AssetImage("lib/assets/user.png"),
+            userName: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.currentUser["name"]
+                : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+            email: FirebaseAuth.instance.currentUser != null
+                ? MongoDatabase.email!
+                : ""), //MongoDatabase.email!),
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
           title: const Image(

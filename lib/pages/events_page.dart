@@ -62,11 +62,15 @@ class _EventsPageState extends State<EventsPage> {
     var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
       drawer: MenuBar(
-          imageProvider: FirebaseAuth.instance.currentUser != null
+          imageProvider: MongoDatabase.picture != null
               ? MongoDatabase.picture!
               : AssetImage("lib/assets/user.png"),
-          userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-          email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+          userName: FirebaseAuth.instance.currentUser != null
+              ? MongoDatabase.currentUser["name"]
+              : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+          email: FirebaseAuth.instance.currentUser != null
+              ? MongoDatabase.email!
+              : ""), //MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: Color.fromRGBO(232, 107, 62, 1),
         leading: Icon(
@@ -159,7 +163,7 @@ class _EventsPageState extends State<EventsPage> {
                     onTap: () => setState(() {
                       _selectedDate == "augusztus 26."
                           ? _selectedDate = ""
-                          :_selectedDate = "augusztus 26.";
+                          : _selectedDate = "augusztus 26.";
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -196,7 +200,7 @@ class _EventsPageState extends State<EventsPage> {
                     onTap: () => setState(() {
                       _selectedDate == "augusztus 27."
                           ? _selectedDate = ""
-                          :_selectedDate = "augusztus 27.";
+                          : _selectedDate = "augusztus 27.";
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -233,7 +237,7 @@ class _EventsPageState extends State<EventsPage> {
                     onTap: () => setState(() {
                       _selectedDate == "augusztus 28."
                           ? _selectedDate = ""
-                          :_selectedDate = "augusztus 28.";
+                          : _selectedDate = "augusztus 28.";
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,

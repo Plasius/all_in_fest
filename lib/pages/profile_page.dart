@@ -26,7 +26,8 @@ class _ProfilePageState extends State<ProfilePage> {
   var _cmpressed_image;
   ImageProvider? provider = const AssetImage("lib/assets/user.png");
   var flag = false;
-  String? userName = "Név";
+  String userName = "Adj meg egy nevet";
+  String bio = "Adj meg egy bio-t";
   String? email = FirebaseAuth.instance.currentUser != null
       ? FirebaseAuth.instance.currentUser?.email
       : "example@bit.hu";
@@ -38,6 +39,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    nameController.text = userName;
+    bioController.text = bio;
     loadImage();
     loadProfile();
   }
@@ -47,11 +50,15 @@ class _ProfilePageState extends State<ProfilePage> {
         home: Scaffold(
             resizeToAvoidBottomInset: false,
             drawer: MenuBar(
-                imageProvider: FirebaseAuth.instance.currentUser != null
+                imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+                userName: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.currentUser["name"]
+                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+                email: FirebaseAuth.instance.currentUser != null
+                    ? MongoDatabase.email!
+                    : ""), //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: const Image(
@@ -119,21 +126,23 @@ class _ProfilePageState extends State<ProfilePage> {
                                   : DecorationImage(
                                       image: AssetImage("lib/assets/user.png"),
                                       fit: BoxFit.cover),
-                              border: Border.all(color: Colors.white, width: 8)),
+                              border:
+                                  Border.all(color: Colors.white, width: 8)),
                         ),
                         Positioned(
                           child: Container(
-                            height: size.width*0.125,
-                            width: size.width*0.125,
+                            height: size.width * 0.125,
+                            width: size.width * 0.125,
                             decoration: BoxDecoration(
-                                color: Colors.redAccent, shape: BoxShape.circle),
+                                color: Colors.redAccent,
+                                shape: BoxShape.circle),
                             child: Icon(
                               MdiIcons.cameraPlus,
                               color: Colors.white,
                             ),
                           ),
-                          bottom: size.width*0,
-                          right: size.width*0.04,
+                          bottom: size.width * 0,
+                          right: size.width * 0.04,
                         )
                       ]),
                     ),
@@ -152,7 +161,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           controller: nameController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "Név",
                               hintStyle: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
@@ -178,7 +186,6 @@ class _ProfilePageState extends State<ProfilePage> {
                           controller: bioController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintText: "Bio",
                               hintStyle: TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
@@ -361,19 +368,24 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    var img = await MongoDatabase.bucket.chunks
-        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
-    setState(() {
-      provider = MemoryImage(base64Decode(img["data"]));
-    });
+    if (MongoDatabase.picture == null)
+      provider = AssetImage("lib/assets/user.png");
+    else
+      provider = MongoDatabase.picture;
+
+    setState(() {});
   }
 
   void loadProfile() async {
     var user = await MongoDatabase.users.findOne(
         mongo.where.eq("userID", FirebaseAuth.instance.currentUser?.uid));
     print(user["name"]);
+
     setState(() {
       userName = user["name"];
+      bio = user["bio"];
+      nameController.text = userName;
+      bioController.text = bio;
     });
   }
 }

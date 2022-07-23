@@ -10,12 +10,12 @@ class ChatPage extends StatefulWidget {
   final ImageProvider photo;
   final String chatPartnerID;
   final String chatPartnerName;
-  const ChatPage({
-    Key? key,
-    required this.chatPartnerID,
-    required this.photo,
-    required this.chatPartnerName
-  }) : super(
+  const ChatPage(
+      {Key? key,
+      required this.chatPartnerID,
+      required this.photo,
+      required this.chatPartnerName})
+      : super(
           key: key,
         );
 
@@ -29,7 +29,7 @@ class _ChatPageState extends State<ChatPage> {
   ImageProvider? partnerPhoto;
 
   var match;
-  var messages=[];
+  var messages = [];
   Stream<QuerySnapshot<Object?>>? messages_stream;
 
   var message = '';
@@ -47,8 +47,9 @@ class _ChatPageState extends State<ChatPage> {
 
       print(partnerName! + partnerUID!);
 
-      match = MongoDatabase.matches.findOne(mongo.where.match("_id", partnerUID!));
-      messages=match["messages"].find;
+      match =
+          MongoDatabase.matches.findOne(mongo.where.match("_id", partnerUID!));
+      messages = match["messages"].find;
 
       messages.sort((a, b) => a["datetime"].compareTo(b["datetime"]));
 
@@ -91,11 +92,15 @@ class _ChatPageState extends State<ChatPage> {
     if (messages == null) {
       return Scaffold(
           drawer: MenuBar(
-              imageProvider: FirebaseAuth.instance.currentUser != null
+              imageProvider: MongoDatabase.picture != null
                   ? MongoDatabase.picture!
                   : AssetImage("lib/assets/user.png"),
-              userName: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.currentUser["name"] : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-              email: FirebaseAuth.instance.currentUser!=null ? MongoDatabase.email! : ""),//MongoDatabase.email!),
+              userName: FirebaseAuth.instance.currentUser != null
+                  ? MongoDatabase.currentUser["name"]
+                  : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
+              email: FirebaseAuth.instance.currentUser != null
+                  ? MongoDatabase.email!
+                  : ""), //MongoDatabase.email!),
           appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             leading: const Icon(
@@ -179,13 +184,13 @@ class _ChatPageState extends State<ChatPage> {
                                                     image: DecorationImage(
                                                         image: partnerPhoto!,
                                                         fit: BoxFit.cover)),
-
                                               ),
                                             ),
                                             Container(
                                               decoration: BoxDecoration(
                                                   color: Colors.white,
-                                              borderRadius: BorderRadius.circular(5)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal:
@@ -221,7 +226,8 @@ class _ChatPageState extends State<ChatPage> {
                                               decoration: BoxDecoration(
                                                   color: Color.fromRGBO(
                                                       187, 229, 243, 1),
-                                              borderRadius: BorderRadius.circular(5)),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
                                               child: Padding(
                                                 padding: EdgeInsets.symmetric(
                                                     horizontal:

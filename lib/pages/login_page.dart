@@ -32,16 +32,6 @@ class _LoginPageState extends State<LoginPage> {
       title: 'Login',
       home: Scaffold(
         resizeToAvoidBottomInset: false,
-        drawer: MenuBar(
-            imageProvider: FirebaseAuth.instance.currentUser != null
-                ? MongoDatabase.picture!
-                : AssetImage("lib/assets/user.png"),
-            userName: FirebaseAuth.instance.currentUser != null
-                ? MongoDatabase.currentUser["name"]
-                : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-            email: FirebaseAuth.instance.currentUser != null
-                ? MongoDatabase.email!
-                : ""),
         body: Container(
           constraints: BoxConstraints.expand(),
           decoration: BoxDecoration(
@@ -248,8 +238,11 @@ class _LoginPageState extends State<LoginPage> {
         password: password,
       );
 
-      Navigator.push(context,
-          MaterialPageRoute(builder: (context) => ProfilePage()));
+      MongoDatabase.disconnect();
+      await MongoDatabase.connect();
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ProfilePage()));
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');

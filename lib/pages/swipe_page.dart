@@ -28,10 +28,14 @@ class _SwipePageState extends State<SwipePage> {
     _profiles = await MongoDatabase.users
         .find(mongo.where.ne('userID', FirebaseAuth.instance.currentUser?.uid))
         .toList();
+
+    //shuffle?
+
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
       var img = await MongoDatabase.bucket.chunks
           .findOne(mongo.where.eq('user', _profiles[i]["userID"]));
+      if (img == null) continue;
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
@@ -99,7 +103,7 @@ class _SwipePageState extends State<SwipePage> {
         title: 'Welcome to Flutter',
         home: Scaffold(
             drawer: MenuBar(
-                imageProvider: FirebaseAuth.instance.currentUser != null
+                imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
                 userName: FirebaseAuth.instance.currentUser != null

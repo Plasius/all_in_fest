@@ -11,6 +11,11 @@ class MongoDatabase {
   static var currentProfilePic;
   static ImageProvider? picture;
   static String? email;
+
+  static disconnect() async {
+    db.close();
+  }
+
   static connect() async {
     db = Db.pool([
       "mongodb://bitclub:Festival22@cluster0-shard-00-00.3v4ig.mongodb.net:27017/allinfest?ssl=true&authSource=admin&retryWrites=true&w=majority",
