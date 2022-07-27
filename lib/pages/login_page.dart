@@ -31,194 +31,198 @@ class _LoginPageState extends State<LoginPage> {
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
-        resizeToAvoidBottomInset: false,
+        resizeToAvoidBottomInset: true,
         body: Container(
-          constraints: BoxConstraints.expand(),
+          constraints: BoxConstraints.tight(MediaQuery.of(context).size),
           decoration: BoxDecoration(
               image: DecorationImage(
                   image: AssetImage("lib/assets/LOGIN.png"),
                   fit: BoxFit.cover)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                      left: size.width * 0.0386,
-                      right: size.width * 0.0386,
-                      top: size.height * 0.25,
-                      bottom: size.height * 0.1),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        color: Color.fromRGBO(97, 42, 122, 1),
-                        borderRadius: BorderRadius.circular(5)),
-                    height: MediaQuery.of(context).size.height * 0.46,
-                    width: MediaQuery.of(context).size.width,
-                    child: SingleChildScrollView(
-                      child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  top: size.height * 0.037,
-                                  bottom: size.height * 0.022),
-                              child: Center(
-                                child: const Text(
-                                  "Bejelentkezés",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 30,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.043,
-                                  bottom: MediaQuery.of(context).size.height *
-                                      0.011),
-                              child: const Text(
-                                "E-mail cím",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.normal),
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: size.width * 0.041,
-                                  right: size.width * 0.041,
-                                  bottom: size.width * 0.041),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border: Border.all(
-                                        color: Colors.white, width: 3),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: TextFormField(
-                                  onChanged: (value) => email = value,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    prefixIcon: Icon(
-                                      Icons.mail_outlined,
-                                      color: Colors.white,
-                                    ),
+          child: SingleChildScrollView(
+            physics: NeverScrollableScrollPhysics(),
+            reverse: true,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                        left: size.width * 0.0386,
+                        right: size.width * 0.0386,
+                        top: size.height * 0.25,
+                        bottom: size.height * 0.1),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Color.fromRGBO(97, 42, 122, 1),
+                          borderRadius: BorderRadius.circular(5)),
+                      height: MediaQuery.of(context).size.height * 0.46,
+                      width: MediaQuery.of(context).size.width,
+                      child: SingleChildScrollView(
+                        child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    top: size.height * 0.037,
+                                    bottom: size.height * 0.022),
+                                child: Center(
+                                  child: const Text(
+                                    "Bejelentkezés",
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left:
-                                      MediaQuery.of(context).size.width * 0.043,
-                                  bottom: MediaQuery.of(context).size.height *
-                                      0.011),
-                              child: const Text(
-                                "Jelszó",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.normal),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left:
+                                        MediaQuery.of(context).size.width * 0.043,
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.011),
+                                child: const Text(
+                                  "E-mail cím",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.normal),
+                                ),
                               ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  left: size.width * 0.041,
-                                  right: size.width * 0.041,
-                                  bottom: size.width * 0.082),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                    color: Color.fromRGBO(255, 255, 255, 0.4),
-                                    border: Border.all(
-                                        color: Colors.white, width: 3),
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: TextFormField(
-                                    onChanged: (value) => password = value,
-                                    obscureText: _showPassword ? false : true,
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: size.width * 0.041,
+                                    right: size.width * 0.041,
+                                    bottom: size.width * 0.041),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      border: Border.all(
+                                          color: Colors.white, width: 3),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: TextFormField(
+                                    onChanged: (value) => email = value,
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
-                                        Icons.lock_outline,
+                                        Icons.mail_outlined,
                                         color: Colors.white,
                                       ),
-                                      suffixIcon: GestureDetector(
-                                        onTap: () {
-                                          _togglevisibility();
-                                        },
-                                        child: Icon(
-                                          _showPassword
-                                              ? Icons.visibility
-                                              : Icons.visibility_off,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    )),
-                              ),
-                            ),
-                            Center(
-                              child: GestureDetector(
-                                onTap: () => signInUsingEmailPassword(
-                                    context: context,
-                                    email: email,
-                                    password: password),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                      color: Color.fromRGBO(254, 192, 1, 1),
-                                      borderRadius: BorderRadius.circular(5)),
-                                  child: Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: size.height * 0.009,
-                                        horizontal: size.width * 0.065),
-                                    child: const Text(
-                                      "Belépés",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 32),
                                     ),
                                   ),
                                 ),
                               ),
-                            )
-                          ]),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left:
+                                        MediaQuery.of(context).size.width * 0.043,
+                                    bottom: MediaQuery.of(context).size.height *
+                                        0.011),
+                                child: const Text(
+                                  "Jelszó",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.normal),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: size.width * 0.041,
+                                    right: size.width * 0.041,
+                                    bottom: size.width * 0.082),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      border: Border.all(
+                                          color: Colors.white, width: 3),
+                                      borderRadius: BorderRadius.circular(5)),
+                                  child: TextFormField(
+                                      onChanged: (value) => password = value,
+                                      obscureText: _showPassword ? false : true,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        prefixIcon: Icon(
+                                          Icons.lock_outline,
+                                          color: Colors.white,
+                                        ),
+                                        suffixIcon: GestureDetector(
+                                          onTap: () {
+                                            _togglevisibility();
+                                          },
+                                          child: Icon(
+                                            _showPassword
+                                                ? Icons.visibility
+                                                : Icons.visibility_off,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      )),
+                                ),
+                              ),
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () => signInUsingEmailPassword(
+                                      context: context,
+                                      email: email,
+                                      password: password),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                        color: Color.fromRGBO(254, 192, 1, 1),
+                                        borderRadius: BorderRadius.circular(5)),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          vertical: size.height * 0.009,
+                                          horizontal: size.width * 0.065),
+                                      child: const Text(
+                                        "Belépés",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 32),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ]),
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    top: size.height * 0.035, right: size.height * 0.022),
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(bottom: size.height * 0.013),
-                          child: const Text("Még nincs fiókod?",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20)),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => RegisterPage())),
-                          child: const Text(
-                            "Regisztráció",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
+                Padding(
+                  padding: EdgeInsets.only(
+                      top: size.height * 0.035, right: size.height * 0.022, bottom: size.height * 0.035),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(bottom: size.height * 0.013),
+                            child: const Text("Még nincs fiókod?",
+                                style:
+                                    TextStyle(color: Colors.white, fontSize: 20)),
                           ),
-                        )
-                      ]),
-                ),
-              )
-            ],
+                          GestureDetector(
+                            onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => RegisterPage())),
+                            child: const Text(
+                              "Regisztráció",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20),
+                            ),
+                          )
+                        ]),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

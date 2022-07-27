@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/mongo_connect.dart';
 import 'menu_sidebar.dart';
@@ -27,6 +28,7 @@ class _ChatPageState extends State<ChatPage> {
   String? partnerUID;
   String? partnerName;
   ImageProvider? partnerPhoto;
+  late IO.Socket socket;
 
   var match;
   var messages = [];
@@ -35,6 +37,12 @@ class _ChatPageState extends State<ChatPage> {
   var message = '';
 
   final messageInput = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    //connect();
+  }
 
   @override
   Future<void> didChangeDependencies() async {
@@ -85,6 +93,17 @@ class _ChatPageState extends State<ChatPage> {
     } catch (e) {
       print("no internet");
     }
+  }
+
+  void connect() {
+    socket = IO.io(
+        "http://localhost:4000",
+        IO.OptionBuilder()
+            .setTransports(['websocket'])
+            .disableAutoConnect()
+            .build());
+    socket.connect();
+
   }
 
   @override
@@ -303,7 +322,8 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     GestureDetector(
                         onTap: () {
-                          messages?.add({
+                          sendMessage(message);
+                          /*messages.add({
                             'from': FirebaseAuth.instance.currentUser!.uid,
                             'users': partnerUID! +
                                 FirebaseAuth.instance.currentUser!.uid,
@@ -320,7 +340,7 @@ class _ChatPageState extends State<ChatPage> {
                                 FirebaseAuth.instance.currentUser!.uid,
                             'message': message,
                             'datetime': DateTime.now().millisecondsSinceEpoch
-                          });
+                          });*/
                           messageInput.clear();
                         },
                         child: Container(
@@ -350,5 +370,14 @@ class _ChatPageState extends State<ChatPage> {
             ]),
           ));
     }
+  }
+
+  void sendMessage(String text) {
+    var messageJSON = {
+      "message": text,
+      "from": FirebaseAuth.instance.currentUser?.uid,
+      "datetime": DateTime.now().millisecondsSinceEpoch
+    };
+    socket.emit('message', messageJSON);
   }
 }
