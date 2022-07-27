@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:convert';
 import 'package:realm/realm.dart';
+import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
 
 import 'menu_sidebar.dart';
@@ -372,22 +373,32 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void createUserProfile() async {
-    AppConfiguration appConfig = AppConfiguration(APP_ID);
+    AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
     App app = App(appConfig);
+    EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
+    await authProvider.registerUser(email, password);
+    Credentials emailPwCredentials = Credentials.emailPassword(email, password);
+    realmUser.User currentUser = await app.logIn(emailPwCredentials);
 
+    Configuration config =
+        Configuration.flexibleSync(currentUser, [user.User.schema]);
+    Realm realm = Realm(config);
 
-    var config =
-        Configuration([user.User.schema], inMemory: false, readOnly: false);
-    var realm = Realm(config);
+    final userQuery = realm.query<user.User>("");
+    SubscriptionSet subscriptions = realm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "users", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
 
-    final _user = user.User(auth.currentUser!.uid.toString(),
+    final _user = user.User(FirebaseAuth.instance.currentUser!.uid,
         name: name,
-        bio: "Always all in.",
+        bio: "Allways all in",
         since: DateTime.now().millisecondsSinceEpoch);
+
     realm.write(() {
       realm.add(_user);
     });
-
     /*try {
       MongoDatabase.users.insertOne({
         'name': name,

@@ -13,7 +13,7 @@ class User extends _User with RealmEntity, RealmObject {
     String? bio,
     int? since,
   }) {
-    RealmObject.set(this, 'userID', userID);
+    RealmObject.set(this, '_id', userID);
     RealmObject.set(this, 'name', name);
     RealmObject.set(this, 'bio', bio);
     RealmObject.set(this, 'since', since);
@@ -22,7 +22,7 @@ class User extends _User with RealmEntity, RealmObject {
   User._();
 
   @override
-  String get userID => RealmObject.get<String>(this, 'userID') as String;
+  String get userID => RealmObject.get<String>(this, '_id') as String;
   @override
   set userID(String value) => throw RealmUnsupportedSetError();
 
@@ -49,8 +49,9 @@ class User extends _User with RealmEntity, RealmObject {
   static SchemaObject? _schema;
   static SchemaObject _initSchema() {
     RealmObject.registerFactory(User._);
-    return const SchemaObject(User, [
-      SchemaProperty('userID', RealmPropertyType.string, primaryKey: true),
+    return const SchemaObject(User, 'User', [
+      SchemaProperty('_id', RealmPropertyType.string,
+          mapTo: '_id', primaryKey: true),
       SchemaProperty('name', RealmPropertyType.string, optional: true),
       SchemaProperty('bio', RealmPropertyType.string, optional: true),
       SchemaProperty('since', RealmPropertyType.int, optional: true),

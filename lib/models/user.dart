@@ -3,9 +3,10 @@ import 'package:realm/realm.dart';
 part 'user.g.dart';
 
 @RealmModel()
-class _User{
+class _User {
   @PrimaryKey()
-  late final String userID;
+  @MapTo("_id")
+  late String userID;
 
   late String? name;
   late String? bio;

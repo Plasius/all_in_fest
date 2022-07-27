@@ -26,7 +26,7 @@ Future<void> main() async {
   } catch (err) {
     //might have been initialized before
   }
-  MongoDatabase.connect();
+  //MongoDatabase.connect();
 
   runApp(ChangeNotifierProvider(
       create: (context) => FavoriteModel(), child: const MyApp()));
@@ -87,16 +87,16 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-        drawer: MenuBar(
+        /* drawer: MenuBar(
             imageProvider: MongoDatabase.picture != null
                 ? MongoDatabase.picture!
                 : AssetImage("lib/assets/user.png"),
             userName: FirebaseAuth.instance.currentUser != null
-                ? MongoDatabase.currentUser["name"]
+                ? MongoDatabase.currentUser["name"]!
                 : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
             email: FirebaseAuth.instance.currentUser != null
                 ? MongoDatabase.email!
-                : ""), //MongoDatabase.email!),
+                : ""), //MongoDatabase.email!), */
         appBar: AppBar(
           backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
           title: const Image(
