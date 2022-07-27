@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:convert';
+import 'package:realm/realm.dart';
+import 'package:all_in_fest/models/user.dart' as user;
 
 import 'menu_sidebar.dart';
 
@@ -84,8 +86,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -121,8 +123,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -158,8 +160,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -206,8 +208,8 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -265,7 +267,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     checkedValue = newValue!;
                                   });
                                 },
-                                controlAffinity: ListTileControlAffinity.leading,
+                                controlAffinity:
+                                    ListTileControlAffinity.leading,
                                 activeColor: Colors.white,
                                 checkColor: Colors.orange,
                                 side: BorderSide(
@@ -305,17 +308,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      top: size.height * 0.04, right: size.height * 0.022, bottom: size.height * 0.04),
+                      top: size.height * 0.04,
+                      right: size.height * 0.022,
+                      bottom: size.height * 0.04),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(bottom: size.height * 0.013),
+                            padding:
+                                EdgeInsets.only(bottom: size.height * 0.013),
                             child: const Text("Már van fiókod?",
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 20)),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20)),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.push(
@@ -366,7 +372,23 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void createUserProfile() async {
-    try {
+    AppConfiguration appConfig = AppConfiguration(APP_ID);
+    App app = App(appConfig);
+
+
+    var config =
+        Configuration([user.User.schema], inMemory: false, readOnly: false);
+    var realm = Realm(config);
+
+    final _user = user.User(auth.currentUser!.uid.toString(),
+        name: name,
+        bio: "Always all in.",
+        since: DateTime.now().millisecondsSinceEpoch);
+    realm.write(() {
+      realm.add(_user);
+    });
+
+    /*try {
       MongoDatabase.users.insertOne({
         'name': name,
         'bio': "Always all in.",
@@ -375,7 +397,7 @@ class _RegisterPageState extends State<RegisterPage> {
       });
     } catch (e) {
       print(e.runtimeType);
-    }
+    }*/
 
     final prefs = await SharedPreferences.getInstance();
 

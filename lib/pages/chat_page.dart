@@ -55,43 +55,20 @@ class _ChatPageState extends State<ChatPage> {
 
       print(partnerName! + partnerUID!);
 
-      match =
-          MongoDatabase.matches.findOne(mongo.where.match("_id", partnerUID!));
-      messages = match["messages"].find;
-
-      messages.sort((a, b) => a["datetime"].compareTo(b["datetime"]));
-
-      /*if (partnerUID?.compareTo(FirebaseAuth.instance.currentUser!.uid) != 0) {
-        messages = FirebaseFirestore.instance.collection('matches/' +
-            partnerUID! +
-            '_' +
-            FirebaseAuth.instance.currentUser!.uid +
-            '/messages');
-        messages_stream = messages
-            ?.orderBy('datetime')
-            .snapshots(includeMetadataChanges: true);
-        print('matches/' +
-            partnerUID +
-            '_' +
-            FirebaseAuth.instance.currentUser!.uid +
-            '/messages');
+      if (partnerUID.toString().compareTo(FirebaseAuth.instance.currentUser!.uid) <= 0) {
+        match = await MongoDatabase.matches
+            .findOne(mongo.where.match("_id", partnerUID! + FirebaseAuth.instance.currentUser!.uid));
+        print(match);
+        print("before");
       } else {
-        messages = FirebaseFirestore.instance.collection('matches/' +
-            FirebaseAuth.instance.currentUser!.uid +
-            '_' +
-            partnerUID +
-            '/messages');
-        messages_stream = messages
-            ?.orderBy('datetime')
-            .snapshots(includeMetadataChanges: true);
-        print('matches/' +
-            FirebaseAuth.instance.currentUser!.uid +
-            '_' +
-            partnerUID +
-            '/messages');
-      }*/
+        match = await MongoDatabase.matches
+            .findOne(mongo.where.match("_id", FirebaseAuth.instance.currentUser!.uid + partnerUID!));
+        print(match);
+        print("after");
+      }
     } catch (e) {
       print("no internet");
+      print(e);
     }
   }
 
@@ -103,7 +80,6 @@ class _ChatPageState extends State<ChatPage> {
             .disableAutoConnect()
             .build());
     socket.connect();
-
   }
 
   @override
@@ -158,7 +134,7 @@ class _ChatPageState extends State<ChatPage> {
                 height: MediaQuery.of(context).size.height * 0.80,
                 child: SingleChildScrollView(
                     child: StreamBuilder(
-                  stream: messages_stream,
+                  stream: match["messages"],
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
@@ -373,11 +349,16 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage(String text) {
-    var messageJSON = {
+    match["messages"].insertOne({
+      "from": FirebaseAuth.instance.currentUser?.uid,
+      "message": text,
+      "datetime": DateTime.now().microsecondsSinceEpoch
+    });
+    /*var messageJSON = {
       "message": text,
       "from": FirebaseAuth.instance.currentUser?.uid,
       "datetime": DateTime.now().millisecondsSinceEpoch
     };
-    socket.emit('message', messageJSON);
+    socket.emit('message', messageJSON);*/
   }
 }

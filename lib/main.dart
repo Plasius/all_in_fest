@@ -26,7 +26,7 @@ Future<void> main() async {
   } catch (err) {
     //might have been initialized before
   }
-  await MongoDatabase.connect();
+  MongoDatabase.connect();
 
   runApp(ChangeNotifierProvider(
       create: (context) => FavoriteModel(), child: const MyApp()));
