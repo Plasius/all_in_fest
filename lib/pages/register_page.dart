@@ -384,7 +384,7 @@ class _RegisterPageState extends State<RegisterPage> {
         Configuration.flexibleSync(currentUser, [user.User.schema]);
     Realm realm = Realm(config);
 
-    final userQuery = realm.query<user.User>("");
+    final userQuery = realm.all<user.User>();
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "users", update: true);
@@ -399,6 +399,9 @@ class _RegisterPageState extends State<RegisterPage> {
     realm.write(() {
       realm.add(_user);
     });
+
+    realm.close();
+
     /*try {
       MongoDatabase.users.insertOne({
         'name': name,
