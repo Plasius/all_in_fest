@@ -7,7 +7,6 @@ import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
 
 class RealmConnect {
-  static var realm;
   static var appConfig;
   static var app;
   static var currentUser;
@@ -17,44 +16,43 @@ class RealmConnect {
     app = App(appConfig);
   }
 
-  static void initSchemas() {
-    realmOpen();
-    Configuration config = Configuration.flexibleSync(
-        currentUser, [user.User.schema, Message.schema, Match.schema]);
-    realm = Realm(config);
-  }
-
   static void realmRegister(
       String email, String password, user.User _user) async {
-    initSchemas();
+    AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
+    App app = App(appConfig);
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
     await authProvider.registerUser(email, password);
-    realmLogin(email, password);
+    Credentials emailPwCredentials = Credentials.emailPassword(email, password);
+    realmUser.User currentUser = await app.logIn(emailPwCredentials);
+
+    Configuration config =
+        Configuration.flexibleSync(currentUser, [user.User.schema]);
+    Realm realm = Realm(config);
 
     final userQuery = realm.all<user.User>();
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "users", update: true);
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
 
-    realm.write(() {
-      realm.add(_user);
-    });
+    realm.write(() => {realm.add(_user)});
   }
 
   static void realmLogin(String email, String password) async {
-    initSchemas();
+    realmOpen();
     Credentials emailPwCredentials = Credentials.emailPassword(email, password);
     currentUser = await app.logIn(emailPwCredentials);
   }
 
   static void realmSendMessage(Message _message) async {
-    initSchemas();
+    Configuration config =
+        Configuration.flexibleSync(app.currentUser, [Message.schema]);
+    Realm realm = Realm(config);
     final messageQuery = realm.all<Message>();
     SubscriptionSet messageSubscriptions = realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(messageQuery, name: "messages", update: true);
+      mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
 
@@ -64,16 +62,20 @@ class RealmConnect {
   }
 
   static void realmAddMatch(Match _match) async {
-    initSchemas();
+    Configuration config =
+        Configuration.flexibleSync(app.currentUser, [Match.schema]);
+    Realm realm = Realm(config);
+
     final matchQuery = realm.all<Match>();
     SubscriptionSet messageSubscriptions = realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "messages", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
 
     realm.write(() {
       realm.add(_match);
+      print("writed");
     });
   }
 }

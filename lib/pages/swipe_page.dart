@@ -6,6 +6,7 @@ import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:realm/realm.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:all_in_fest/models/user.dart' as user;
@@ -22,21 +23,22 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   List<SwipeItem> _swipeItems = <SwipeItem>[];
-  List<Map<String, dynamic>> _profiles = [];
+  var _profiles;
   List<Map<String, dynamic>> _matches = [];
 
   void getProfiles() async {
-    RealmConnect.initSchemas();
-    _profiles = RealmConnect.realm
-        .all<user.User>("_id != ${RealmConnect.currentUser.id}");
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user.User.schema]);
+    Realm realm = Realm(config);
+    _profiles = realm
+        .all<user.User>()
+        .query("_id != '${RealmConnect.app.currentUser.id}'");
 
     //shuffle?
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
-      var img = await MongoDatabase.bucket.chunks
-          .findOne(mongo.where.eq('user', _profiles[i]["_id"]));
-      if (img == null) continue;
+      var img;
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
@@ -62,12 +64,11 @@ class _SwipePageState extends State<SwipePage> {
                             height: MediaQuery.of(context).size.height / 3,
                             decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image:
-                                        MemoryImage(base64Decode(img["data"])),
+                                    image: AssetImage("lib/assets/user.png"),
                                     fit: BoxFit.cover))),
                       ),
                       Text(
-                        _profiles[i]['name'],
+                        _profiles[i].name,
                         style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -76,43 +77,41 @@ class _SwipePageState extends State<SwipePage> {
                     ],
                   ))
               : Text('No profiles found'),
-          likeAction: () => messageOptions(_profiles[i]["_id"]),
+          likeAction: () =>
+              {print("${_profiles[i].userID}"), liked(_profiles[i].userID)},
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
     setState(() {});
   }
 
-  void getMatches() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    await MongoDatabase.matches
-        .find(mongo.where.within('_id', auth.currentUser?.uid));
-  }
+  void getMatches() async {}
 
   void initState() {
     super.initState();
-    _matchEngine = MatchEngine(swipeItems: _swipeItems);
     //getMatches();
-    getProfiles();
-    getMatches();
+    Future.delayed(Duration.zero, () {
+      getProfiles();
+      _matchEngine = MatchEngine(swipeItems: _swipeItems);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_profiles.isNotEmpty) {
+    if (_profiles != null) {
       return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
-            drawer: MenuBar(
+            /* drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
                 userName: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.currentUser["name"]
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser != null
+                email: 
                     ? MongoDatabase.email!
-                    : ""), //MongoDatabase.email!),
+                    : ""), */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               leading: const Icon(
@@ -211,11 +210,26 @@ class _SwipePageState extends State<SwipePage> {
     );
   }
 
-  void messageOptions(String otherUser) async {
+  void liked(String otherUser) async {
+    print("im in");
+    RealmConnect.realmOpen();
     final _match = Match(RealmConnect.currentUser.id + otherUser,
         user1: RealmConnect.currentUser.id, user2: otherUser);
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Match.schema]);
+    Realm realm = Realm(config);
 
-    RealmConnect.realmAddMatch(_match);
+    final matchQuery = realm.all<Match>();
+    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    messageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
+    realm.write(() {
+      realm.add(_match);
+      print("writed");
+    });
   }
 
   void showNopeGif() {}
