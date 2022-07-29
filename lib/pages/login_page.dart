@@ -1,3 +1,4 @@
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
@@ -78,8 +79,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -115,8 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Padding(
                                 padding: EdgeInsets.only(
-                                    left:
-                                        MediaQuery.of(context).size.width * 0.043,
+                                    left: MediaQuery.of(context).size.width *
+                                        0.043,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.011),
                                 child: const Text(
@@ -163,10 +164,16 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Center(
                                 child: GestureDetector(
-                                  onTap: () => signInUsingEmailPassword(
-                                      context: context,
-                                      email: email,
-                                      password: password),
+                                  onTap: () => {
+                                    RealmConnect.realmLogin(email, password),
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MyHomePage(
+                                                    title:
+                                                        "Logged in succesfully")))
+                                  },
                                   child: Container(
                                     decoration: BoxDecoration(
                                         color: Color.fromRGBO(254, 192, 1, 1),
@@ -193,17 +200,20 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      top: size.height * 0.035, right: size.height * 0.022, bottom: size.height * 0.035),
+                      top: size.height * 0.035,
+                      right: size.height * 0.022,
+                      bottom: size.height * 0.035),
                   child: Align(
                     alignment: Alignment.bottomRight,
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Padding(
-                            padding: EdgeInsets.only(bottom: size.height * 0.013),
+                            padding:
+                                EdgeInsets.only(bottom: size.height * 0.013),
                             child: const Text("Még nincs fiókod?",
-                                style:
-                                    TextStyle(color: Colors.white, fontSize: 20)),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20)),
                           ),
                           GestureDetector(
                             onTap: () => Navigator.push(
@@ -227,34 +237,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  void signInUsingEmailPassword({
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-
-    try {
-      await auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-
-      MongoDatabase.disconnect();
-      await MongoDatabase.connect();
-
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ProfilePage()));
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        print('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        print('Wrong password provided.');
-      } else {
-        print(e);
-      }
-    }
   }
 }

@@ -1,13 +1,13 @@
 import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'dart:convert';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
+import 'package:all_in_fest/models/open_realm.dart';
 
 import 'menu_sidebar.dart';
 
@@ -278,11 +278,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               ),
                               Center(
                                 child: GestureDetector(
-                                  onTap: () => registerUsingEmailPassword(
-                                      name: name,
-                                      context: context,
-                                      email: email,
-                                      password: password),
+                                  onTap: () => createUserProfile(),
                                   child: Container(
                                     decoration: BoxDecoration(
                                         color: Color.fromRGBO(254, 192, 1, 1),
@@ -348,60 +344,15 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-  void registerUsingEmailPassword({
-    required String name,
-    required String email,
-    required String password,
-    required BuildContext context,
-  }) async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-    } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        print('The password provided is too weak.');
-      } else if (e.code == 'email-already-in-use') {
-        print('The account already exists for that email.');
-      }
-    } catch (e) {
-      print(e);
-    }
-    createUserProfile();
-    Navigator.pop(context);
-  }
-
   void createUserProfile() async {
-    AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
-    App app = App(appConfig);
-    EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
-    await authProvider.registerUser(email, password);
-    Credentials emailPwCredentials = Credentials.emailPassword(email, password);
-    realmUser.User currentUser = await app.logIn(emailPwCredentials);
-
-    Configuration config =
-        Configuration.flexibleSync(currentUser, [user.User.schema]);
-    Realm realm = Realm(config);
-
-    final userQuery = realm.all<user.User>();
-    SubscriptionSet subscriptions = realm.subscriptions;
-    subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "users", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    final _user = user.User(FirebaseAuth.instance.currentUser!.uid,
+    final _user = user.User(ObjectId().toString(),
         name: name,
         bio: "Allways all in",
         since: DateTime.now().millisecondsSinceEpoch);
 
-    realm.write(() {
-      realm.add(_user);
-    });
+    RealmConnect.realmRegister(email, password, _user);
 
-    realm.close();
-
+    Navigator.pop(context);
     /*try {
       MongoDatabase.users.insertOne({
         'name': name,

@@ -1,7 +1,11 @@
+import 'package:all_in_fest/models/message.dart';
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:realm/src/user.dart' as realmUser;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:realm/realm.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 import '../models/mongo_connect.dart';
@@ -55,14 +59,17 @@ class _ChatPageState extends State<ChatPage> {
 
       print(partnerName! + partnerUID!);
 
-      if (partnerUID.toString().compareTo(FirebaseAuth.instance.currentUser!.uid) <= 0) {
-        match = await MongoDatabase.matches
-            .findOne(mongo.where.match("_id", partnerUID! + FirebaseAuth.instance.currentUser!.uid));
+      if (partnerUID
+              .toString()
+              .compareTo(FirebaseAuth.instance.currentUser!.uid) <=
+          0) {
+        match = await MongoDatabase.matches.findOne(mongo.where.match(
+            "_id", partnerUID! + FirebaseAuth.instance.currentUser!.uid));
         print(match);
         print("before");
       } else {
-        match = await MongoDatabase.matches
-            .findOne(mongo.where.match("_id", FirebaseAuth.instance.currentUser!.uid + partnerUID!));
+        match = await MongoDatabase.matches.findOne(mongo.where.match(
+            "_id", FirebaseAuth.instance.currentUser!.uid + partnerUID!));
         print(match);
         print("after");
       }
@@ -139,9 +146,6 @@ class _ChatPageState extends State<ChatPage> {
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     if (!snapshot.hasData) {
                       return const CircularProgressIndicator();
-                    } else if (snapshot.connectionState ==
-                        ConnectionState.waiting) {
-                      return const Text('Loading');
                     } else {
                       return Column(
                         children: [
@@ -298,7 +302,13 @@ class _ChatPageState extends State<ChatPage> {
                     ),
                     GestureDetector(
                         onTap: () {
-                          sendMessage(message);
+                          realmUser.User user = RealmConnect.currentUser;
+                          final _message = Message(ObjectId().toString(),
+                              from: user.id,
+                              datetime: DateTime.now().millisecondsSinceEpoch,
+                              message: message,
+                              matchID: ObjectId().toString());
+                          RealmConnect.realmSendMessage(_message);
                           /*messages.add({
                             'from': FirebaseAuth.instance.currentUser!.uid,
                             'users': partnerUID! +

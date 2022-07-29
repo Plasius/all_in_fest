@@ -1,3 +1,4 @@
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -19,13 +20,7 @@ import 'pages/settings_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-  } catch (err) {
-    //might have been initialized before
-  }
+
   //MongoDatabase.connect();
 
   runApp(ChangeNotifierProvider(
@@ -52,7 +47,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: FirebaseAuth.instance.currentUser != null
+      home: RealmConnect.currentUser != null
           ? const MyHomePage(title: 'Flutter Demo Home Page')
           : LoginPage(),
     );

@@ -1,13 +1,14 @@
 import 'dart:convert';
 
+import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/mongo_connect.dart';
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:all_in_fest/models/user.dart' as user;
 
 import 'menu_sidebar.dart';
 
@@ -25,16 +26,16 @@ class _SwipePageState extends State<SwipePage> {
   List<Map<String, dynamic>> _matches = [];
 
   void getProfiles() async {
-    _profiles = await MongoDatabase.users
-        .find(mongo.where.ne('userID', FirebaseAuth.instance.currentUser?.uid))
-        .toList();
+    RealmConnect.initSchemas();
+    _profiles = RealmConnect.realm
+        .all<user.User>("_id != ${RealmConnect.currentUser.id}");
 
     //shuffle?
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
       var img = await MongoDatabase.bucket.chunks
-          .findOne(mongo.where.eq('user', _profiles[i]["userID"]));
+          .findOne(mongo.where.eq('user', _profiles[i]["_id"]));
       if (img == null) continue;
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
@@ -75,7 +76,7 @@ class _SwipePageState extends State<SwipePage> {
                     ],
                   ))
               : Text('No profiles found'),
-          likeAction: () => messageOptions(_profiles[i]["userID"]),
+          likeAction: () => messageOptions(_profiles[i]["_id"]),
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
@@ -211,13 +212,10 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void messageOptions(String otherUser) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
+    final _match = Match(RealmConnect.currentUser.id + otherUser,
+        user1: RealmConnect.currentUser.id, user2: otherUser);
 
-    await MongoDatabase.matches.insertOne({
-      "_id": "${auth.currentUser?.uid}" + otherUser,
-      "user1": auth.currentUser?.uid,
-      "user2": otherUser
-    });
+    RealmConnect.realmAddMatch(_match);
   }
 
   void showNopeGif() {}
