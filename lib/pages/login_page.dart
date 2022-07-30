@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
@@ -13,8 +15,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _showPassword = false;
-  String email = "";
-  String password = "";
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
   void _togglevisibility() {
     setState(() {
       _showPassword = !_showPassword;
@@ -99,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                    onChanged: (value) => email = value,
+                                    controller: emailController,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
@@ -137,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                      onChanged: (value) => password = value,
+                                      controller: passwordController,
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
@@ -161,16 +163,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               Center(
                                 child: GestureDetector(
-                                  onTap: () => {
-                                    RealmConnect.realmLogin(email, password),
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MyHomePage(
-                                                    title:
-                                                        "Logged in succesfully")))
-                                  },
+                                  onTap: login,
                                   child: Container(
                                     decoration: BoxDecoration(
                                         color: const Color.fromRGBO(
@@ -236,5 +229,20 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
+  }
+
+  void login() {
+    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+      print("Please fill out all of the fields.");
+      return;
+    }
+
+    RealmConnect.realmLogin(emailController.text, passwordController.text);
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) =>
+                const MyHomePage(title: "Logged in succesfully")));
   }
 }

@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: app.currentUser != null
-          ? const MyHomePage(title: 'Flutter Demo Home Page')
+          ? const MyHomePage(title: 'Festival')
           : const LoginPage(),
     );
   }

@@ -1,4 +1,4 @@
-// ignore_for_file: library_prefixes, implementation_imports
+// ignore_for_file: library_prefixes, implementation_imports, avoid_print
 
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
@@ -15,9 +15,9 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  String email = "";
-  String password = "";
-  String name = "";
+  var emailController = TextEditingController();
+  var passwordController = TextEditingController();
+  var nameController = TextEditingController();
   bool checkedValue = false;
 
   bool _showPassword = false;
@@ -108,7 +108,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                    onChanged: (value) => name = value,
+                                    controller: nameController,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
@@ -146,7 +146,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                    onChanged: (value) => email = value,
+                                    controller: emailController,
                                     decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
@@ -184,7 +184,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                      onChanged: (value) => password = value,
+                                      controller: passwordController,
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
@@ -233,7 +233,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                      onChanged: (value) => password = value,
+                                      controller: passwordController,
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
@@ -348,15 +348,24 @@ class _RegisterPageState extends State<RegisterPage> {
   //FirebaseAuth auth = FirebaseAuth.instance;
 
   void createUserProfile() async {
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        passwordController.text.isEmpty) {
+      print("Please fill out all of the fields.");
+      return;
+    }
+
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
     App app = App(appConfig);
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
-    await authProvider.registerUser(email, password);
-    Credentials emailPwCredentials = Credentials.emailPassword(email, password);
+    await authProvider.registerUser(
+        emailController.text, passwordController.text);
+    Credentials emailPwCredentials = Credentials.emailPassword(
+        emailController.text, passwordController.text);
     realmUser.User currentUser = await app.logIn(emailPwCredentials);
 
     final _user = user.User(currentUser.id,
-        name: name,
+        name: nameController.text,
         bio: "Allways all in",
         since: DateTime.now().millisecondsSinceEpoch);
 
