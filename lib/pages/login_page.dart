@@ -1,13 +1,8 @@
 import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/pages/menu_sidebar.dart';
-import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import '../main.dart';
-import '../models/mongo_connect.dart';
-import 'matches_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -35,12 +30,12 @@ class _LoginPageState extends State<LoginPage> {
         resizeToAvoidBottomInset: true,
         body: Container(
           constraints: BoxConstraints.tight(MediaQuery.of(context).size),
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage("lib/assets/LOGIN.png"),
                   fit: BoxFit.cover)),
           child: SingleChildScrollView(
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             reverse: true,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -54,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                         bottom: size.height * 0.1),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: Color.fromRGBO(97, 42, 122, 1),
+                          color: const Color.fromRGBO(97, 42, 122, 1),
                           borderRadius: BorderRadius.circular(5)),
                       height: MediaQuery.of(context).size.height * 0.46,
                       width: MediaQuery.of(context).size.width,
@@ -67,8 +62,8 @@ class _LoginPageState extends State<LoginPage> {
                                 padding: EdgeInsets.only(
                                     top: size.height * 0.037,
                                     bottom: size.height * 0.022),
-                                child: Center(
-                                  child: const Text(
+                                child: const Center(
+                                  child: Text(
                                     "Bejelentkezés",
                                     style: TextStyle(
                                         color: Colors.white,
@@ -98,13 +93,14 @@ class _LoginPageState extends State<LoginPage> {
                                     bottom: size.width * 0.041),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
                                     onChanged: (value) => email = value,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
                                         Icons.mail_outlined,
@@ -135,7 +131,8 @@ class _LoginPageState extends State<LoginPage> {
                                     bottom: size.width * 0.082),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
@@ -144,7 +141,7 @@ class _LoginPageState extends State<LoginPage> {
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        prefixIcon: Icon(
+                                        prefixIcon: const Icon(
                                           Icons.lock_outline,
                                           color: Colors.white,
                                         ),
@@ -176,7 +173,8 @@ class _LoginPageState extends State<LoginPage> {
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Color.fromRGBO(254, 192, 1, 1),
+                                        color: const Color.fromRGBO(
+                                            254, 192, 1, 1),
                                         borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
@@ -219,7 +217,8 @@ class _LoginPageState extends State<LoginPage> {
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => RegisterPage())),
+                                    builder: (context) =>
+                                        const RegisterPage())),
                             child: const Text(
                               "Regisztráció",
                               style: TextStyle(

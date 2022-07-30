@@ -1,21 +1,14 @@
-import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
-import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
-import 'firebase_options.dart';
 import 'package:flutter/material.dart';
 
 import 'models/favorite_model.dart';
-import 'models/mongo_connect.dart';
 import 'pages/map_page.dart';
 import 'pages/settings_page.dart';
 
@@ -43,23 +36,13 @@ class MyApp extends StatelessWidget {
       ),
       home: app.currentUser != null
           ? const MyHomePage(title: 'Flutter Demo Home Page')
-          : LoginPage(),
+          : const LoginPage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override

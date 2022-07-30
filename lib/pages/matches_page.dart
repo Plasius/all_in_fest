@@ -1,7 +1,8 @@
+// ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
+
 import 'dart:convert';
 
 import 'package:all_in_fest/pages/chat_page.dart';
-import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
@@ -46,7 +47,7 @@ class _MatchesPageState extends State<MatchesPage> {
           .findOne(mongo.where.eq("user", partner));
       photoURLs.add(partnerPhoto != null
           ? MemoryImage(base64Decode(partnerPhoto["data"]))
-          : AssetImage("lib/assets/user.png"));
+          : const AssetImage("lib/assets/user.png"));
       print(photoURLs.length);
     }
     setState(() {});
@@ -67,7 +68,7 @@ class _MatchesPageState extends State<MatchesPage> {
             drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
-                    : AssetImage("lib/assets/user.png"),
+                    : const AssetImage("lib/assets/user.png"),
                 userName: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.currentUser["name"]
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
@@ -82,14 +83,14 @@ class _MatchesPageState extends State<MatchesPage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/logo.png"),
+                image: AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
             ),
             body: Container(
-              constraints: BoxConstraints.expand(),
-              decoration: BoxDecoration(
+              constraints: const BoxConstraints.expand(),
+              decoration: const BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,

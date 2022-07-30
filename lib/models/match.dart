@@ -1,6 +1,3 @@
-import 'dart:ffi';
-
-import 'package:all_in_fest/models/message.dart';
 import 'package:realm/realm.dart';
 
 part 'match.g.dart';

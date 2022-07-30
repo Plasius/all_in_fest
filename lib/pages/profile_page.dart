@@ -1,13 +1,13 @@
+// ignore_for_file: non_constant_identifier_names, prefer_typing_uninitialized_variables, avoid_print
+
 import 'dart:convert';
 
 import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -19,11 +19,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  @override
   DateTime selectedDate = DateTime.now();
   var photoURL = "";
   final ImagePicker _picker = ImagePicker();
-  var _cmpressed_image;
   ImageProvider? provider = const AssetImage("lib/assets/user.png");
   var flag = false;
   String userName = "Adj meg egy nevet";
@@ -32,9 +30,9 @@ class _ProfilePageState extends State<ProfilePage> {
       ? FirebaseAuth.instance.currentUser?.email
       : "example@bit.hu";
 
-  var nameController = new TextEditingController();
+  var nameController = TextEditingController();
 
-  var bioController = new TextEditingController();
+  var bioController = TextEditingController();
 
   @override
   void initState() {
@@ -45,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
     loadProfile();
   }
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
@@ -52,7 +51,7 @@ class _ProfilePageState extends State<ProfilePage> {
             drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
-                    : AssetImage("lib/assets/user.png"),
+                    : const AssetImage("lib/assets/user.png"),
                 userName: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.currentUser["name"]
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
@@ -62,14 +61,14 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: const Image(
-                image: const AssetImage("lib/assets/logo.png"),
+                image: AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
               actions: [
                 IconButton(
                   onPressed: ((() => saveProfile())),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.save,
                     color: Colors.white,
                   ),
@@ -82,8 +81,8 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget editBody(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return Container(
-      constraints: BoxConstraints.expand(),
-      decoration: BoxDecoration(
+      constraints: const BoxConstraints.expand(),
+      decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("lib/assets/profile.png"), fit: BoxFit.cover)),
       child: SingleChildScrollView(
@@ -98,7 +97,7 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Container(
                 height: MediaQuery.of(context).size.height * 0.65,
                 decoration: BoxDecoration(
-                    color: Color.fromRGBO(97, 42, 122, 1),
+                    color: const Color.fromRGBO(97, 42, 122, 1),
                     borderRadius: BorderRadius.circular(5)),
               ),
             ),
@@ -123,7 +122,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               image: provider != null
                                   ? DecorationImage(
                                       image: provider!, fit: BoxFit.cover)
-                                  : DecorationImage(
+                                  : const DecorationImage(
                                       image: AssetImage("lib/assets/user.png"),
                                       fit: BoxFit.cover),
                               border:
@@ -133,10 +132,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           child: Container(
                             height: size.width * 0.125,
                             width: size.width * 0.125,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 color: Colors.redAccent,
                                 shape: BoxShape.circle),
-                            child: Icon(
+                            child: const Icon(
                               MdiIcons.cameraPlus,
                               color: Colors.white,
                             ),
@@ -154,14 +153,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           top: size.width * 0.041),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Color.fromRGBO(255, 255, 255, 0.4),
+                            color: const Color.fromRGBO(255, 255, 255, 0.4),
                             border: Border.all(color: Colors.white, width: 3),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
                           controller: nameController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
                                   fontSize: 22),
@@ -179,14 +178,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           top: size.width * 0.041),
                       child: Container(
                         decoration: BoxDecoration(
-                            color: Color.fromRGBO(255, 255, 255, 0.4),
+                            color: const Color.fromRGBO(255, 255, 255, 0.4),
                             border: Border.all(color: Colors.white, width: 3),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
                           controller: bioController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
-                              hintStyle: TextStyle(
+                              hintStyle: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.normal,
                                   fontSize: 22),
@@ -205,17 +204,17 @@ class _ProfilePageState extends State<ProfilePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      MyHomePage(title: "Exited")))
+                                      const MyHomePage(title: "Exited")))
                         },
                         child: Container(
                           width: size.width * 0.119,
                           height: size.width * 0.119,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               color: Color.fromRGBO(232, 107, 62, 1),
                               shape: BoxShape.circle),
                           child: Padding(
                             padding: EdgeInsets.all(size.width * 0.025),
-                            child: Image(
+                            child: const Image(
                               image: AssetImage("lib/assets/logout.png"),
                               fit: BoxFit.cover,
                             ),
@@ -237,31 +236,15 @@ class _ProfilePageState extends State<ProfilePage> {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
       print("im in");
-      try {
-        _cmpressed_image = await FlutterImageCompress.compressWithFile(
-            pickedFile.path,
-            format: CompressFormat.jpeg,
-            quality: 70);
-      } catch (e) {
+      try {} catch (e) {
         print(e.runtimeType);
       }
     } else {
       print('No image selected.');
     }
 
-    Map<String, dynamic> image = {
-      "_id": pickedFile?.path.split("/").last,
-      "data": base64Encode(_cmpressed_image),
-      "user": FirebaseAuth.instance.currentUser?.uid
-    };
-
     var img = await MongoDatabase.bucket.chunks
         .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
-    var res = img == null
-        ? await MongoDatabase.bucket.chunks.insert(image)
-        : await MongoDatabase.bucket.chunks.updateOne(
-            mongo.where.eq('user', FirebaseAuth.instance.currentUser?.uid),
-            mongo.modify.set('data', base64Encode(_cmpressed_image)));
 
     img = await MongoDatabase.bucket.chunks
         .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
@@ -276,30 +259,15 @@ class _ProfilePageState extends State<ProfilePage> {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
       print("im in");
-      try {
-        _cmpressed_image = await FlutterImageCompress.compressWithFile(
-            pickedFile.path,
-            format: CompressFormat.heic,
-            quality: 70);
-      } catch (e) {
+      try {} catch (e) {
         print(e.runtimeType);
       }
     } else {
       print('No image selected.');
     }
 
-    Map<String, dynamic> image = {
-      "_id": pickedFile?.path.split("/").last,
-      "data": base64Encode(_cmpressed_image),
-      "user": FirebaseAuth.instance.currentUser?.uid
-    };
     var img = await MongoDatabase.bucket.chunks
         .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
-    var res = img == null
-        ? await MongoDatabase.bucket.chunks.insert(image)
-        : await MongoDatabase.bucket.chunks.updateOne(
-            mongo.where.eq('user', FirebaseAuth.instance.currentUser?.uid),
-            mongo.modify.set('data', base64Encode(_cmpressed_image)));
 
     img = await MongoDatabase.bucket.chunks
         .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
@@ -308,36 +276,6 @@ class _ProfilePageState extends State<ProfilePage> {
       provider = MemoryImage(base64Decode(img["data"]));
       flag = true;
     });
-  }
-
-  void _showPicker(BuildContext context) {
-    showModalBottomSheet(
-        context: context,
-        builder: (BuildContext bc) {
-          return SafeArea(
-            child: Container(
-              child: new Wrap(
-                children: <Widget>[
-                  new ListTile(
-                      leading: new Icon(Icons.photo_library),
-                      title: new Text('Gallery'),
-                      onTap: () {
-                        imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  new ListTile(
-                    leading: new Icon(Icons.photo_camera),
-                    title: new Text('Camera'),
-                    onTap: () {
-                      imgFromCamera();
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        });
   }
 
   void saveProfile() {
@@ -368,10 +306,11 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    if (MongoDatabase.picture == null)
-      provider = AssetImage("lib/assets/user.png");
-    else
+    if (MongoDatabase.picture == null) {
+      provider = const AssetImage("lib/assets/user.png");
+    } else {
       provider = MongoDatabase.picture;
+    }
 
     setState(() {});
   }

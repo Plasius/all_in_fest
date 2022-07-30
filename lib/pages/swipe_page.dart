@@ -1,17 +1,12 @@
-import 'dart:convert';
+// ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
 import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
 import 'package:swipe_cards/swipe_cards.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:all_in_fest/models/user.dart' as user;
-
-import 'menu_sidebar.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
@@ -22,9 +17,8 @@ class SwipePage extends StatefulWidget {
 
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
-  List<SwipeItem> _swipeItems = <SwipeItem>[];
+  final List<SwipeItem> _swipeItems = <SwipeItem>[];
   var _profiles;
-  List<Map<String, dynamic>> _matches = [];
 
   void getProfiles() async {
     Configuration config = Configuration.flexibleSync(
@@ -38,16 +32,15 @@ class _SwipePageState extends State<SwipePage> {
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
-      var img;
       _swipeItems.add(SwipeItem(
           content: _profiles.isNotEmpty
               ? Container(
-                  decoration:
-                      BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
+                  decoration: const BoxDecoration(
+                      color: Color.fromRGBO(97, 42, 122, 1)),
                   child: Column(
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
+                      const Padding(
+                        padding: EdgeInsets.only(top: 16.0),
                         child: Text(
                           "in/Touch",
                           style: TextStyle(
@@ -62,21 +55,21 @@ class _SwipePageState extends State<SwipePage> {
                         child: Container(
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height / 3,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 image: DecorationImage(
                                     image: AssetImage("lib/assets/user.png"),
                                     fit: BoxFit.cover))),
                       ),
                       Text(
                         _profiles[i].name,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 25),
                       )
                     ],
                   ))
-              : Text('No profiles found'),
+              : const Text('No profiles found'),
           likeAction: () =>
               {print("${_profiles[i].userID}"), liked(_profiles[i].userID)},
           nopeAction: () => showNopeGif(),
@@ -87,6 +80,7 @@ class _SwipePageState extends State<SwipePage> {
 
   void getMatches() async {}
 
+  @override
   void initState() {
     super.initState();
     //getMatches();
@@ -119,14 +113,14 @@ class _SwipePageState extends State<SwipePage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/logo.png"),
+                image: AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
             ),
             body: swipeBody()),
       );
-    } else
+    } else {
       return MaterialApp(
           title: 'Welcome to Flutter',
           home: Scaffold(
@@ -137,19 +131,19 @@ class _SwipePageState extends State<SwipePage> {
                   color: Colors.white,
                 ),
                 title: const Image(
-                  image: const AssetImage("lib/assets/logo.png"),
+                  image: AssetImage("lib/assets/logo.png"),
                   height: 50,
                   fit: BoxFit.contain,
                 ),
               ),
-              body: CircularProgressIndicator()));
+              body: const CircularProgressIndicator()));
+    }
   }
 
   Widget swipeBody() {
-    var size = MediaQuery.of(context).size;
     return Container(
-      constraints: BoxConstraints.expand(),
-      decoration: BoxDecoration(
+      constraints: const BoxConstraints.expand(),
+      decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("lib/assets/LOGIN.png"), fit: BoxFit.cover)),
       child: Padding(
@@ -186,15 +180,18 @@ class _SwipePageState extends State<SwipePage> {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: GestureDetector(
-                onTap: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => MatchesPage())),
+                onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const MatchesPage())),
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.24,
                   height: MediaQuery.of(context).size.height * 0.067,
                   decoration: BoxDecoration(
-                      color: Color.fromRGBO(97, 42, 122, 1),
+                      color: const Color.fromRGBO(97, 42, 122, 1),
                       border: Border.all(
-                          color: Color.fromRGBO(254, 254, 254, 1), width: 1),
+                          color: const Color.fromRGBO(254, 254, 254, 1),
+                          width: 1),
                       borderRadius: BorderRadius.circular(10)),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(

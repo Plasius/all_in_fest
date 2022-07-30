@@ -64,7 +64,7 @@ class _EventsPageState extends State<EventsPage> {
       drawer: MenuBar(
           imageProvider: MongoDatabase.picture != null
               ? MongoDatabase.picture!
-              : AssetImage("lib/assets/user.png"),
+              : const AssetImage("lib/assets/user.png"),
           userName: FirebaseAuth.instance.currentUser != null
               ? MongoDatabase.currentUser["name"]
               : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
@@ -72,12 +72,12 @@ class _EventsPageState extends State<EventsPage> {
               ? MongoDatabase.email!
               : ""), //MongoDatabase.email!),
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(232, 107, 62, 1),
-        leading: Icon(
+        backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+        leading: const Icon(
           Icons.menu,
           color: Colors.white,
         ),
-        title: Image(
+        title: const Image(
           image: AssetImage("lib/assets/logo.png"),
           height: 50,
           fit: BoxFit.contain,
@@ -93,13 +93,13 @@ class _EventsPageState extends State<EventsPage> {
           ),
 */
           IconButton(
-            icon: Icon(Icons.favorite_sharp),
+            icon: const Icon(Icons.favorite_sharp),
             color: Colors.white,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const FavoritePage())),
           ),
           IconButton(
-            icon: Icon(Icons.filter_alt_outlined),
+            icon: const Icon(Icons.filter_alt_outlined),
             color: Colors.white,
             onPressed: () {
               showFilter();
@@ -108,15 +108,15 @@ class _EventsPageState extends State<EventsPage> {
         ],
       ),
       body: Container(
-        constraints: BoxConstraints.expand(),
-        decoration: BoxDecoration(
+        constraints: const BoxConstraints.expand(),
+        decoration: const BoxDecoration(
             image: DecorationImage(
                 image: AssetImage("lib/assets/background.png"),
                 fit: BoxFit.cover)),
         child: Column(children: [
           Container(
               height: MediaQuery.of(context).size.height / 8,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Color.fromRGBO(232, 107, 62, 1),
               ),
               child: Row(
@@ -136,13 +136,13 @@ class _EventsPageState extends State<EventsPage> {
                           "csütörtök",
                           style: TextStyle(
                               color: _selectedDate == "augusztus 25."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white),
                         ),
                         Container(
                           decoration: BoxDecoration(
                               color: _selectedDate == "augusztus 25."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white,
                               shape: BoxShape.circle),
                           child: Padding(
@@ -173,13 +173,13 @@ class _EventsPageState extends State<EventsPage> {
                           "péntek",
                           style: TextStyle(
                               color: _selectedDate == "augusztus 26."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white),
                         ),
                         Container(
                           decoration: BoxDecoration(
                               color: _selectedDate == "augusztus 26."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white,
                               shape: BoxShape.circle),
                           child: Padding(
@@ -210,13 +210,13 @@ class _EventsPageState extends State<EventsPage> {
                           "szombat",
                           style: TextStyle(
                               color: _selectedDate == "augusztus 27."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white),
                         ),
                         Container(
                           decoration: BoxDecoration(
                               color: _selectedDate == "augusztus 27."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white,
                               shape: BoxShape.circle),
                           child: Padding(
@@ -247,13 +247,13 @@ class _EventsPageState extends State<EventsPage> {
                           "vasárnap",
                           style: TextStyle(
                               color: _selectedDate == "augusztus 28."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white),
                         ),
                         Container(
                           decoration: BoxDecoration(
                               color: _selectedDate == "augusztus 28."
-                                  ? Color.fromRGBO(97, 42, 122, 1)
+                                  ? const Color.fromRGBO(97, 42, 122, 1)
                                   : Colors.white,
                               shape: BoxShape.circle),
                           child: Padding(
@@ -318,7 +318,7 @@ class _EventsPageState extends State<EventsPage> {
                                                                 .height /
                                                             12,
                                                         decoration:
-                                                            BoxDecoration(
+                                                            const BoxDecoration(
                                                                 color: Color
                                                                     .fromRGBO(
                                                                         254,
@@ -334,7 +334,7 @@ class _EventsPageState extends State<EventsPage> {
                                                           children: [
                                                             Text(
                                                               document['name'],
-                                                              style: TextStyle(
+                                                              style: const TextStyle(
                                                                   color: Colors
                                                                       .white,
                                                                   fontWeight:
@@ -343,7 +343,7 @@ class _EventsPageState extends State<EventsPage> {
                                                             ),
                                                             Text(
                                                               document['stage'],
-                                                              style: TextStyle(
+                                                              style: const TextStyle(
                                                                   color: Colors
                                                                       .white,
                                                                   fontWeight:
@@ -361,12 +361,13 @@ class _EventsPageState extends State<EventsPage> {
                                                           Text(
                                                             document[
                                                                 'datetime'],
-                                                            style: TextStyle(
-                                                                color: Colors
-                                                                    .white),
+                                                            style:
+                                                                const TextStyle(
+                                                                    color: Colors
+                                                                        .white),
                                                           ),
                                                           IconButton(
-                                                            icon: Icon(Icons
+                                                            icon: const Icon(Icons
                                                                 .favorite_border_sharp),
                                                             color: Colors.white,
                                                             onPressed: () {
@@ -378,7 +379,7 @@ class _EventsPageState extends State<EventsPage> {
                                                       )
                                                     ],
                                                   ),
-                                                  decoration: BoxDecoration(
+                                                  decoration: const BoxDecoration(
                                                       image: DecorationImage(
                                                           image: AssetImage(
                                                               "lib/assets/event_container.png"),
@@ -403,7 +404,7 @@ class _EventsPageState extends State<EventsPage> {
                                                                           .circular(
                                                                               5),
                                                                   gradient:
-                                                                      LinearGradient(
+                                                                      const LinearGradient(
                                                                     begin: Alignment
                                                                         .topCenter,
                                                                     end: Alignment
@@ -440,28 +441,28 @@ class _EventsPageState extends State<EventsPage> {
                                                                               padding: const EdgeInsets.all(15.0),
                                                                               child: Text(
                                                                                 document['name'],
-                                                                                style: TextStyle(color: Colors.white, fontSize: 20),
+                                                                                style: const TextStyle(color: Colors.white, fontSize: 20),
                                                                               ),
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsets.only(top: 10, left: 15),
+                                                                              padding: const EdgeInsets.only(top: 10, left: 15),
                                                                               child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                                                                                 Text(
                                                                                   document['datetime'],
-                                                                                  style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
+                                                                                  style: const TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
                                                                                 ),
-                                                                                SizedBox(width: 20),
+                                                                                const SizedBox(width: 20),
                                                                                 Text(
                                                                                   document['datetime'],
-                                                                                  style: TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
+                                                                                  style: const TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
                                                                                 )
                                                                               ]),
                                                                             ),
                                                                             Padding(
-                                                                              padding: EdgeInsets.only(top: 20, left: 15),
+                                                                              padding: const EdgeInsets.only(top: 20, left: 15),
                                                                               child: Text(
                                                                                 document['stage'],
-                                                                                style: TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 16.5),
+                                                                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 16.5),
                                                                               ),
                                                                             )
                                                                           ],

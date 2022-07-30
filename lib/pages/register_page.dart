@@ -1,16 +1,11 @@
-import 'package:all_in_fest/models/mongo_connect.dart';
-import 'package:all_in_fest/models/open_realm.dart';
+// ignore_for_file: library_prefixes, implementation_imports
+
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
-import 'dart:convert';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
-
-import 'menu_sidebar.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -40,14 +35,14 @@ class _RegisterPageState extends State<RegisterPage> {
       home: Scaffold(
         resizeToAvoidBottomInset: true,
         body: Container(
-          constraints: BoxConstraints.expand(),
-          decoration: BoxDecoration(
+          constraints: const BoxConstraints.expand(),
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage("lib/assets/LOGIN.png"),
                   fit: BoxFit.cover)),
           child: SingleChildScrollView(
             reverse: true,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -60,12 +55,12 @@ class _RegisterPageState extends State<RegisterPage> {
                         bottom: 0),
                     child: Container(
                       decoration: BoxDecoration(
-                          color: Color.fromRGBO(97, 42, 122, 1),
+                          color: const Color.fromRGBO(97, 42, 122, 1),
                           borderRadius: BorderRadius.circular(5)),
                       height: MediaQuery.of(context).size.height * 0.72,
                       width: MediaQuery.of(context).size.width,
                       child: SingleChildScrollView(
-                        physics: AlwaysScrollableScrollPhysics(),
+                        physics: const AlwaysScrollableScrollPhysics(),
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,8 +71,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                         0.027,
                                     bottom: MediaQuery.of(context).size.height *
                                         0.022),
-                                child: Center(
-                                  child: const Text(
+                                child: const Center(
+                                  child: Text(
                                     "Regisztráció",
                                     style: TextStyle(
                                         color: Colors.white,
@@ -107,13 +102,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                     bottom: size.width * 0.041),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
                                     onChanged: (value) => name = value,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
                                         Icons.person,
@@ -144,13 +140,14 @@ class _RegisterPageState extends State<RegisterPage> {
                                     bottom: size.width * 0.041),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
                                     onChanged: (value) => email = value,
-                                    decoration: InputDecoration(
+                                    decoration: const InputDecoration(
                                       border: InputBorder.none,
                                       prefixIcon: Icon(
                                         Icons.mail_outlined,
@@ -181,7 +178,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     bottom: size.width * 0.041),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
@@ -190,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        prefixIcon: Icon(
+                                        prefixIcon: const Icon(
                                           Icons.lock_outline,
                                           color: Colors.white,
                                         ),
@@ -229,7 +227,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                     bottom: size.width * 0.0205),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Color.fromRGBO(255, 255, 255, 0.4),
+                                      color: const Color.fromRGBO(
+                                          255, 255, 255, 0.4),
                                       border: Border.all(
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
@@ -238,7 +237,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
-                                        prefixIcon: Icon(
+                                        prefixIcon: const Icon(
                                           Icons.lock_outline,
                                           color: Colors.white,
                                         ),
@@ -257,7 +256,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                               CheckboxListTile(
-                                title: Text(
+                                title: const Text(
                                   "Elfogadod az ÁSZF-et?",
                                   style: TextStyle(
                                       color: Colors.white,
@@ -273,7 +272,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     ListTileControlAffinity.leading,
                                 activeColor: Colors.white,
                                 checkColor: Colors.orange,
-                                side: BorderSide(
+                                side: const BorderSide(
                                     color: Colors.white,
                                     width: 3), //  <-- leading Checkbox
                               ),
@@ -282,7 +281,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                   onTap: () => createUserProfile(),
                                   child: Container(
                                     decoration: BoxDecoration(
-                                        color: Color.fromRGBO(254, 192, 1, 1),
+                                        color: const Color.fromRGBO(
+                                            254, 192, 1, 1),
                                         borderRadius: BorderRadius.circular(5)),
                                     child: Padding(
                                       padding: EdgeInsets.symmetric(
@@ -325,7 +325,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => LoginPage())),
+                                    builder: (context) => const LoginPage())),
                             child: const Text(
                               "Belépés",
                               style: TextStyle(

@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../models/mongo_connect.dart';
-import 'event_details.dart';
 import 'menu_sidebar.dart';
 
 class FavoritePage extends StatefulWidget {
@@ -36,7 +35,7 @@ class _FavoritePageState extends State<FavoritePage> {
       drawer: MenuBar(
           imageProvider: MongoDatabase.picture != null
               ? MongoDatabase.picture!
-              : AssetImage("lib/assets/user.png"),
+              : const AssetImage("lib/assets/user.png"),
           userName: FirebaseAuth.instance.currentUser != null
               ? MongoDatabase.currentUser["name"]
               : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
@@ -44,29 +43,29 @@ class _FavoritePageState extends State<FavoritePage> {
               ? MongoDatabase.email!
               : ""), //MongoDatabase.email!),
       appBar: AppBar(
-        backgroundColor: Color.fromRGBO(232, 107, 62, 1),
-        leading: Icon(
+        backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+        leading: const Icon(
           Icons.menu,
           color: Colors.white,
         ),
-        title: Image(
+        title: const Image(
           image: AssetImage("lib/assets/logo.png"),
           height: 50,
           fit: BoxFit.contain,
         ),
         actions: [
-          Icon(
+          const Icon(
             Icons.search_outlined,
             color: Colors.white,
           ),
           IconButton(
-            icon: Icon(Icons.home),
+            icon: const Icon(Icons.home),
             color: Colors.white,
             onPressed: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const EventsPage())),
           ),
           IconButton(
-            icon: Icon(Icons.filter_alt_outlined),
+            icon: const Icon(Icons.filter_alt_outlined),
             color: Colors.white,
             onPressed: () {
               showFilter();
@@ -76,15 +75,15 @@ class _FavoritePageState extends State<FavoritePage> {
         ],
       ),
       body: Container(
-          constraints: BoxConstraints.expand(),
-          decoration: BoxDecoration(
+          constraints: const BoxConstraints.expand(),
+          decoration: const BoxDecoration(
               image: DecorationImage(
                   image: AssetImage("lib/assets/background.png"),
                   fit: BoxFit.cover)),
           child: Column(children: [
             Container(
                 height: MediaQuery.of(context).size.height / 8,
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Color.fromRGBO(232, 107, 62, 1),
                 ),
                 child: Row(
@@ -104,13 +103,13 @@ class _FavoritePageState extends State<FavoritePage> {
                             "csütörtök",
                             style: TextStyle(
                                 color: _selectedDate == "augusztus 25."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white),
                           ),
                           Container(
                             decoration: BoxDecoration(
                                 color: _selectedDate == "augusztus 25."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white,
                                 shape: BoxShape.circle),
                             child: Padding(
@@ -141,13 +140,13 @@ class _FavoritePageState extends State<FavoritePage> {
                             "péntek",
                             style: TextStyle(
                                 color: _selectedDate == "augusztus 26."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white),
                           ),
                           Container(
                             decoration: BoxDecoration(
                                 color: _selectedDate == "augusztus 26."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white,
                                 shape: BoxShape.circle),
                             child: Padding(
@@ -178,13 +177,13 @@ class _FavoritePageState extends State<FavoritePage> {
                             "szombat",
                             style: TextStyle(
                                 color: _selectedDate == "augusztus 27."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white),
                           ),
                           Container(
                             decoration: BoxDecoration(
                                 color: _selectedDate == "augusztus 27."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white,
                                 shape: BoxShape.circle),
                             child: Padding(
@@ -215,13 +214,13 @@ class _FavoritePageState extends State<FavoritePage> {
                             "vasárnap",
                             style: TextStyle(
                                 color: _selectedDate == "augusztus 28."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white),
                           ),
                           Container(
                             decoration: BoxDecoration(
                                 color: _selectedDate == "augusztus 28."
-                                    ? Color.fromRGBO(97, 42, 122, 1)
+                                    ? const Color.fromRGBO(97, 42, 122, 1)
                                     : Colors.white,
                                 shape: BoxShape.circle),
                             child: Padding(
@@ -262,7 +261,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                     .size
                                                     .height /
                                                 12,
-                                            decoration: BoxDecoration(
+                                            decoration: const BoxDecoration(
                                                 color: Color.fromRGBO(
                                                     254, 192, 1, 1)),
                                           ),
@@ -273,12 +272,12 @@ class _FavoritePageState extends State<FavoritePage> {
                                                 Text(
                                                   favoriteEvent.events[index]
                                                       ['name'],
-                                                  style: TextStyle(
+                                                  style: const TextStyle(
                                                       color: Colors.white,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
-                                                Text(
+                                                const Text(
                                                   //favoriteEvent.events[index]['place'],
                                                   "place",
                                                   style: TextStyle(
@@ -293,14 +292,14 @@ class _FavoritePageState extends State<FavoritePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.end,
                                             children: [
-                                              Text(
+                                              const Text(
                                                 //favoriteEvent.events[index]['date'].toString(),
                                                 "date",
                                                 style: TextStyle(
                                                     color: Colors.white),
                                               ),
                                               IconButton(
-                                                icon: Icon(Icons
+                                                icon: const Icon(Icons
                                                     .favorite_border_sharp),
                                                 color: Colors.white,
                                                 onPressed: () {
@@ -313,7 +312,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                           )
                                         ],
                                       ),
-                                      decoration: BoxDecoration(
+                                      decoration: const BoxDecoration(
                                           image: DecorationImage(
                                               image: AssetImage(
                                                   "lib/assets/event_container.png"),
@@ -331,7 +330,8 @@ class _FavoritePageState extends State<FavoritePage> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             5),
-                                                    gradient: LinearGradient(
+                                                    gradient:
+                                                        const LinearGradient(
                                                       begin:
                                                           Alignment.topCenter,
                                                       end: Alignment
@@ -369,7 +369,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                               .events[
                                                                           index]
                                                                       ['name'],
-                                                                  style: TextStyle(
+                                                                  style: const TextStyle(
                                                                       color: Colors
                                                                           .white,
                                                                       fontSize:
@@ -377,8 +377,9 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                 ),
                                                               ),
                                                               Padding(
-                                                                padding: EdgeInsets
-                                                                    .only(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
                                                                         top: 10,
                                                                         left:
                                                                             15),
@@ -391,7 +392,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                         favoriteEvent.events[index]
                                                                             [
                                                                             'datetime'],
-                                                                        style: TextStyle(
+                                                                        style: const TextStyle(
                                                                             color: Colors
                                                                                 .white,
                                                                             fontSize:
@@ -399,14 +400,14 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                             fontWeight:
                                                                                 FontWeight.normal),
                                                                       ),
-                                                                      SizedBox(
+                                                                      const SizedBox(
                                                                           width:
                                                                               20),
                                                                       Text(
                                                                         favoriteEvent.events[index]
                                                                             [
                                                                             'datetime'],
-                                                                        style: TextStyle(
+                                                                        style: const TextStyle(
                                                                             color: Colors
                                                                                 .white,
                                                                             fontSize:
@@ -417,8 +418,9 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                     ]),
                                                               ),
                                                               Padding(
-                                                                padding: EdgeInsets
-                                                                    .only(
+                                                                padding:
+                                                                    const EdgeInsets
+                                                                            .only(
                                                                         top: 20,
                                                                         left:
                                                                             15),
@@ -427,7 +429,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                               .events[
                                                                           index]
                                                                       ['stage'],
-                                                                  style: TextStyle(
+                                                                  style: const TextStyle(
                                                                       color: Colors
                                                                           .white,
                                                                       fontWeight:
@@ -465,7 +467,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                                     onTap:
                                                                         () => {
                                                                               Navigator.pop(context),
-                                                                              sleep(Duration(milliseconds: 1500)),
+                                                                              sleep(const Duration(milliseconds: 1500)),
                                                                               favoriteEvent.remove(favoriteEvent.events[index]),
                                                                             });
                                                               }))
@@ -474,7 +476,7 @@ class _FavoritePageState extends State<FavoritePage> {
                                                     ],
                                                   ),
                                                 )
-                                              : Text("Nincs adat")),
+                                              : const Text("Nincs adat")),
                                 ),
                               ],
                             ),

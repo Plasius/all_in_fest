@@ -13,21 +13,21 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  @override
   DateTime selectedDate = DateTime.now();
 
-  var email_1 = new TextEditingController();
-  var email_2 = new TextEditingController();
-  var password_1 = new TextEditingController();
-  var password_2 = new TextEditingController();
+  var email_1 = TextEditingController();
+  var email_2 = TextEditingController();
+  var password_1 = TextEditingController();
+  var password_2 = TextEditingController();
 
+  @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
             drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
-                    : AssetImage("lib/assets/user.png"),
+                    : const AssetImage("lib/assets/user.png"),
                 userName: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.currentUser["name"]
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
@@ -41,7 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Colors.white,
               ),
               title: const Image(
-                image: const AssetImage("lib/assets/logo.png"),
+                image: AssetImage("lib/assets/logo.png"),
                 height: 50,
                 fit: BoxFit.contain,
               ),
@@ -55,14 +55,14 @@ class _SettingsPageState extends State<SettingsPage> {
         padding: const EdgeInsets.all(15),
         child: Column(
           children: [
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextFormField(
               controller: email_1,
               decoration: InputDecoration(
                   labelText: 'E-mail',
-                  labelStyle: TextStyle(
+                  labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold),
@@ -74,14 +74,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 20,
             ),
             TextFormField(
               controller: email_2,
               decoration: InputDecoration(
                   labelText: 'E-mail újra',
-                  labelStyle: TextStyle(
+                  labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold),
@@ -93,21 +93,21 @@ class _SettingsPageState extends State<SettingsPage> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             ElevatedButton(
-              child: Text('Frissítés'),
+              child: const Text('Frissítés'),
               onPressed: () => emailCsere(),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             TextFormField(
               controller: password_1,
               decoration: InputDecoration(
                   labelText: 'Jelszó',
-                  labelStyle: TextStyle(
+                  labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold),
@@ -119,14 +119,14 @@ class _SettingsPageState extends State<SettingsPage> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             TextFormField(
               controller: password_2,
               decoration: InputDecoration(
                   labelText: 'Jelszó újra',
-                  labelStyle: TextStyle(
+                  labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
                       fontWeight: FontWeight.bold),
@@ -138,11 +138,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 15,
             ),
             ElevatedButton(
-              child: Text('Frissítés'),
+              child: const Text('Frissítés'),
               onPressed: () => jelszoCsere(),
             )
           ],

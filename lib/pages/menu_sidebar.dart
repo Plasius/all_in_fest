@@ -1,4 +1,3 @@
-import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
@@ -15,7 +14,12 @@ class MenuBar extends StatelessWidget {
   final ImageProvider imageProvider;
   final String userName;
   final String email;
-  const MenuBar({Key? key, required this.imageProvider, required this.userName, required this.email}) : super(key: key);
+  const MenuBar(
+      {Key? key,
+      required this.imageProvider,
+      required this.userName,
+      required this.email})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -33,89 +37,73 @@ class MenuBar extends StatelessWidget {
                 image: imageProvider,
               )),
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color.fromRGBO(232, 107, 62, 1),
             ),
           ),
           ListTile(
-            title: Text('Home'),
-            leading: Icon(Icons.home),
+            title: const Text('Home'),
+            leading: const Icon(Icons.home),
             onTap: () => {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                      const MyHomePage(title: "Home")))
+                      builder: (context) => const MyHomePage(title: "Home")))
             },
           ),
           ListTile(
-            leading: Icon(Icons.login),
-            title: Text('Login'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const LoginPage())),
+            leading: const Icon(Icons.login),
+            title: const Text('Login'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const LoginPage())),
           ),
           ListTile(
-            leading: Icon(Icons.person_add_alt),
-            title: Text('in/Touch'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const SwipePage())),
+            leading: const Icon(Icons.person_add_alt),
+            title: const Text('in/Touch'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SwipePage())),
           ),
           ListTile(
-            leading: Icon(Icons.people_outline),
-            title: Text('Matches'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const MatchesPage())),
+            leading: const Icon(Icons.people_outline),
+            title: const Text('Matches'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MatchesPage())),
           ),
           ListTile(
-            leading: Icon(Icons.calendar_today),
-            title: Text('Events'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const EventsPage())),
+            leading: const Icon(Icons.calendar_today),
+            title: const Text('Events'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const EventsPage())),
           ),
           ListTile(
-            leading: Icon(Icons.map_outlined),
-            title: Text('Map'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const MapPage())),
+            leading: const Icon(Icons.map_outlined),
+            title: const Text('Map'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const MapPage())),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const SettingsPage())),
+            leading: const Icon(Icons.settings),
+            title: const Text('Settings'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const SettingsPage())),
           ),
           ListTile(
-            leading: Icon(Icons.person_outline),
-            title: Text('Profile'),
-            onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const ProfilePage())),
+            leading: const Icon(Icons.person_outline),
+            title: const Text('Profile'),
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const ProfilePage())),
           ),
-          Divider(),
+          const Divider(),
           ListTile(
-            title: Text('Exit'),
-            leading: Icon(Icons.exit_to_app),
+            title: const Text('Exit'),
+            leading: const Icon(Icons.exit_to_app),
             onTap: () => {
               FirebaseAuth.instance.signOut(),
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          const MyHomePage(title: "Exited")))
+                      builder: (context) => const MyHomePage(title: "Exited")))
             },
           ),
         ],
