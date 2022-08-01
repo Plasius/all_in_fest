@@ -24,16 +24,15 @@ class _SwipePageState extends State<SwipePage> {
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [user.User.schema]);
     Realm realm = Realm(config);
-    _profiles = realm
-        .all<user.User>()
-        .query("_id != '${RealmConnect.app.currentUser.id}'");
+    _profiles = realm.all<user.User>();
+    //.query("_id != '${RealmConnect.app.currentUser.id}'");
 
     //shuffle?
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
       _swipeItems.add(SwipeItem(
-          content: _profiles.isNotEmpty
+          content: _profiles.length != 0
               ? Container(
                   decoration: const BoxDecoration(
                       color: Color.fromRGBO(97, 42, 122, 1)),
@@ -208,10 +207,10 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void liked(String otherUser) async {
-    print("im in");
+    print(RealmConnect.app.currentUser.id);
     RealmConnect.realmOpen();
-    final _match = Match(RealmConnect.currentUser.id + otherUser,
-        user1: RealmConnect.currentUser.id, user2: otherUser);
+    final _match = Match(RealmConnect.app.currentUser.id + otherUser,
+        user1: RealmConnect.app.currentUser.id, user2: otherUser);
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
     Realm realm = Realm(config);
@@ -222,6 +221,7 @@ class _SwipePageState extends State<SwipePage> {
       mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
+    print("synched");
 
     realm.write(() {
       realm.add(_match);

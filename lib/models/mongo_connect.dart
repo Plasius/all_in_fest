@@ -7,12 +7,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
 class MongoDatabase {
-  static var db, users, events, matches, messages;
+  static var db;
   static var bucket;
-  static var currentUser;
   static var currentProfilePic;
   static ImageProvider? picture;
-  static String? email;
 
   static disconnect() async {
     db.close();
@@ -27,25 +25,13 @@ class MongoDatabase {
       ]);
       await db.open();
 
-      users = db.collection('users');
-      events = db.collection('events');
-      matches = db.collection('matches');
-      messages = db.collection('messages');
-
-      bucket = GridFS(db, "images");
-
-      currentUser = await users
-          .findOne(where.eq("userID", RealmConnect.app.currentUser.id));
-
       currentProfilePic = RealmConnect.app.currentUser.id != null
-          ? await bucket.chunks.findOne(where.eq("user", currentUser["userID"]))
+          ? await bucket.chunks.findOne(
+              where.eq("user", RealmConnect.app.currentUser.id.toString()))
           : null;
       picture = currentProfilePic != null
           ? MemoryImage(base64Decode(currentProfilePic["data"]))
           : null;
-
-      email = "example@bit.hu";
-      print(email);
     } catch (e) {
       print(e);
     }

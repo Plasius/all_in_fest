@@ -3,13 +3,17 @@
 import 'dart:convert';
 
 import 'package:all_in_fest/main.dart';
+import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/user.dart' as userModel;
 import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:image_picker/image_picker.dart';
+import 'package:realm/realm.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -37,8 +41,13 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     nameController.text = userName;
     bioController.text = bio;
+    RealmConnect.realmOpen();
     loadImage();
-    loadProfile();
+    Future.delayed(
+        Duration.zero,
+        (() => {
+              loadProfile(),
+            }));
   }
 
   @override
@@ -127,15 +136,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                   Border.all(color: Colors.white, width: 8)),
                         ),
                         Positioned(
-                          child: Container(
-                            height: size.width * 0.125,
-                            width: size.width * 0.125,
-                            decoration: const BoxDecoration(
-                                color: Colors.redAccent,
-                                shape: BoxShape.circle),
-                            child: const Icon(
-                              MdiIcons.cameraPlus,
-                              color: Colors.white,
+                          child: GestureDetector(
+                            onTap: (() => _showPicker(context)),
+                            child: Container(
+                              height: size.width * 0.125,
+                              width: size.width * 0.125,
+                              decoration: const BoxDecoration(
+                                  color: Color.fromRGBO(232, 107, 62, 1),
+                                  shape: BoxShape.circle),
+                              child: const Icon(
+                                MdiIcons.cameraPlus,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                           bottom: size.width * 0,
@@ -197,6 +209,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     Center(
                       child: GestureDetector(
                         onTap: () => {
+                          RealmConnect.app.currentUser.logOut(),
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -230,71 +243,122 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future imgFromGallery() async {
+    var imageQuery;
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
+      var _cmpressed_image;
       print("im in");
-      try {} catch (e) {
+      try {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.jpeg,
+            quality: 70);
+
+        var image = UserImage(pickedFile.path.split("/").last,
+            base64Encode(_cmpressed_image), RealmConnect.app.currentUser.id);
+
+        RealmConnect.realmOpen();
+        Configuration config = Configuration.flexibleSync(
+            RealmConnect.app.currentUser, [UserImage.schema]);
+        Realm realm = Realm(config);
+
+        imageQuery = realm.all<UserImage>();
+        SubscriptionSet messageSubscriptions = realm.subscriptions;
+        messageSubscriptions.update((mutableSubscriptions) {
+          mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+        });
+        await realm.subscriptions.waitForSynchronization();
+
+        realm.write(() => realm.add(image));
+      } catch (e) {
         print(e.runtimeType);
       }
     } else {
       print('No image selected.');
     }
 
-    var img = await MongoDatabase.bucket.chunks
-        .findOne({"user": RealmConnect.app.currentUser.id});
-
-    img = await MongoDatabase.bucket.chunks
-        .findOne({"user": RealmConnect.app.currentUser.id});
+    var img = imageQuery
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
 
     setState(() {
-      provider = MemoryImage(base64Decode(img["data"]));
+      provider = MemoryImage(base64Decode(img.data));
       flag = true;
     });
   }
 
   Future imgFromCamera() async {
+    var imageQuery;
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
+      var _cmpressed_image;
       print("im in");
-      try {} catch (e) {
+      try {
+        _cmpressed_image = await FlutterImageCompress.compressWithFile(
+            pickedFile.path,
+            format: CompressFormat.jpeg,
+            quality: 70);
+
+        var image = UserImage(pickedFile.path.split("/").last,
+            base64Encode(_cmpressed_image), RealmConnect.app.currentUser.id);
+
+        RealmConnect.realmOpen();
+        Configuration config = Configuration.flexibleSync(
+            RealmConnect.app.currentUser, [UserImage.schema]);
+        Realm realm = Realm(config);
+
+        imageQuery = realm.all<UserImage>();
+        SubscriptionSet messageSubscriptions = realm.subscriptions;
+        messageSubscriptions.update((mutableSubscriptions) {
+          mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+        });
+        await realm.subscriptions.waitForSynchronization();
+
+        realm.write(() => realm.add(image));
+      } catch (e) {
         print(e.runtimeType);
       }
     } else {
       print('No image selected.');
     }
 
-    var img = await MongoDatabase.bucket.chunks
-        .findOne({"user": RealmConnect.app.currentUser.id});
-
-    img = await MongoDatabase.bucket.chunks
-        .findOne({"user": RealmConnect.app.currentUser.id});
+    var img = imageQuery
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
 
     setState(() {
-      provider = MemoryImage(base64Decode(img["data"]));
+      provider = MemoryImage(base64Decode(img.data));
       flag = true;
     });
   }
 
-  void saveProfile() {
-    //get user id
+  Future<void> saveProfile() async {
+    //get user id and realm connection
     var uid = RealmConnect.app.currentUser.id;
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [userModel.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm.all<userModel.User>().query("_id == '$uid'");
+    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    messageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
     //update name
     if (uid != null) {
+      userModel.User myUser = userQuery[0];
       if (nameController.text.isNotEmpty && bioController.text.isNotEmpty) {
-        MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
-            mongo.modify.set('name', nameController.text),
-            mongo.modify.set('bio', bioController.text));
+        realm.write(() => {
+              myUser.name = nameController.text,
+              myUser.bio = bioController.text
+            });
         print("Succeful update");
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
-        MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
-            mongo.modify.set('name', nameController.text));
+        realm.write(() => {myUser.name = nameController.text});
         print("Name updated");
       } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
-        MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
-            mongo.modify.set('bio', bioController.text));
+        realm.write(() => {myUser.bio = bioController.text});
         print("Bio updated");
       } else {
         print("Please provide new name or bio");
@@ -303,25 +367,63 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    if (MongoDatabase.picture == null) {
+    RealmConnect.realmGetImage();
+    if (RealmConnect.picture == null) {
       provider = const AssetImage("lib/assets/user.png");
     } else {
-      provider = MongoDatabase.picture;
+      provider = RealmConnect.picture;
     }
 
     setState(() {});
   }
 
-  void loadProfile() async {
-    var user = await MongoDatabase.users
-        .findOne(mongo.where.eq("userID", RealmConnect.app.currentUser.id));
-    print(user["name"]);
+  void loadProfile() {
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [userModel.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm
+        .all<userModel.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+    var user = userQuery[0];
+    print(user.name);
 
     setState(() {
-      userName = user["name"];
-      bio = user["bio"];
+      userName = user.name!;
+      bio = user.bio!;
       nameController.text = userName;
       bioController.text = bio;
     });
+  }
+
+  void _showPicker(context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext bc) {
+          return SafeArea(
+            child: Container(
+              child: Wrap(
+                children: <Widget>[
+                  ListTile(
+                      leading: Icon(Icons.photo_library),
+                      title: Text('Gallery'),
+                      onTap: () {
+                        imgFromGallery();
+                        Navigator.of(context).pop();
+                      }),
+                  ListTile(
+                    leading: Icon(Icons.photo_camera),
+                    title: Text('Camera'),
+                    onTap: () {
+                      imgFromCamera();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
   }
 }

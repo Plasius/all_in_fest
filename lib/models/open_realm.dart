@@ -1,7 +1,11 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print, library_prefixes, implementation_imports
 
+import 'dart:convert';
+
+import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/message.dart';
+import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
@@ -10,10 +14,24 @@ class RealmConnect {
   static var appConfig;
   static var app;
   static var currentUser;
+  static var currentProfilePic;
+  static var picture;
 
   static void realmOpen() async {
     appConfig = AppConfiguration("application-0-bjnqv");
     app = App(appConfig);
+  }
+
+  static void realmGetImage() {
+    realmOpen();
+    var imageQuery;
+    Configuration config =
+        Configuration.flexibleSync(app.currentUser, [UserImage.schema]);
+    Realm realm = Realm(config);
+    imageQuery = realm.all<UserImage>();
+    currentProfilePic = imageQuery
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
+    picture = MemoryImage(base64Decode(currentProfilePic.data));
   }
 
   static void realmRegister(
@@ -58,24 +76,6 @@ class RealmConnect {
 
     realm.write(() {
       realm.add(_message);
-    });
-  }
-
-  static void realmAddMatch(Match _match) async {
-    Configuration config =
-        Configuration.flexibleSync(app.currentUser, [Match.schema]);
-    Realm realm = Realm(config);
-
-    final matchQuery = realm.all<Match>();
-    SubscriptionSet messageSubscriptions = realm.subscriptions;
-    messageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    realm.write(() {
-      realm.add(_match);
-      print("writed");
     });
   }
 }

@@ -2,12 +2,14 @@
 
 import 'dart:convert';
 
+import 'package:all_in_fest/models/image.dart';
+import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/chat_page.dart';
+import 'package:all_in_fest/models/user.dart' as user;
 import 'package:flutter/material.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
+import 'package:realm/realm.dart';
 
-import '../models/mongo_connect.dart';
 import 'menu_sidebar.dart';
 
 class MatchesPage extends StatefulWidget {
@@ -18,36 +20,54 @@ class MatchesPage extends StatefulWidget {
 }
 
 class _MatchesPageState extends State<MatchesPage> {
-  var matches = [];
-  var photoURLs = [];
+  var matches;
+  var photos = [];
   var matchedProfiles = [];
   bool ready = false;
 
   void loadMatches() async {
-    matches = await MongoDatabase.matches
-        .find(mongo.where.match('_id', "${""}"))
-        .toList();
-    for (var element in matches) {
-      print(element["user1"]);
-      print(element["user2"]);
-      var partner;
-      element["user2"] == RealmConnect.app.currentUser.id
-          ? partner = element["user1"]
-          : partner = element["user2"];
-      print(partner);
-      var matchedProfile =
-          await MongoDatabase.users.findOne(mongo.where.eq("userID", partner));
-      print(matchedProfile["name"]);
-      matchedProfiles.add(matchedProfile);
-      print(matchedProfiles.length);
+    RealmConnect.realmOpen();
+    Configuration matchConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Match.schema]);
+    Realm matchesRealm = Realm(matchConfig);
+    final matchQuery = matchesRealm
+        .all<Match>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+    print(matchQuery.length);
 
-      var partnerPhoto = await MongoDatabase.bucket.chunks
-          .findOne(mongo.where.eq("user", partner));
-      photoURLs.add(partnerPhoto != null
-          ? MemoryImage(base64Decode(partnerPhoto["data"]))
-          : const AssetImage("lib/assets/user.png"));
-      print(photoURLs.length);
+    /*  RealmConnect.realmOpen();
+    Configuration photoConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [UserImage.schema]);
+    Realm imagesRealm = Realm(photoConfig);
+    var images = imagesRealm.all<UserImage>();
+    print(images.length);
+ */
+    Configuration userConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user.User.schema]);
+    Realm userRealm = Realm(userConfig);
+    var users = userRealm.all<user.User>();
+    print(users.length);
+
+    for (int i = 0; i < matchQuery.length; i++) {
+      if (matchQuery[i].user2 == RealmConnect.app.currentUser.id) {
+        print("if");
+        var matchedProfile =
+            users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
+        matchedProfiles.add(matchedProfile);
+        RealmConnect.realmGetImage();
+        var matchedProfileImage = RealmConnect.picture;
+        photos.add(matchedProfileImage);
+      } else {
+        print("else");
+        var matchedProfile =
+            users.query("_id CONTAINS '${matchQuery[i].user2}'")[0];
+        matchedProfiles.add(matchedProfile);
+        RealmConnect.realmGetImage();
+        var matchedProfileImage = RealmConnect.picture;
+        photos.add(matchedProfileImage);
+      }
     }
+    print(photos.length);
     setState(() {});
   }
 
@@ -101,7 +121,7 @@ class _MatchesPageState extends State<MatchesPage> {
               child: SingleChildScrollView(
                 child: Column(
                   children: List.generate(
-                      matches.length,
+                      matchedProfiles.length,
                       (index) => GestureDetector(
                             onTap: () {},
                             child: Column(
@@ -120,7 +140,8 @@ class _MatchesPageState extends State<MatchesPage> {
                                         decoration: BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
-                                                image: photoURLs[index])),
+                                                image: AssetImage(
+                                                    "lib/assets/user.png"))),
                                       ),
                                       Padding(
                                         padding:
@@ -135,7 +156,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: size.width * 0.01625),
                                               child: Text(
-                                                matchedProfiles[index]["name"],
+                                                matchedProfiles[index].name,
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
