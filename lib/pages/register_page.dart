@@ -17,6 +17,7 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   var emailController = TextEditingController();
   var passwordController = TextEditingController();
+  var passwordConfirmController = TextEditingController();
   var nameController = TextEditingController();
   bool checkedValue = false;
 
@@ -233,7 +234,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                           color: Colors.white, width: 3),
                                       borderRadius: BorderRadius.circular(5)),
                                   child: TextFormField(
-                                      controller: passwordController,
+                                      controller: passwordConfirmController,
                                       obscureText: _showPassword ? false : true,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
@@ -350,8 +351,14 @@ class _RegisterPageState extends State<RegisterPage> {
   void createUserProfile() async {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
-        passwordController.text.isEmpty) {
+        passwordController.text.isEmpty ||
+        passwordConfirmController.text.isEmpty) {
       print("Please fill out all of the fields.");
+      return;
+    }
+
+    if (passwordConfirmController.text != passwordController.text) {
+      print("Passwords don't match.");
       return;
     }
 

@@ -3,6 +3,7 @@
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:realm/realm.dart';
 
 import '../main.dart';
 
@@ -232,6 +233,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void login() {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
+    if (app.currentUser != null) {
+      app.currentUser?.logOut();
+    }
+
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       print("Please fill out all of the fields.");
       return;

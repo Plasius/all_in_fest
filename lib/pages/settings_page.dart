@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:realm/realm.dart';
 
 import '../models/mongo_connect.dart';
 import 'menu_sidebar.dart';
@@ -15,7 +16,6 @@ class _SettingsPageState extends State<SettingsPage> {
   DateTime selectedDate = DateTime.now();
 
   var email_1 = TextEditingController();
-  var email_2 = TextEditingController();
   var password_1 = TextEditingController();
   var password_2 = TextEditingController();
 
@@ -60,7 +60,7 @@ class _SettingsPageState extends State<SettingsPage> {
             TextFormField(
               controller: email_1,
               decoration: InputDecoration(
-                  labelText: 'E-mail',
+                  labelText: 'E-mail megerősítése',
                   labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
@@ -72,32 +72,6 @@ class _SettingsPageState extends State<SettingsPage> {
                       fontWeight: FontWeight.normal),
                   border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15))),
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              controller: email_2,
-              decoration: InputDecoration(
-                  labelText: 'E-mail újra',
-                  labelStyle: const TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'radev.anthony@uni-corvinus.hu',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            ElevatedButton(
-              child: const Text('Frissítés'),
-              onPressed: () => emailCsere(),
             ),
             const SizedBox(
               height: 15,
@@ -105,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
             TextFormField(
               controller: password_1,
               decoration: InputDecoration(
-                  labelText: 'Jelszó',
+                  labelText: 'Új jelszó',
                   labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
@@ -124,7 +98,7 @@ class _SettingsPageState extends State<SettingsPage> {
             TextFormField(
               controller: password_2,
               decoration: InputDecoration(
-                  labelText: 'Jelszó újra',
+                  labelText: 'Új jelszó újra',
                   labelStyle: const TextStyle(
                       color: Colors.redAccent,
                       fontSize: 14,
@@ -140,9 +114,18 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(
               height: 15,
             ),
-            ElevatedButton(
-              child: const Text('Frissítés'),
-              onPressed: () => jelszoCsere(),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  child: const Text('Change password'),
+                  onPressed: () => jelszoCsere(),
+                ),
+                SizedBox(
+                  width: 15,
+                ),
+                ElevatedButton(onPressed: logout, child: const Text("Log out"))
+              ],
             )
           ],
         ),
@@ -150,11 +133,42 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  void emailCsere() {
-    if (email_1.text == email_2.text && email_1.text != "") {}
+  void logout() {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
+    if (app.currentUser != null) app.currentUser?.logOut();
   }
 
-  void jelszoCsere() {
-    if (password_1.text == password_2.text && password_1.text != '') {}
+  void jelszoCsere() async {
+    if (email_1.text.isEmpty == false &&
+        password_1.text == password_2.text &&
+        password_1.text.isEmpty == false) {
+      var appConfig = AppConfiguration("application-0-bjnqv");
+      var app = App(appConfig);
+
+      EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
+      await authProvider.callResetPasswordFunction(
+          email_1.text, password_1.text,
+          functionArgs: []);
+
+      Fluttertoast.showToast(
+          msg: "Password reset successfully.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    } else {
+      Fluttertoast.showToast(
+          msg: "Something went wrong",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 }
