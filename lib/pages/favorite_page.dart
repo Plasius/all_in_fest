@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:all_in_fest/models/favorite_model.dart';
 import 'package:all_in_fest/pages/events_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -32,7 +31,7 @@ class _FavoritePageState extends State<FavoritePage> {
   Widget build(BuildContext context) {
     var favoriteEvent = context.watch<FavoriteModel>();
     return Scaffold(
-      drawer: MenuBar(
+      /* drawer: MenuBar(
           imageProvider: MongoDatabase.picture != null
               ? MongoDatabase.picture!
               : const AssetImage("lib/assets/user.png"),
@@ -41,7 +40,7 @@ class _FavoritePageState extends State<FavoritePage> {
               : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
           email: FirebaseAuth.instance.currentUser != null
               ? MongoDatabase.email!
-              : ""), //MongoDatabase.email!),
+              : ""), */ //MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
         leading: const Icon(

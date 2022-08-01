@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
@@ -18,7 +17,7 @@ class _MapPageState extends State<MapPage> {
     return MaterialApp(
       title: 'Map',
       home: Scaffold(
-          drawer: MenuBar(
+          /* drawer: MenuBar(
               imageProvider: MongoDatabase.picture != null
                   ? MongoDatabase.picture!
                   : const AssetImage("lib/assets/user.png"),
@@ -27,7 +26,7 @@ class _MapPageState extends State<MapPage> {
                   : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
               email: FirebaseAuth.instance.currentUser != null
                   ? MongoDatabase.email!
-                  : ""), //MongoDatabase.email!),
+                  : ""), */ //MongoDatabase.email!),
           /*appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             leading: const Icon(

@@ -4,11 +4,11 @@ import 'dart:convert';
 
 import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/mongo_connect.dart';
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/menu_sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -26,9 +26,7 @@ class _ProfilePageState extends State<ProfilePage> {
   var flag = false;
   String userName = "Adj meg egy nevet";
   String bio = "Adj meg egy bio-t";
-  String? email = FirebaseAuth.instance.currentUser != null
-      ? FirebaseAuth.instance.currentUser?.email
-      : "example@bit.hu";
+  String? email = "example@bit.hu";
 
   var nameController = TextEditingController();
 
@@ -48,7 +46,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return MaterialApp(
         home: Scaffold(
             resizeToAvoidBottomInset: false,
-            drawer: MenuBar(
+            /* drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : const AssetImage("lib/assets/user.png"),
@@ -57,7 +55,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
                 email: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.email!
-                    : ""), //MongoDatabase.email!),
+                    : ""),  */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: const Image(
@@ -199,7 +197,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     Center(
                       child: GestureDetector(
                         onTap: () => {
-                          FirebaseAuth.instance.signOut(),
                           Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -244,10 +241,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     var img = await MongoDatabase.bucket.chunks
-        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+        .findOne({"user": RealmConnect.app.currentUser.id});
 
     img = await MongoDatabase.bucket.chunks
-        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+        .findOne({"user": RealmConnect.app.currentUser.id});
 
     setState(() {
       provider = MemoryImage(base64Decode(img["data"]));
@@ -267,10 +264,10 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     var img = await MongoDatabase.bucket.chunks
-        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+        .findOne({"user": RealmConnect.app.currentUser.id});
 
     img = await MongoDatabase.bucket.chunks
-        .findOne({"user": FirebaseAuth.instance.currentUser?.uid});
+        .findOne({"user": RealmConnect.app.currentUser.id});
 
     setState(() {
       provider = MemoryImage(base64Decode(img["data"]));
@@ -280,23 +277,23 @@ class _ProfilePageState extends State<ProfilePage> {
 
   void saveProfile() {
     //get user id
-    var uid = FirebaseAuth.instance.currentUser?.uid;
+    var uid = RealmConnect.app.currentUser.id;
     //update name
     if (uid != null) {
       if (nameController.text.isNotEmpty && bioController.text.isNotEmpty) {
         MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
             mongo.modify.set('name', nameController.text),
             mongo.modify.set('bio', bioController.text));
         print("Succeful update");
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
         MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
             mongo.modify.set('name', nameController.text));
         print("Name updated");
       } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
         MongoDatabase.users.updateOne(
-            mongo.where.eq('userID', FirebaseAuth.instance.currentUser?.uid),
+            mongo.where.eq('userID', RealmConnect.app.currentUser.id),
             mongo.modify.set('bio', bioController.text));
         print("Bio updated");
       } else {
@@ -316,8 +313,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void loadProfile() async {
-    var user = await MongoDatabase.users.findOne(
-        mongo.where.eq("userID", FirebaseAuth.instance.currentUser?.uid));
+    var user = await MongoDatabase.users
+        .findOne(mongo.where.eq("userID", RealmConnect.app.currentUser.id));
     print(user["name"]);
 
     setState(() {

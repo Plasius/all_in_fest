@@ -1,21 +1,19 @@
 import 'dart:collection';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class FavoriteModel extends ChangeNotifier {
-  final List<DocumentSnapshot> _events = [];
+  final List<dynamic> _events = [];
 
-  UnmodifiableListView<DocumentSnapshot> get events =>
-      UnmodifiableListView(_events);
+  UnmodifiableListView<dynamic> get events => UnmodifiableListView(_events);
 
-  void add(DocumentSnapshot event) {
+  void add(dynamic event) {
     _events.add(event);
     checkFavorite(event);
     notifyListeners();
   }
 
-  void remove(DocumentSnapshot event) {
+  void remove(dynamic event) {
     _events.remove(event);
     checkFavorite(event);
     notifyListeners();
@@ -32,7 +30,7 @@ class FavoriteModel extends ChangeNotifier {
         .where((element) => element['stage'].toString().contains(stage));
   }
 
-  bool? checkFavorite(DocumentSnapshot event) {
+  bool? checkFavorite(dynamic event) {
     if (events.contains(event)) {
       return true;
     } else {

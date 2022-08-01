@@ -2,7 +2,7 @@
 
 import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:mongo_dart/mongo_dart.dart';
 
@@ -35,18 +35,16 @@ class MongoDatabase {
       bucket = GridFS(db, "images");
 
       currentUser = await users
-          .findOne(where.eq("userID", FirebaseAuth.instance.currentUser?.uid));
+          .findOne(where.eq("userID", RealmConnect.app.currentUser.id));
 
-      currentProfilePic = FirebaseAuth.instance.currentUser != null
+      currentProfilePic = RealmConnect.app.currentUser.id != null
           ? await bucket.chunks.findOne(where.eq("user", currentUser["userID"]))
           : null;
       picture = currentProfilePic != null
           ? MemoryImage(base64Decode(currentProfilePic["data"]))
           : null;
 
-      email = FirebaseAuth.instance.currentUser != null
-          ? FirebaseAuth.instance.currentUser?.email
-          : "example@bit.hu";
+      email = "example@bit.hu";
       print(email);
     } catch (e) {
       print(e);

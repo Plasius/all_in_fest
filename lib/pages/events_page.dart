@@ -1,5 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +15,6 @@ class EventsPage extends StatefulWidget {
 }
 
 class _EventsPageState extends State<EventsPage> {
-  Stream eventsStream =
-      FirebaseFirestore.instance.collection('events').snapshots();
   String _selectedStage = "";
   String _selectedDate = "";
   List<Text> stages = [
@@ -61,7 +57,7 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
-      drawer: MenuBar(
+      /* drawer: MenuBar(
           imageProvider: MongoDatabase.picture != null
               ? MongoDatabase.picture!
               : const AssetImage("lib/assets/user.png"),
@@ -70,7 +66,7 @@ class _EventsPageState extends State<EventsPage> {
               : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
           email: FirebaseAuth.instance.currentUser != null
               ? MongoDatabase.email!
-              : ""), //MongoDatabase.email!),
+              : ""), */ //MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
         leading: const Icon(
@@ -273,229 +269,8 @@ class _EventsPageState extends State<EventsPage> {
                 ],
               )),
           Expanded(
-            child: StreamBuilder(
-              stream:
-                  FirebaseFirestore.instance.collection('events').snapshots(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                } else {
-                  return ListView(
-                    children: snapshot.data!.docs
-                        .where((element) => element
-                            .get('stage')
-                            .toString()
-                            .contains(_selectedStage))
-                        .where((element) => element
-                            .get('datetime')
-                            .toString()
-                            .contains(_selectedDate))
-                        .map((DocumentSnapshot document) {
-                      return Center(
-                        child: SingleChildScrollView(
-                          child: Column(
-                            children: List.generate(
-                                1,
-                                (index) => Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 20, right: 20, top: 20),
-                                      child: Column(
-                                        children: [
-                                          GestureDetector(
-                                              child: Container(
-                                                  child: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.start,
-                                                    children: [
-                                                      Container(
-                                                        width: 10,
-                                                        height: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height /
-                                                            12,
-                                                        decoration:
-                                                            const BoxDecoration(
-                                                                color: Color
-                                                                    .fromRGBO(
-                                                                        254,
-                                                                        192,
-                                                                        1,
-                                                                        1)),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(15.0),
-                                                        child: Column(
-                                                          children: [
-                                                            Text(
-                                                              document['name'],
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold),
-                                                            ),
-                                                            Text(
-                                                              document['stage'],
-                                                              style: const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .normal),
-                                                            )
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .end,
-                                                        children: [
-                                                          Text(
-                                                            document[
-                                                                'datetime'],
-                                                            style:
-                                                                const TextStyle(
-                                                                    color: Colors
-                                                                        .white),
-                                                          ),
-                                                          IconButton(
-                                                            icon: const Icon(Icons
-                                                                .favorite_border_sharp),
-                                                            color: Colors.white,
-                                                            onPressed: () {
-                                                              favoriteEvent.add(
-                                                                  document);
-                                                            },
-                                                          )
-                                                        ],
-                                                      )
-                                                    ],
-                                                  ),
-                                                  decoration: const BoxDecoration(
-                                                      image: DecorationImage(
-                                                          image: AssetImage(
-                                                              "lib/assets/event_container.png"),
-                                                          fit:
-                                                              BoxFit.contain))),
-                                              onTap: () =>
-                                                  showCupertinoModalPopup(
-                                                      context: context,
-                                                      builder:
-                                                          (BuildContext
-                                                                  context) =>
-                                                              Container(
-                                                                height: MediaQuery.of(
-                                                                            context)
-                                                                        .size
-                                                                        .height *
-                                                                    0.74,
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              5),
-                                                                  gradient:
-                                                                      const LinearGradient(
-                                                                    begin: Alignment
-                                                                        .topCenter,
-                                                                    end: Alignment
-                                                                        .bottomCenter,
-                                                                    colors: [
-                                                                      Color.fromRGBO(
-                                                                          232,
-                                                                          107,
-                                                                          62,
-                                                                          1),
-                                                                      Color.fromRGBO(
-                                                                          97,
-                                                                          42,
-                                                                          122,
-                                                                          1)
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                                child: Column(
-                                                                  crossAxisAlignment:
-                                                                      CrossAxisAlignment
-                                                                          .start,
-                                                                  children: [
-                                                                    Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .spaceBetween,
-                                                                      children: [
-                                                                        Column(
-                                                                          crossAxisAlignment:
-                                                                              CrossAxisAlignment.start,
-                                                                          children: [
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.all(15.0),
-                                                                              child: Text(
-                                                                                document['name'],
-                                                                                style: const TextStyle(color: Colors.white, fontSize: 20),
-                                                                              ),
-                                                                            ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(top: 10, left: 15),
-                                                                              child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                                                                Text(
-                                                                                  document['datetime'],
-                                                                                  style: const TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
-                                                                                ),
-                                                                                const SizedBox(width: 20),
-                                                                                Text(
-                                                                                  document['datetime'],
-                                                                                  style: const TextStyle(color: Colors.white, fontSize: 16.5, fontWeight: FontWeight.normal),
-                                                                                )
-                                                                              ]),
-                                                                            ),
-                                                                            Padding(
-                                                                              padding: const EdgeInsets.only(top: 20, left: 15),
-                                                                              child: Text(
-                                                                                document['stage'],
-                                                                                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.normal, fontSize: 16.5),
-                                                                              ),
-                                                                            )
-                                                                          ],
-                                                                        ),
-                                                                        Padding(
-                                                                            padding:
-                                                                                const EdgeInsets.only(right: 35.0),
-                                                                            child: Consumer<FavoriteModel>(builder: (context, favoriteEvent, child) {
-                                                                              return GestureDetector(
-                                                                                  child: Icon(
-                                                                                    favoriteEvent.checkFavorite(document) == true ? CupertinoIcons.heart_fill : CupertinoIcons.heart,
-                                                                                    color: Colors.white,
-                                                                                    size: 40,
-                                                                                  ),
-                                                                                  onTap: () => favoriteEvent.checkFavorite(document) == true ? favoriteEvent.remove(document) : favoriteEvent.add(document));
-                                                                            }))
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ))),
-                                        ],
-                                      ),
-                                    )),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  );
-                }
-              },
-            ),
-          ),
+            child: Container(),
+          )
         ]),
       ),
     );

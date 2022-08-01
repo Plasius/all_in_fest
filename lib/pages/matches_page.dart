@@ -2,8 +2,8 @@
 
 import 'dart:convert';
 
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/chat_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:mongo_dart/mongo_dart.dart' as mongo;
 
@@ -24,16 +24,14 @@ class _MatchesPageState extends State<MatchesPage> {
   bool ready = false;
 
   void loadMatches() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
     matches = await MongoDatabase.matches
-        .find(mongo.where.match('_id', "${auth.currentUser?.uid}"))
+        .find(mongo.where.match('_id', "${""}"))
         .toList();
     for (var element in matches) {
-      print(FirebaseAuth.instance.currentUser?.uid);
       print(element["user1"]);
       print(element["user2"]);
       var partner;
-      element["user2"] == FirebaseAuth.instance.currentUser?.uid
+      element["user2"] == RealmConnect.app.currentUser.id
           ? partner = element["user1"]
           : partner = element["user2"];
       print(partner);
@@ -65,7 +63,7 @@ class _MatchesPageState extends State<MatchesPage> {
     return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
-            drawer: MenuBar(
+            /* drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : const AssetImage("lib/assets/user.png"),
@@ -74,7 +72,7 @@ class _MatchesPageState extends State<MatchesPage> {
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
                 email: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.email!
-                    : ""), //MongoDatabase.email!),
+                    : ""), */ //MongoDatabase.email!),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
@@ -105,20 +103,7 @@ class _MatchesPageState extends State<MatchesPage> {
                   children: List.generate(
                       matches.length,
                       (index) => GestureDetector(
-                            onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ChatPage(
-                                          chatPartnerID: matches[index]
-                                                      ["user2"] ==
-                                                  FirebaseAuth
-                                                      .instance.currentUser?.uid
-                                              ? matches[index]["user1"]
-                                              : matches[index]["user2"],
-                                          photo: photoURLs[index],
-                                          chatPartnerName:
-                                              matchedProfiles[index]["name"],
-                                        ))),
+                            onTap: () {},
                             child: Column(
                               children: [
                                 Padding(

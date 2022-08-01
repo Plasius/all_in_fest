@@ -5,7 +5,7 @@ import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/settings_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
 
 import '../main.dart';
@@ -99,7 +99,6 @@ class MenuBar extends StatelessWidget {
             title: const Text('Exit'),
             leading: const Icon(Icons.exit_to_app),
             onTap: () => {
-              FirebaseAuth.instance.signOut(),
               Navigator.push(
                   context,
                   MaterialPageRoute(

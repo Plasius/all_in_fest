@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 import '../models/mongo_connect.dart';
@@ -24,7 +23,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            drawer: MenuBar(
+            /* drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : const AssetImage("lib/assets/user.png"),
@@ -33,7 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
                 email: FirebaseAuth.instance.currentUser != null
                     ? MongoDatabase.email!
-                    : ""), //MongoDatabase.email!),
+                    : ""), */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               leading: const Icon(
@@ -152,24 +151,10 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void emailCsere() {
-    if (email_1.text == email_2.text && email_1.text != "") {
-      User? firebaseUser = FirebaseAuth.instance.currentUser;
-      firebaseUser
-          ?.updateEmail(email_1.text)
-          .then(((value) => Fluttertoast.showToast(msg: "Sikeres módosítás")))
-          .catchError(
-              ((value) => Fluttertoast.showToast(msg: "Sikertelen módosítás")));
-    }
+    if (email_1.text == email_2.text && email_1.text != "") {}
   }
 
   void jelszoCsere() {
-    if (password_1.text == password_2.text && password_1.text != '') {
-      User? firebaseUser = FirebaseAuth.instance.currentUser;
-      firebaseUser
-          ?.updatePassword(password_1.text)
-          .then(((value) => Fluttertoast.showToast(msg: "Sikeres módosítás")))
-          .catchError(
-              ((value) => Fluttertoast.showToast(msg: "Sikertelen módosítás")));
-    }
+    if (password_1.text == password_2.text && password_1.text != '') {}
   }
 }
