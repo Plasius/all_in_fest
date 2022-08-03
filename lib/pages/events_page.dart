@@ -1,9 +1,11 @@
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:realm/realm.dart';
 
+import '../models/event.dart';
 import '../models/favorite_model.dart';
-import '../models/mongo_connect.dart';
 import 'favorite_page.dart';
 import 'menu_sidebar.dart';
 
@@ -17,6 +19,9 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   String _selectedStage = "";
   String _selectedDate = "";
+
+  var eventsQuery;
+
   List<Text> stages = [
     const Text("1. stage"),
     const Text("2. stage"),
@@ -25,37 +30,71 @@ class _EventsPageState extends State<EventsPage> {
     const Text("5. stage"),
   ];
 
-/*
-  void addEvents() async {
-    int stageNumber;
-    for (int i = 0; i < 51; i++) {
-      stageNumber = i % 5 + 1;
-      await FirebaseFirestore.instance
-          .collection('events')
-          .doc('event' + i.toString())
-          .set({
-        'id': i,
-        'bio': "",
-        'name': "event" + i.toString(),
-        'datetime': stageNumber == 1
-            ? "augusztus 25."
-            : stageNumber == 2
-                ? "augusztus 26."
-                : stageNumber == 3
-                    ? "augusztus 27."
-                    : stageNumber == 4
-                        ? "augusztus 28."
-                        : stageNumber == 5 ? "augusztus 25." : "",
-        'photo': "",
-        'stage': stageNumber.toString() + ". " + "stage"
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+
+    loadEvents();
   }
-*/
+
+  void loadEvents() async {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
+    Configuration eventsConfig =
+        Configuration.flexibleSync(app.currentUser!, [Event.schema]);
+    Realm eventsRealm = Realm(eventsConfig);
+
+    if (_selectedDate.isEmpty && _selectedStage.isEmpty) {
+      eventsQuery = eventsRealm.all<Event>();
+    } else if (_selectedDate.isEmpty && _selectedStage.isEmpty == false) {
+      eventsQuery = eventsRealm
+          .all<Event>()
+          .query("stage CONTAINS '$_selectedStage'")
+          .toList();
+    } else if (_selectedDate.isEmpty == false && _selectedStage.isEmpty) {
+      eventsQuery = eventsRealm
+          .all<Event>()
+          .query("date CONTAINS '$_selectedDate'")
+          .toList();
+    } else {
+      eventsQuery = eventsRealm
+          .all<Event>()
+          .query("date CONTAINS '$_selectedDate'")
+          .query("stage CONTAINS '$_selectedStage'")
+          .toList();
+    }
+
+    print(eventsQuery.length);
+  }
+
+  ListView buildEvents() {
+    var eventwidgets = [];
+
+    if (eventsQuery == null) {
+      loadEvents();
+      return ListView();
+    }
+
+    for (var event in eventsQuery) {
+      eventwidgets.add(Row(
+        children: [
+          Text(event.name == null ? "event" : event.name),
+        ],
+      ));
+    }
+
+    return ListView.builder(
+      itemCount: eventwidgets.length,
+      itemBuilder: (context, index) {
+        return eventwidgets[index];
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    var favoriteEvent = context.read<FavoriteModel>();
+    //var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
       /* drawer: MenuBar(
           imageProvider: MongoDatabase.picture != null
@@ -123,6 +162,8 @@ class _EventsPageState extends State<EventsPage> {
                       _selectedDate == "augusztus 25."
                           ? _selectedDate = ""
                           : _selectedDate = "augusztus 25.";
+                      loadEvents();
+                      buildEvents();
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -160,6 +201,8 @@ class _EventsPageState extends State<EventsPage> {
                       _selectedDate == "augusztus 26."
                           ? _selectedDate = ""
                           : _selectedDate = "augusztus 26.";
+                      loadEvents();
+                      buildEvents();
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -197,6 +240,8 @@ class _EventsPageState extends State<EventsPage> {
                       _selectedDate == "augusztus 27."
                           ? _selectedDate = ""
                           : _selectedDate = "augusztus 27.";
+                      loadEvents();
+                      buildEvents();
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -234,6 +279,8 @@ class _EventsPageState extends State<EventsPage> {
                       _selectedDate == "augusztus 28."
                           ? _selectedDate = ""
                           : _selectedDate = "augusztus 28.";
+                      loadEvents();
+                      buildEvents();
                     }),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -269,7 +316,7 @@ class _EventsPageState extends State<EventsPage> {
                 ],
               )),
           Expanded(
-            child: Container(),
+            child: buildEvents(),
           )
         ]),
       ),
