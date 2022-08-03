@@ -1,13 +1,10 @@
-import 'package:all_in_fest/models/open_realm.dart';
+// ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
 
 import '../models/event.dart';
-import '../models/favorite_model.dart';
-import 'favorite_page.dart';
-import 'menu_sidebar.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -23,11 +20,9 @@ class _EventsPageState extends State<EventsPage> {
   var eventsQuery;
 
   List<Text> stages = [
-    const Text("1. stage"),
-    const Text("2. stage"),
-    const Text("3. stage"),
-    const Text("4. stage"),
-    const Text("5. stage"),
+    const Text(""),
+    const Text("E.ON Mainstage"),
+    const Text("Miller x Wild Boar Project Stage"),
   ];
 
   @override
@@ -60,8 +55,8 @@ class _EventsPageState extends State<EventsPage> {
     } else {
       eventsQuery = eventsRealm
           .all<Event>()
-          .query("date CONTAINS '$_selectedDate'")
-          .query("stage CONTAINS '$_selectedStage'")
+          .query(
+              "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage'")
           .toList();
     }
 
@@ -79,7 +74,7 @@ class _EventsPageState extends State<EventsPage> {
     for (var event in eventsQuery) {
       eventwidgets.add(Row(
         children: [
-          Text(event.name == null ? "event" : event.name),
+          Text(event.name ?? "event"),
         ],
       ));
     }
@@ -118,21 +113,6 @@ class _EventsPageState extends State<EventsPage> {
           fit: BoxFit.contain,
         ),
         actions: [
-/*
-          IconButton(
-            icon: Icon(Icons.add_rounded),
-            color: Colors.white,
-            onPressed: () {
-              addEvents();
-            },
-          ),
-*/
-          IconButton(
-            icon: const Icon(Icons.favorite_sharp),
-            color: Colors.white,
-            onPressed: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const FavoritePage())),
-          ),
           IconButton(
             icon: const Icon(Icons.filter_alt_outlined),
             color: Colors.white,
@@ -336,6 +316,8 @@ class _EventsPageState extends State<EventsPage> {
                   Text text = stages[value];
                   setState(() {
                     _selectedStage = text.data.toString();
+                    loadEvents();
+                    print(_selectedStage);
                   });
                 },
                 itemExtent: 25,

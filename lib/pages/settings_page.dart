@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
-import '../models/mongo_connect.dart';
-import 'menu_sidebar.dart';
-
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
 
@@ -121,7 +118,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   child: const Text('Change password'),
                   onPressed: () => jelszoCsere(),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 15,
                 ),
                 ElevatedButton(onPressed: logout, child: const Text("Log out"))

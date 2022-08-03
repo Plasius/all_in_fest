@@ -4,14 +4,11 @@ import 'dart:convert';
 
 import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/image.dart';
-import 'package:all_in_fest/models/mongo_connect.dart';
 import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/models/user.dart' as userModel;
-import 'package:all_in_fest/pages/menu_sidebar.dart';
+import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:image_picker/image_picker.dart';
 import 'package:realm/realm.dart';
 
@@ -335,10 +332,10 @@ class _ProfilePageState extends State<ProfilePage> {
     var uid = RealmConnect.app.currentUser.id;
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [userModel.User.schema]);
+        RealmConnect.app.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
-    var userQuery = realm.all<userModel.User>().query("_id == '$uid'");
+    var userQuery = realm.all<user_model.User>().query("_id == '$uid'");
     SubscriptionSet messageSubscriptions = realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
@@ -347,7 +344,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     //update name
     if (uid != null) {
-      userModel.User myUser = userQuery[0];
+      user_model.User myUser = userQuery[0];
       if (nameController.text.isNotEmpty && bioController.text.isNotEmpty) {
         realm.write(() => {
               myUser.name = nameController.text,
@@ -380,11 +377,11 @@ class _ProfilePageState extends State<ProfilePage> {
   void loadProfile() {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [userModel.User.schema]);
+        RealmConnect.app.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm
-        .all<userModel.User>()
+        .all<user_model.User>()
         .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
     var user = userQuery[0];
     print(user.name);
@@ -402,26 +399,24 @@ class _ProfilePageState extends State<ProfilePage> {
         context: context,
         builder: (BuildContext bc) {
           return SafeArea(
-            child: Container(
-              child: Wrap(
-                children: <Widget>[
-                  ListTile(
-                      leading: Icon(Icons.photo_library),
-                      title: Text('Gallery'),
-                      onTap: () {
-                        imgFromGallery();
-                        Navigator.of(context).pop();
-                      }),
-                  ListTile(
-                    leading: Icon(Icons.photo_camera),
-                    title: Text('Camera'),
+            child: Wrap(
+              children: <Widget>[
+                ListTile(
+                    leading: const Icon(Icons.photo_library),
+                    title: const Text('Gallery'),
                     onTap: () {
-                      imgFromCamera();
+                      imgFromGallery();
                       Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              ),
+                    }),
+                ListTile(
+                  leading: const Icon(Icons.photo_camera),
+                  title: const Text('Camera'),
+                  onTap: () {
+                    imgFromCamera();
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
             ),
           );
         });

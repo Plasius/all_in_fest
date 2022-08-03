@@ -1,16 +1,10 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
-import 'dart:convert';
-
-import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/models/user.dart' as user;
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
-
-import 'menu_sidebar.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({Key? key}) : super(key: key);
@@ -137,7 +131,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                       Container(
                                         height: size.height * 0.11,
                                         width: size.width * 0.24,
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                                 image: AssetImage(

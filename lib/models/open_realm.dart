@@ -3,7 +3,6 @@
 import 'dart:convert';
 
 import 'package:all_in_fest/models/image.dart';
-import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/message.dart';
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';

@@ -5,19 +5,15 @@ import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/settings_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
-import 'package:provider/provider.dart';
 import 'package:realm/realm.dart';
 import 'package:flutter/material.dart';
-
-import 'models/favorite_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //MongoDatabase.connect();
 
-  runApp(ChangeNotifierProvider(
-      create: (context) => FavoriteModel(), child: const MyApp()));
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {

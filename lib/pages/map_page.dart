@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
-import '../models/mongo_connect.dart';
-import 'menu_sidebar.dart';
-
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
 
