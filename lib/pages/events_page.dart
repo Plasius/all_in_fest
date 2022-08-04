@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
 import '../models/event.dart';
@@ -33,6 +34,8 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void loadEvents() async {
+    RealmResults<Event> eventsQ;
+
     var appConfig = AppConfiguration("application-0-bjnqv");
     var app = App(appConfig);
 
@@ -40,27 +43,40 @@ class _EventsPageState extends State<EventsPage> {
         Configuration.flexibleSync(app.currentUser!, [Event.schema]);
     Realm eventsRealm = Realm(eventsConfig);
 
-    if (_selectedDate.isEmpty && _selectedStage.isEmpty) {
-      eventsQuery = eventsRealm.all<Event>();
-    } else if (_selectedDate.isEmpty && _selectedStage.isEmpty == false) {
-      eventsQuery = eventsRealm
-          .all<Event>()
-          .query("stage CONTAINS '$_selectedStage'")
-          .toList();
-    } else if (_selectedDate.isEmpty == false && _selectedStage.isEmpty) {
-      eventsQuery = eventsRealm
-          .all<Event>()
-          .query("date CONTAINS '$_selectedDate'")
-          .toList();
+    if (_selectedDate == "" && _selectedStage == "") {
+      eventsQ = eventsRealm.all<Event>();
+    } else if (_selectedDate == "" && _selectedStage != "") {
+      eventsQ =
+          eventsRealm.all<Event>().query("stage CONTAINS '$_selectedStage'");
+    } else if (_selectedDate != "" && _selectedStage == "") {
+      eventsQ =
+          eventsRealm.all<Event>().query("date CONTAINS '$_selectedDate'");
     } else {
-      eventsQuery = eventsRealm
-          .all<Event>()
-          .query(
-              "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage'")
-          .toList();
+      eventsQ = eventsRealm.all<Event>().query(
+          "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage'");
     }
 
-    print(eventsQuery.length);
+    SubscriptionSet subscriptions = eventsRealm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(eventsQ, name: "events", update: true);
+    });
+
+    await eventsRealm.subscriptions.waitForSynchronization();
+
+    eventsQuery = eventsQ.toList();
+
+    if (eventsQuery.length == 0) {
+      Fluttertoast.showToast(
+          msg: "Az események még nem töltödtek be.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
+
+    setState(() {});
   }
 
   ListView buildEvents() {

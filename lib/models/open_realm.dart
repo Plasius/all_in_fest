@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/message.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
@@ -21,15 +22,24 @@ class RealmConnect {
     app = App(appConfig);
   }
 
-  static void realmGetImage() {
+  static void realmGetImage() async {
     realmOpen();
     var imageQuery;
     Configuration config =
         Configuration.flexibleSync(app.currentUser, [UserImage.schema]);
     Realm realm = Realm(config);
-    imageQuery = realm.all<UserImage>();
-    currentProfilePic = imageQuery
-        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
+    imageQuery = realm
+        .all<UserImage>()
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet subscriptions = realm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "image", update: true);
+    });
+
+    await realm.subscriptions.waitForSynchronization();
+
+    currentProfilePic = imageQuery[0];
     picture = MemoryImage(base64Decode(currentProfilePic.data));
   }
 
@@ -59,7 +69,18 @@ class RealmConnect {
   static void realmLogin(String email, String password) async {
     realmOpen();
     Credentials emailPwCredentials = Credentials.emailPassword(email, password);
-    currentUser = await app.logIn(emailPwCredentials);
+    try {
+      currentUser = await app.logIn(emailPwCredentials);
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Nem sikerült bejelentkezni.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0);
+    }
   }
 
   static void realmSendMessage(Message _message) async {

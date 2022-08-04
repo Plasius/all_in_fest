@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
 
     RealmConnect.realmLogin(emailController.text, passwordController.text);
 
-    Navigator.push(
+    Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) =>

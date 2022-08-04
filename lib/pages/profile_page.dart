@@ -374,7 +374,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {});
   }
 
-  void loadProfile() {
+  void loadProfile() async {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [user_model.User.schema]);
@@ -383,6 +383,13 @@ class _ProfilePageState extends State<ProfilePage> {
     var userQuery = realm
         .all<user_model.User>()
         .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet userSubscriptions = realm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "Image", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
     var user = userQuery[0];
     print(user.name);
 

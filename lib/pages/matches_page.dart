@@ -27,6 +27,14 @@ class _MatchesPageState extends State<MatchesPage> {
     final matchQuery = matchesRealm
         .all<Match>()
         .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet subscriptions = matchesRealm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(matchQuery, name: "events", update: true);
+    });
+
+    await matchesRealm.subscriptions.waitForSynchronization();
+
     print(matchQuery.length);
 
     /*  RealmConnect.realmOpen();
@@ -40,6 +48,14 @@ class _MatchesPageState extends State<MatchesPage> {
         RealmConnect.app.currentUser, [user.User.schema]);
     Realm userRealm = Realm(userConfig);
     var users = userRealm.all<user.User>();
+
+    SubscriptionSet subscriptions2 = userRealm.subscriptions;
+    subscriptions2.update((mutableSubscriptions) {
+      mutableSubscriptions.add(users, name: "events", update: true);
+    });
+
+    await userRealm.subscriptions.waitForSynchronization();
+
     print(users.length);
 
     for (int i = 0; i < matchQuery.length; i++) {

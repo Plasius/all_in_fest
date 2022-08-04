@@ -323,7 +323,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     color: Colors.white, fontSize: 20)),
                           ),
                           GestureDetector(
-                            onTap: () => Navigator.push(
+                            onTap: () => Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => const LoginPage())),
