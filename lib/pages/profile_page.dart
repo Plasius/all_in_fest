@@ -386,7 +386,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     SubscriptionSet userSubscriptions = realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "Image", update: true);
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
 

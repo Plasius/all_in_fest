@@ -21,11 +21,18 @@ class _SwipePageState extends State<SwipePage> {
   var _profiles;
 
   void getProfiles() async {
+    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [user.User.schema]);
     Realm realm = Realm(config);
     _profiles = realm.all<user.User>();
-    //.query("_id != '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet subscriptions = realm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(_profiles, name: "User", update: true);
+    });
+
+    await realm.subscriptions.waitForSynchronization();
 
     //shuffle?
 

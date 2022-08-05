@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
+import 'package:all_in_fest/pages/event_details.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -81,6 +82,7 @@ class _EventsPageState extends State<EventsPage> {
 
   ListView buildEvents() {
     var eventwidgets = [];
+    var eventPhotos = [];
 
     if (eventsQuery == null) {
       loadEvents();
@@ -88,17 +90,200 @@ class _EventsPageState extends State<EventsPage> {
     }
 
     for (var event in eventsQuery) {
-      eventwidgets.add(Row(
-        children: [
-          Text(event.name ?? "event"),
-        ],
-      ));
+      eventPhotos.add(event.image);
+      eventwidgets.add(
+        Padding(
+          padding: EdgeInsets.only(
+              left: MediaQuery.of(context).size.width * 0.036,
+              right: MediaQuery.of(context).size.width * 0.036,
+              top: MediaQuery.of(context).size.width * 0.054),
+          child: Row(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width * 0.036),
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.45,
+                      child: Text(
+                        event.name ?? "event",
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: Text(
+                      event.stage ?? "stage",
+                      style: TextStyle(color: Colors.white),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    event.date,
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    event.time,
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+      );
     }
 
     return ListView.builder(
       itemCount: eventwidgets.length,
       itemBuilder: (context, index) {
-        return eventwidgets[index];
+        return Padding(
+          padding: const EdgeInsets.all(8),
+          child: GestureDetector(
+            onTap: () => showModalBottomSheet(
+                context: context,
+                enableDrag: true,
+                isScrollControlled: true,
+                shape: RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20))),
+                builder: (context) => Container(
+                      height: MediaQuery.of(context).size.height * 0.76,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(232, 107, 62, 1),
+                            Color.fromRGBO(97, 42, 122, 1)
+                          ],
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(15.0),
+                                    child: Text(
+                                      eventsQuery[index].name,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 10, left: 15),
+                                    child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            eventsQuery[index].date,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.5,
+                                                fontWeight: FontWeight.normal),
+                                          ),
+                                          SizedBox(width: 20),
+                                          Text(
+                                            eventsQuery[index].time,
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 16.5,
+                                                fontWeight: FontWeight.normal),
+                                          )
+                                        ]),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.only(top: 20, left: 15),
+                                    child: Text(
+                                      eventsQuery[index].stage,
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.normal,
+                                          fontSize: 16.5),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.144),
+                                    child: Container(
+                                      alignment: Alignment.center,
+                                      width: MediaQuery.of(context).size.width *
+                                          0.664,
+                                      height:
+                                          MediaQuery.of(context).size.height *
+                                              0.33,
+                                      decoration: BoxDecoration(
+                                          color:
+                                              Colors.white.withOpacity(0.78)),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                                image: NetworkImage(
+                                                    "https://drive.google.com/uc?export=view&id=1NKugkHNAkncxpwmFxD83n9WY0qqGYXKx"))),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.095,
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        color: eventsQuery[index].stage == "E.ON Mainstage"
+                            ? Colors.yellow
+                            : Colors.orange),
+                    width: MediaQuery.of(context).size.width * 0.036,
+                  ),
+                  Container(
+                    height: MediaQuery.of(context).size.height * 0.095,
+                    width: MediaQuery.of(context).size.width * 0.9,
+                    decoration: BoxDecoration(
+                        image: DecorationImage(
+                      image: AssetImage("lib/assets/event_container.png"),
+                    )),
+                    child: Row(
+                      children: [
+                        Column(
+                          children: [eventwidgets[index]],
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
       },
     );
   }

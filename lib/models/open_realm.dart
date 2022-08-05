@@ -34,7 +34,7 @@ class RealmConnect {
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(imageQuery, name: "image", update: true);
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
 
     await realm.subscriptions.waitForSynchronization();
