@@ -22,7 +22,7 @@ class RealmConnect {
     app = App(appConfig);
   }
 
-  static void realmGetImage() async {
+  static realmGetImage() async {
     realmOpen();
     RealmResults<UserImage> imageQuery;
     Configuration config =
