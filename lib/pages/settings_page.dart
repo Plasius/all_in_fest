@@ -1,3 +1,5 @@
+import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
@@ -140,7 +142,12 @@ class _SettingsPageState extends State<SettingsPage> {
     var appConfig = AppConfiguration("application-0-bjnqv");
     var app = App(appConfig);
 
-    if (app.currentUser != null) app.currentUser?.logOut();
+    if (app.currentUser != null) {
+      app.currentUser?.logOut();
+      RealmConnect.currentUser = null;
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+    }
   }
 
   void jelszoCsere() async {

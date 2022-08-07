@@ -207,7 +207,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: GestureDetector(
                         onTap: () => {
                           RealmConnect.app.currentUser.logOut(),
-                          Navigator.push(
+                          RealmConnect.currentUser = null,
+                          Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
