@@ -31,9 +31,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: app.currentUser != null
-          ? const MyHomePage(title: 'Festival')
-          : const LoginPage(),
+      home: LoginPage(),
     );
   }
 }

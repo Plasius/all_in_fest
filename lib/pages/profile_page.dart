@@ -6,6 +6,7 @@ import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
+import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -211,8 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const MyHomePage(title: "Exited")))
+                                  builder: (context) => const LoginPage()))
                         },
                         child: Container(
                           width: size.width * 0.119,
@@ -372,7 +372,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    RealmConnect.realmGetImage();
+    await RealmConnect.realmGetImage();
     if (RealmConnect.picture == null) {
       provider = const AssetImage("lib/assets/user.png");
     } else {
