@@ -33,10 +33,10 @@ class _SettingsPageState extends State<SettingsPage> {
                     : ""), */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              leading: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
+              /*leading: const Icon(
+          Icons.menu,
+          color: Colors.white,
+        ),*/
               title: const Image(
                 image: AssetImage("lib/assets/logo.png"),
                 height: 50,
@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(
               height: 15,
             ),
-            Row(
+            Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(

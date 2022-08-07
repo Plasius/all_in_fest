@@ -119,7 +119,7 @@ class _SwipePageState extends State<SwipePage> {
                       style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12),
+                          fontSize: 16),
                     )
                   ],
                 ))
@@ -187,10 +187,10 @@ class _SwipePageState extends State<SwipePage> {
           home: Scaffold(
               appBar: AppBar(
                 backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-                leading: const Icon(
-                  Icons.menu,
-                  color: Colors.white,
-                ),
+                /*leading: const Icon(
+          Icons.menu,
+          color: Colors.white,
+        ),*/
                 title: const Image(
                   image: AssetImage("lib/assets/logo.png"),
                   height: 50,

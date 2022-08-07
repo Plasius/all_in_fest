@@ -266,6 +266,8 @@ class _ProfilePageState extends State<ProfilePage> {
         });
         await realm.subscriptions.waitForSynchronization();
 
+        await RealmConnect.realmDeleteImage();
+
         realm.write(() => realm.add(image));
       } catch (e) {
         print(e.runtimeType);
@@ -309,6 +311,8 @@ class _ProfilePageState extends State<ProfilePage> {
           mutableSubscriptions.add(imageQuery, name: "Image", update: true);
         });
         await realm.subscriptions.waitForSynchronization();
+
+        await RealmConnect.realmDeleteImage();
 
         realm.write(() => realm.add(image));
       } catch (e) {

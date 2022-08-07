@@ -45,6 +45,28 @@ class RealmConnect {
     }
   }
 
+  static realmDeleteImage() async {
+    realmOpen();
+    RealmResults<UserImage> imageQuery;
+    Configuration config =
+        Configuration.flexibleSync(app.currentUser, [UserImage.schema]);
+    Realm realm = Realm(config);
+    imageQuery = realm
+        .all<UserImage>()
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet subscriptions = realm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+
+    await realm.subscriptions.waitForSynchronization();
+
+    if (imageQuery.toList().isEmpty == false) {
+      realm.write(() => realm.delete(imageQuery[0]));
+    }
+  }
+
   static void realmRegister(
       String email, String password, user.User _user) async {
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
@@ -68,7 +90,7 @@ class RealmConnect {
     realm.write(() => {realm.add(_user)});
   }
 
-  static void realmLogin(String email, String password) async {
+  static realmLogin(String email, String password) async {
     realmOpen();
     Credentials emailPwCredentials = Credentials.emailPassword(email, password);
     try {

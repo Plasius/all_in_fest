@@ -245,12 +245,15 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    RealmConnect.realmLogin(emailController.text, passwordController.text);
+    await RealmConnect.realmLogin(
+        emailController.text, passwordController.text);
 
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) =>
-                const MyHomePage(title: "Logged in succesfully")));
+    if (app.currentUser != null) {
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  const MyHomePage(title: "Logged in succesfully")));
+    }
   }
 }

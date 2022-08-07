@@ -106,10 +106,10 @@ class _MatchesPageState extends State<MatchesPage> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              leading: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),
+              /*leading: const Icon(
+          Icons.menu,
+          color: Colors.white,
+        ),*/
               title: const Image(
                 image: AssetImage("lib/assets/logo.png"),
                 height: 50,
