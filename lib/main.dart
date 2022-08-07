@@ -162,6 +162,10 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: 20,
                       ),
                       GestureDetector(
+                        onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const ProfilePage())),
                         child: Container(
                           decoration: BoxDecoration(
                               borderRadius:
@@ -173,12 +177,12 @@ class _MyHomePageState extends State<MyHomePage> {
                           height: MediaQuery.of(context).size.height * 0.21,
                           child: Column(
                             children: [
-                              Icon(Icons.food_bank,
+                              Icon(Icons.person,
                                   color: Colors.white,
                                   size:
                                       MediaQuery.of(context).size.width * 0.3),
                               Text(
-                                "RENDELÉS",
+                                "PROFILE",
                                 style: TextStyle(
                                     fontSize:
                                         MediaQuery.of(context).size.height *
@@ -230,35 +234,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     const SizedBox(
                       width: 1,
                       height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const ProfilePage())),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(20)),
-                            color: const Color.fromRGBO(97, 42, 122, .40),
-                            border: Border.all(color: Colors.white, width: 3)),
-                        width: MediaQuery.of(context).size.width * 0.4,
-                        height: MediaQuery.of(context).size.height * 0.21,
-                        child: Column(
-                          children: [
-                            Icon(Icons.developer_board,
-                                color: Colors.white,
-                                size: MediaQuery.of(context).size.width * 0.3),
-                            Text(
-                              "PROFILE",
-                              style: TextStyle(
-                                  fontSize:
-                                      MediaQuery.of(context).size.height * 0.02,
-                                  color: Colors.white),
-                            )
-                          ],
-                        ),
-                      ),
                     ),
                     const SizedBox(
                       width: 1,

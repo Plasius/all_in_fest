@@ -24,7 +24,7 @@ class RealmConnect {
 
   static void realmGetImage() async {
     realmOpen();
-    var imageQuery;
+    RealmResults<UserImage> imageQuery;
     Configuration config =
         Configuration.flexibleSync(app.currentUser, [UserImage.schema]);
     Realm realm = Realm(config);
@@ -39,8 +39,10 @@ class RealmConnect {
 
     await realm.subscriptions.waitForSynchronization();
 
-    currentProfilePic = imageQuery[0];
-    picture = MemoryImage(base64Decode(currentProfilePic.data));
+    if (imageQuery.toList().isEmpty == false) {
+      currentProfilePic = imageQuery[0];
+      picture = MemoryImage(base64Decode(currentProfilePic.data));
+    }
   }
 
   static void realmRegister(
@@ -77,7 +79,7 @@ class RealmConnect {
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.BOTTOM,
           timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.red,
           textColor: Colors.white,
           fontSize: 16.0);
     }

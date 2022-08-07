@@ -232,12 +232,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void login() {
+  void login() async {
     var appConfig = AppConfiguration("application-0-bjnqv");
     var app = App(appConfig);
 
     if (app.currentUser != null) {
-      app.currentUser?.logOut();
+      await app.currentUser?.logOut();
     }
 
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {

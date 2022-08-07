@@ -18,7 +18,6 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
-  var profiles = [];
   bool loaded = false;
 
   //shuffle?
@@ -52,23 +51,20 @@ class _SwipePageState extends State<SwipePage> {
     await realm2.subscriptions.waitForSynchronization();
 
     //szures
+    var ignoreList = [RealmConnect.app.currentUser.id];
+
     for (int i = 0; i < _matches.length; i++) {
-      for (int k = 0; k < _profiles.length; k++) {
-        if (_matches[i].user2 == RealmConnect.app.currentUser.id &&
-            _profiles[k].userID == _matches[i].user1) {
-          _profiles[k].userID = RealmConnect.app.currentUser.id;
-        } else if (_matches[i].user1 == RealmConnect.app.currentUser.id &&
-            _profiles[k].userID == _matches[i].user2) {
-          _profiles[k].userID = RealmConnect.app.currentUser.id;
-        }
+      if (_matches[i].user2 == RealmConnect.app.currentUser.id) {
+        ignoreList.add(_matches[i].user1);
+      } else {
+        ignoreList.add(_matches[i].user2);
       }
     }
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
-      if (_profiles[i].userID == RealmConnect.app.currentUser.id) {
-        continue;
-      }
+      if (ignoreList.contains(_profiles[i].userID)) continue;
+
       _swipeItems.add(SwipeItem(
           content: _profiles.length != 0
               ? Container(
@@ -112,6 +108,9 @@ class _SwipePageState extends State<SwipePage> {
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
+
+    _swipeItems.add(SwipeItem(content: Text("")));
+
     loaded = true;
     setState(() {});
   }
@@ -131,7 +130,7 @@ class _SwipePageState extends State<SwipePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (loaded == true) {
+    if (loaded == true && _swipeItems.isEmpty == false) {
       return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
