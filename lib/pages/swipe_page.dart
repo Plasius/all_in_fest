@@ -6,7 +6,9 @@ import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:all_in_fest/models/user.dart' as user;
 
@@ -69,54 +71,65 @@ class _SwipePageState extends State<SwipePage> {
       }
     }
 
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? items = prefs.getStringList('Rejected');
     print(profile_shuffle.length);
     for (int i = 0; i < profile_shuffle.length; i++) {
       if (ignoreList.contains(profile_shuffle[i].userID)) continue;
-
+      if (items != null) {
+        if (items.contains(profile_shuffle[i].userID)) continue;
+      }
       _swipeItems.add(SwipeItem(
-          content: profile_shuffle.length != 0
-              ? Container(
-                  decoration: const BoxDecoration(
-                      color: Color.fromRGBO(97, 42, 122, 1)),
-                  child: Column(
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          "in/Touch",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 25),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                            left: 32, right: 32, top: 10, bottom: 10),
-                        child: Container(
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height / 3,
-                            decoration: const BoxDecoration(
-                                image: DecorationImage(
-                                    image: AssetImage("lib/assets/user.png"),
-                                    fit: BoxFit.cover))),
-                      ),
-                      Text(
-                        profile_shuffle[i].name ?? 'Jane Doe',
-                        style: const TextStyle(
+        content: profile_shuffle.length != 0
+            ? Container(
+                decoration:
+                    const BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
+                child: Column(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16.0),
+                      child: Text(
+                        "in/Touch",
+                        style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
                             fontSize: 25),
-                      )
-                    ],
-                  ))
-              : const Text('No profiles found'),
-          likeAction: () => {
-                print("${profile_shuffle[i].userID}"),
-                liked(profile_shuffle[i].userID)
-              },
-          nopeAction: () => showNopeGif(),
-          superlikeAction: () => showHornyGif()));
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 32, right: 32, top: 10, bottom: 10),
+                      child: Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height / 3,
+                          decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                  image: AssetImage("lib/assets/user.png"),
+                                  fit: BoxFit.cover))),
+                    ),
+                    Text(
+                      profile_shuffle[i].name ?? 'Jane Doe',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 25),
+                    ),
+                    Text(
+                      profile_shuffle[i].bio ?? '',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    )
+                  ],
+                ))
+            : const Text('No profiles found'),
+        likeAction: () => {
+          print("${profile_shuffle[i].userID}"),
+          liked(profile_shuffle[i].userID)
+        },
+        nopeAction: () => showNopeGif(profile_shuffle[i].userID),
+      ));
     }
 
     _swipeItems.add(SwipeItem(content: Text("")));
@@ -221,7 +234,7 @@ class _SwipePageState extends State<SwipePage> {
                   )*/
                       ;
                 },
-                onStackFinished: () => showHornyGif(),
+                onStackFinished: () => showHornyGif('Végig néztél mindenkit!'),
                 upSwipeAllowed: true,
               ),
             ),
@@ -278,7 +291,27 @@ class _SwipePageState extends State<SwipePage> {
     });
   }
 
-  void showNopeGif() {}
+  void showNopeGif(var rejectedID) async {
+    final prefs = await SharedPreferences.getInstance();
+    final List<String>? items = prefs.getStringList('Rejected');
 
-  void showHornyGif() {}
+    if (items == null) {
+      await prefs.setStringList('Rejected', <String>[rejectedID]);
+    } else {
+      items.add(rejectedID);
+      await prefs.setStringList('Rejected', items);
+    }
+  }
+
+  void showHornyGif(var bio) {
+    if (bio == '') bio = 'Még nincs Bio-m :(';
+    Fluttertoast.showToast(
+        msg: bio,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 10,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -121,7 +122,12 @@ class _SettingsPageState extends State<SettingsPage> {
                 const SizedBox(
                   width: 15,
                 ),
-                ElevatedButton(onPressed: logout, child: const Text("Log out"))
+                ElevatedButton(onPressed: logout, child: const Text("Log out")),
+                const SizedBox(
+                  width: 15,
+                ),
+                ElevatedButton(
+                    onPressed: clearRejected, child: const Text("Swipe reset"))
               ],
             )
           ],
@@ -167,5 +173,18 @@ class _SettingsPageState extends State<SettingsPage> {
           textColor: Colors.white,
           fontSize: 16.0);
     }
+  }
+
+  void clearRejected() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('Rejected', <String>[]);
+    Fluttertoast.showToast(
+        msg: "Mostmár újra várnak a balra húzottaid!",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.black,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }
