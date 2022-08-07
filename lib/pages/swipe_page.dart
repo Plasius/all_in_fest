@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
+import 'dart:math';
+
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -20,8 +22,6 @@ class _SwipePageState extends State<SwipePage> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
   bool loaded = false;
 
-  //shuffle?
-
   void getProfiles() async {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
@@ -36,6 +36,14 @@ class _SwipePageState extends State<SwipePage> {
 
     await realm.subscriptions.waitForSynchronization();
 
+    var profile_shuffle = _profiles.toList();
+    for (int i = 0; i < profile_shuffle.length; i++) {
+      var a = Random().nextInt(profile_shuffle.length);
+      var b = Random().nextInt(profile_shuffle.length);
+      var temp = profile_shuffle[a];
+      profile_shuffle[a] = profile_shuffle[b];
+      profile_shuffle[b] = temp;
+    }
     Configuration config2 = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
     Realm realm2 = Realm(config2);
@@ -61,12 +69,12 @@ class _SwipePageState extends State<SwipePage> {
       }
     }
 
-    print(_profiles.length);
-    for (int i = 0; i < _profiles.length; i++) {
-      if (ignoreList.contains(_profiles[i].userID)) continue;
+    print(profile_shuffle.length);
+    for (int i = 0; i < profile_shuffle.length; i++) {
+      if (ignoreList.contains(profile_shuffle[i].userID)) continue;
 
       _swipeItems.add(SwipeItem(
-          content: _profiles.length != 0
+          content: profile_shuffle.length != 0
               ? Container(
                   decoration: const BoxDecoration(
                       color: Color.fromRGBO(97, 42, 122, 1)),
@@ -94,7 +102,7 @@ class _SwipePageState extends State<SwipePage> {
                                     fit: BoxFit.cover))),
                       ),
                       Text(
-                        _profiles[i].name ?? 'Jane Doe',
+                        profile_shuffle[i].name ?? 'Jane Doe',
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -103,8 +111,10 @@ class _SwipePageState extends State<SwipePage> {
                     ],
                   ))
               : const Text('No profiles found'),
-          likeAction: () =>
-              {print("${_profiles[i].userID}"), liked(_profiles[i].userID)},
+          likeAction: () => {
+                print("${profile_shuffle[i].userID}"),
+                liked(profile_shuffle[i].userID)
+              },
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
