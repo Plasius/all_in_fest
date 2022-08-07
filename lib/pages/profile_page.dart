@@ -269,6 +269,8 @@ class _ProfilePageState extends State<ProfilePage> {
         await RealmConnect.realmDeleteImage();
 
         realm.write(() => realm.add(image));
+
+        setState(() {});
       } catch (e) {
         print(e.runtimeType);
       }
@@ -315,6 +317,7 @@ class _ProfilePageState extends State<ProfilePage> {
         await RealmConnect.realmDeleteImage();
 
         realm.write(() => realm.add(image));
+        setState(() {});
       } catch (e) {
         print(e.runtimeType);
       }
