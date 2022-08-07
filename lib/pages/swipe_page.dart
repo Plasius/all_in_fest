@@ -18,14 +18,17 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
-  var _profiles;
+  var profiles = [];
+  bool loaded = false;
+
+  //shuffle?
 
   void getProfiles() async {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [user.User.schema]);
     Realm realm = Realm(config);
-    _profiles = realm.all<user.User>();
+    RealmResults<user.User> _profiles = realm.all<user.User>();
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -34,10 +37,38 @@ class _SwipePageState extends State<SwipePage> {
 
     await realm.subscriptions.waitForSynchronization();
 
-    //shuffle?
+    Configuration config2 = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Match.schema]);
+    Realm realm2 = Realm(config2);
+    RealmResults<Match> _matches = realm2
+        .all<Match>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet subscriptions2 = realm2.subscriptions;
+    subscriptions2.update((mutableSubscriptions) {
+      mutableSubscriptions.add(_matches, name: "Matches", update: true);
+    });
+
+    await realm2.subscriptions.waitForSynchronization();
+
+    //szures
+    for (int i = 0; i < _matches.length; i++) {
+      for (int k = 0; k < _profiles.length; k++) {
+        if (_matches[i].user2 == RealmConnect.app.currentUser.id &&
+            _profiles[k].userID == _matches[i].user1) {
+          _profiles[k].userID = RealmConnect.app.currentUser.id;
+        } else if (_matches[i].user1 == RealmConnect.app.currentUser.id &&
+            _profiles[k].userID == _matches[i].user2) {
+          _profiles[k].userID = RealmConnect.app.currentUser.id;
+        }
+      }
+    }
 
     print(_profiles.length);
     for (int i = 0; i < _profiles.length; i++) {
+      if (_profiles[i].userID == RealmConnect.app.currentUser.id) {
+        continue;
+      }
       _swipeItems.add(SwipeItem(
           content: _profiles.length != 0
               ? Container(
@@ -67,7 +98,7 @@ class _SwipePageState extends State<SwipePage> {
                                     fit: BoxFit.cover))),
                       ),
                       Text(
-                        _profiles[i].name,
+                        _profiles[i].name ?? 'Jane Doe',
                         style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -81,24 +112,26 @@ class _SwipePageState extends State<SwipePage> {
           nopeAction: () => showNopeGif(),
           superlikeAction: () => showHornyGif()));
     }
+    loaded = true;
     setState(() {});
   }
-
-  void getMatches() async {}
 
   @override
   void initState() {
     super.initState();
     //getMatches();
     Future.delayed(Duration.zero, () {
-      getProfiles();
+      if (loaded == false) {
+        getProfiles();
+      }
+
       _matchEngine = MatchEngine(swipeItems: _swipeItems);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_profiles != null) {
+    if (loaded == true) {
       return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
