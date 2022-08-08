@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
-import 'package:all_in_fest/pages/event_details.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -105,22 +104,22 @@ class _EventsPageState extends State<EventsPage> {
                   Padding(
                     padding: EdgeInsets.only(
                         right: MediaQuery.of(context).size.width * 0.036),
-                    child: Container(
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Text(
                         event.name ?? "event",
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ),
-                  Container(
+                  SizedBox(
                     width: MediaQuery.of(context).size.width * 0.45,
                     child: Text(
                       event.stage ?? "stage",
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -131,12 +130,12 @@ class _EventsPageState extends State<EventsPage> {
                 children: [
                   Text(
                     event.date,
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white, fontWeight: FontWeight.bold),
                   ),
                   Text(
                     event.time,
-                    style: TextStyle(color: Colors.white),
+                    style: const TextStyle(color: Colors.white),
                   )
                 ],
               )
@@ -156,14 +155,14 @@ class _EventsPageState extends State<EventsPage> {
               context: context,
               enableDrag: true,
               isScrollControlled: true,
-              shape: RoundedRectangleBorder(
+              shape: const RoundedRectangleBorder(
                   borderRadius:
                       BorderRadius.vertical(top: Radius.circular(20))),
               builder: (context) => Container(
                 height: MediaQuery.of(context).size.height * 0.76,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
@@ -179,28 +178,28 @@ class _EventsPageState extends State<EventsPage> {
                       padding: const EdgeInsets.all(15.0),
                       child: Text(
                         eventsQuery[index].name,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white,
                             fontSize: 20,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 10, left: 15),
+                      padding: const EdgeInsets.only(top: 10, left: 15),
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
                               eventsQuery[index].date,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16.5,
                                   fontWeight: FontWeight.normal),
                             ),
-                            SizedBox(width: 20),
+                            const SizedBox(width: 20),
                             Text(
                               eventsQuery[index].time,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 16.5,
                                   fontWeight: FontWeight.normal),
@@ -208,10 +207,10 @@ class _EventsPageState extends State<EventsPage> {
                           ]),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(top: 20, left: 15),
+                      padding: const EdgeInsets.only(top: 20, left: 15),
                       child: Text(
                         eventsQuery[index].stage,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.normal,
                             fontSize: 16.5),
@@ -251,7 +250,7 @@ class _EventsPageState extends State<EventsPage> {
                               alignment: Alignment.bottomCenter,
                               child: Text(
                                 eventsQuery[index].description,
-                                style: TextStyle(color: Colors.white),
+                                style: const TextStyle(color: Colors.white),
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -264,7 +263,7 @@ class _EventsPageState extends State<EventsPage> {
                 ),
               ),
             ),
-            child: Container(
+            child: SizedBox(
               height: MediaQuery.of(context).size.height * 0.095,
               child: Row(
                 children: [
@@ -278,7 +277,7 @@ class _EventsPageState extends State<EventsPage> {
                   Container(
                     height: MediaQuery.of(context).size.height * 0.095,
                     width: MediaQuery.of(context).size.width * 0.9,
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                         image: DecorationImage(
                       image: AssetImage("lib/assets/event_container.png"),
                     )),

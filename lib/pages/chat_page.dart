@@ -1,7 +1,5 @@
 // ignore_for_file: library_prefixes, implementation_imports, prefer_typing_uninitialized_variables, avoid_print
 
-// ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
-
 import 'dart:async';
 import 'dart:convert';
 
@@ -29,7 +27,9 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var partnerImage;
   var partnerName;
+
   TextEditingController messageInput = TextEditingController();
+  final ScrollController scrollController = ScrollController();
 
   var messages = <Message>[];
 
@@ -59,6 +59,7 @@ class _ChatPageState extends State<ChatPage> {
 
     partnerName = widget.partnerUser.name;
     setState(() {});
+    scrollController.jumpTo(scrollController.position.maxScrollExtent);
   }
 
   //initializes messages
@@ -83,6 +84,10 @@ class _ChatPageState extends State<ChatPage> {
     messages = messageQuery.toList();
 
     setState(() {});
+
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
@@ -90,7 +95,12 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     loadPartnerNameAndImage();
     loadMessages();
-    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => loadMessages());
+
+    timer =
+        Timer.periodic(const Duration(seconds: 5), (Timer t) => loadMessages());
+
+    WidgetsBinding.instance.addPostFrameCallback((_) =>
+        scrollController.jumpTo(scrollController.position.maxScrollExtent));
   }
 
   @override
@@ -124,6 +134,7 @@ class _ChatPageState extends State<ChatPage> {
         SizedBox(
           height: MediaQuery.of(context).size.height * 0.8 - 50,
           child: SingleChildScrollView(
+              controller: scrollController,
               child: Column(
                   children: List.generate(
                       messages.length,
@@ -143,12 +154,16 @@ class _ChatPageState extends State<ChatPage> {
                                       child: Container(
                                         width: 40,
                                         height: 40,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    "lib/assets/user.png"),
-                                                fit: BoxFit.cover)),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: partnerImage == null
+                                              ? const DecorationImage(
+                                                  image: AssetImage(
+                                                      "lib/assets/user.png"),
+                                                  fit: BoxFit.cover)
+                                              : DecorationImage(
+                                                  image: partnerImage),
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -218,18 +233,19 @@ class _ChatPageState extends State<ChatPage> {
                 child: Container(
                   decoration: BoxDecoration(
                       border: Border.all(
-                          color: Color.fromRGBO(254, 254, 254, 1), width: 1),
+                          color: const Color.fromRGBO(254, 254, 254, 1),
+                          width: 1),
                       borderRadius: BorderRadius.circular(5)),
                   width: MediaQuery.of(context).size.width * 0.68,
                   height: MediaQuery.of(context).size.height * 0.045,
                   child: TextFormField(
                     decoration: InputDecoration(
                         border: OutlineInputBorder(
-                            borderSide: BorderSide(
+                            borderSide: const BorderSide(
                                 color: Color.fromRGBO(254, 254, 254, 1),
                                 width: 1),
                             borderRadius: BorderRadius.circular(5)),
-                        fillColor: Color.fromRGBO(97, 42, 122, 1),
+                        fillColor: const Color.fromRGBO(97, 42, 122, 1),
                         hintText: "Üzenet írása...",
                         hintStyle: TextStyle(
                             color: Colors.white.withOpacity(0.5),
@@ -237,7 +253,7 @@ class _ChatPageState extends State<ChatPage> {
                             fontSize: 20),
                         contentPadding: EdgeInsets.only(
                             left: MediaQuery.of(context).size.width * 0.0325)),
-                    style: TextStyle(
+                    style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
                         fontSize: 20),
@@ -257,9 +273,10 @@ class _ChatPageState extends State<ChatPage> {
                     width: MediaQuery.of(context).size.width * 0.145,
                     height: MediaQuery.of(context).size.height * 0.045,
                     decoration: BoxDecoration(
-                        color: Color.fromRGBO(97, 42, 122, 1),
+                        color: const Color.fromRGBO(97, 42, 122, 1),
                         border: Border.all(
-                            color: Color.fromRGBO(254, 254, 254, 1), width: 1),
+                            color: const Color.fromRGBO(254, 254, 254, 1),
+                            width: 1),
                         borderRadius: BorderRadius.circular(5)),
                     child: Padding(
                       padding: EdgeInsets.symmetric(

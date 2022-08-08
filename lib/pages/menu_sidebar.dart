@@ -8,7 +8,6 @@ import 'package:all_in_fest/pages/swipe_page.dart';
 
 import 'package:flutter/material.dart';
 
-import '../main.dart';
 import 'home_page.dart';
 
 class MenuBar extends StatelessWidget {

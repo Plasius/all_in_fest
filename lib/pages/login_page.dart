@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
-import '../main.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {

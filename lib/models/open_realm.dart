@@ -15,22 +15,19 @@ class RealmConnect {
   static var app;
   static var currentUser;
   static var currentProfilePic;
-  static var picture;
 
   static void realmOpen() async {
     appConfig = AppConfiguration("application-0-bjnqv");
     app = App(appConfig);
   }
 
-  static realmGetImage() async {
+  static Future<MemoryImage?> realmGetImage(String userID) async {
     realmOpen();
     RealmResults<UserImage> imageQuery;
     Configuration config =
         Configuration.flexibleSync(app.currentUser, [UserImage.schema]);
     Realm realm = Realm(config);
-    imageQuery = realm
-        .all<UserImage>()
-        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'");
+    imageQuery = realm.all<UserImage>().query("user CONTAINS '$userID'");
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -41,8 +38,9 @@ class RealmConnect {
 
     if (imageQuery.toList().isEmpty == false) {
       currentProfilePic = imageQuery[0];
-      picture = MemoryImage(base64Decode(currentProfilePic.data));
+      return MemoryImage(base64Decode(currentProfilePic.data));
     }
+    return null;
   }
 
   static realmDeleteImage() async {

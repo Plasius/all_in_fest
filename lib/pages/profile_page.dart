@@ -2,7 +2,6 @@
 
 import 'dart:convert';
 
-import 'package:all_in_fest/main.dart';
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
@@ -351,7 +350,7 @@ class _ProfilePageState extends State<ProfilePage> {
               myUser.name = nameController.text,
               myUser.bio = bioController.text
             });
-        print("Succeful update");
+        print("Successful update");
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
         realm.write(() => {myUser.name = nameController.text});
         print("Name updated");
@@ -365,11 +364,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    await RealmConnect.realmGetImage();
-    if (RealmConnect.picture == null) {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
+    var pic = await RealmConnect.realmGetImage(app.currentUser!.id.toString());
+    if (pic == null) {
       provider = const AssetImage("lib/assets/user.png");
     } else {
-      provider = RealmConnect.picture;
+      provider = pic;
     }
 
     setState(() {});
@@ -439,7 +441,7 @@ class _ProfilePageState extends State<ProfilePage> {
       RealmConnect.currentUser = null;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
         (Route<dynamic> route) => false,
       );
     }

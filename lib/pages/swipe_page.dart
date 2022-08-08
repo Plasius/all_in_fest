@@ -22,6 +22,7 @@ class SwipePage extends StatefulWidget {
 class _SwipePageState extends State<SwipePage> {
   MatchEngine? _matchEngine;
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
+
   bool loaded = false;
 
   void getProfiles() async {
@@ -38,13 +39,13 @@ class _SwipePageState extends State<SwipePage> {
 
     await realm.subscriptions.waitForSynchronization();
 
-    var profile_shuffle = _profiles.toList();
-    for (int i = 0; i < profile_shuffle.length; i++) {
-      var a = Random().nextInt(profile_shuffle.length);
-      var b = Random().nextInt(profile_shuffle.length);
-      var temp = profile_shuffle[a];
-      profile_shuffle[a] = profile_shuffle[b];
-      profile_shuffle[b] = temp;
+    var profileShuffle = _profiles.toList();
+    for (int i = 0; i < profileShuffle.length; i++) {
+      var a = Random().nextInt(profileShuffle.length);
+      var b = Random().nextInt(profileShuffle.length);
+      var temp = profileShuffle[a];
+      profileShuffle[a] = profileShuffle[b];
+      profileShuffle[b] = temp;
     }
     Configuration config2 = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
@@ -61,78 +62,178 @@ class _SwipePageState extends State<SwipePage> {
     await realm2.subscriptions.waitForSynchronization();
 
     //szures
-    var ignoreList = [RealmConnect.app.currentUser.id];
+    var ignoreList = <String>[RealmConnect.app.currentUser.id];
 
     for (int i = 0; i < _matches.length; i++) {
       if (_matches[i].user2 == RealmConnect.app.currentUser.id) {
-        ignoreList.add(_matches[i].user1);
+        ignoreList.add(_matches[i].user1.toString());
       } else {
-        ignoreList.add(_matches[i].user2);
+        ignoreList.add(_matches[i].user2.toString());
       }
     }
+
+    Map<String, MemoryImage> photosMap =
+        await loadImages(profileShuffle, ignoreList);
 
     final prefs = await SharedPreferences.getInstance();
     final List<String>? items = prefs.getStringList('Rejected');
-    print(profile_shuffle.length);
-    for (int i = 0; i < profile_shuffle.length; i++) {
-      if (ignoreList.contains(profile_shuffle[i].userID)) continue;
-      if (items != null) {
-        if (items.contains(profile_shuffle[i].userID)) continue;
+
+    for (int i = 0; i < profileShuffle.length; i++) {
+      if (ignoreList.contains(profileShuffle[i].userID.toString())) continue;
+
+      if (items != null &&
+          items.contains(profileShuffle[i].userID.toString())) {
+        continue;
       }
+
       _swipeItems.add(SwipeItem(
-        content: profile_shuffle.length != 0
-            ? Container(
-                decoration:
-                    const BoxDecoration(color: Color.fromRGBO(97, 42, 122, 1)),
-                child: Column(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        "in/Touch",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 25),
+        content: profileShuffle.isNotEmpty
+            ? GestureDetector(
+                onTap: () => showModalBottomSheet(
+                  context: context,
+                  enableDrag: true,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20))),
+                  builder: (context) => Container(
+                    height: MediaQuery.of(context).size.height * 0.76,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      gradient: const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color.fromRGBO(232, 107, 62, 1),
+                          Color.fromRGBO(97, 42, 122, 1)
+                        ],
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(
-                          left: 32, right: 32, top: 10, bottom: 10),
-                      child: Container(
-                          width: MediaQuery.of(context).size.width,
-                          height: MediaQuery.of(context).size.height / 3,
-                          decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                  image: AssetImage("lib/assets/user.png"),
-                                  fit: BoxFit.cover))),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Text(
+                            profileShuffle[i].name.toString(),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Padding(
+                                padding: EdgeInsets.symmetric(
+                                    vertical:
+                                        MediaQuery.of(context).size.width *
+                                            0.144),
+                                child: Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width *
+                                        0.664,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.33,
+                                    decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.78)),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        image: photosMap[profileShuffle[i]
+                                                    .userID
+                                                    .toString()] ==
+                                                null
+                                            ? const DecorationImage(
+                                                image: AssetImage(
+                                                    "lib/assets/user.png"),
+                                                fit: BoxFit.cover)
+                                            : DecorationImage(
+                                                image: photosMap[
+                                                    profileShuffle[i]
+                                                        .userID
+                                                        .toString()]!,
+                                              ),
+                                      ),
+                                    )))
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: Align(
+                                  alignment: Alignment.bottomCenter,
+                                  child: Text(
+                                    profileShuffle[i].bio.toString(),
+                                    style: const TextStyle(color: Colors.white),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
                     ),
-                    Text(
-                      profile_shuffle[i].name ?? 'Jane Doe',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 25),
-                    ),
-                    Text(
-                      profile_shuffle[i].bio ?? '',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16),
-                    )
-                  ],
-                ))
+                  ),
+                ),
+                child: Container(
+                    decoration: const BoxDecoration(
+                        color: Color.fromRGBO(97, 42, 122, 1)),
+                    child: Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.only(top: 16.0),
+                          child: Text(
+                            "in/Touch",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 32, right: 32, top: 10, bottom: 10),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width,
+                            height: MediaQuery.of(context).size.height / 3,
+                            decoration: BoxDecoration(
+                              image: photosMap[profileShuffle[i]
+                                          .userID
+                                          .toString()] ==
+                                      null
+                                  ? const DecorationImage(
+                                      image: AssetImage("lib/assets/user.png"),
+                                      fit: BoxFit.cover)
+                                  : DecorationImage(
+                                      image: photosMap[profileShuffle[i]
+                                          .userID
+                                          .toString()]!),
+                            ),
+                          ),
+                        ),
+                        Text(
+                          profileShuffle[i].name ?? 'Jane Doe',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 25),
+                        ),
+                      ],
+                    )),
+              )
             : const Text('No profiles found'),
-        likeAction: () => {
-          print("${profile_shuffle[i].userID}"),
-          liked(profile_shuffle[i].userID)
-        },
-        nopeAction: () => showNopeGif(profile_shuffle[i].userID),
+        likeAction: () => {liked(profileShuffle[i].userID)},
+        nopeAction: () => showNopeGif(profileShuffle[i].userID),
       ));
     }
 
-    _swipeItems.add(SwipeItem(content: Text("")));
+    _swipeItems.add(SwipeItem(content: const Text("")));
 
     loaded = true;
     setState(() {});
@@ -269,7 +370,6 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void liked(String otherUser) async {
-    print(RealmConnect.app.currentUser.id);
     RealmConnect.realmOpen();
     final _match = Match(RealmConnect.app.currentUser.id + otherUser,
         user1: RealmConnect.app.currentUser.id, user2: otherUser);
@@ -283,11 +383,9 @@ class _SwipePageState extends State<SwipePage> {
       mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
-    print("synched");
 
     realm.write(() {
       realm.add(_match);
-      print("writed");
     });
   }
 
@@ -313,5 +411,22 @@ class _SwipePageState extends State<SwipePage> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  loadImages(List<user.User> profileShuffle, List<String> ignoreList) async {
+    Map<String, MemoryImage> photosMap = {};
+
+    for (user.User profile in profileShuffle) {
+      if (ignoreList.contains(profile.userID)) continue;
+
+      MemoryImage? potentialImage =
+          await RealmConnect.realmGetImage(profile.userID.toString());
+
+      if (potentialImage != null) {
+        photosMap[profile.userID.toString()] = potentialImage;
+      }
+    }
+
+    return photosMap;
   }
 }

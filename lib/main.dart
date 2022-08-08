@@ -1,12 +1,6 @@
 import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/home_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
-import 'package:all_in_fest/pages/map_page.dart';
-import 'package:all_in_fest/pages/profile_page.dart';
-import 'package:all_in_fest/pages/register_page.dart';
-import 'package:all_in_fest/pages/settings_page.dart';
-import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:realm/realm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,9 +19,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(

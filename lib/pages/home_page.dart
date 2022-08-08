@@ -1,8 +1,6 @@
 import 'package:all_in_fest/pages/events_page.dart';
-import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
-import 'package:all_in_fest/pages/register_page.dart';
 import 'package:all_in_fest/pages/settings_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:flutter/material.dart';

@@ -147,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
       RealmConnect.currentUser = null;
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
+        MaterialPageRoute(builder: (context) => const LoginPage()),
         (Route<dynamic> route) => false,
       );
     }

@@ -65,16 +65,17 @@ class _MatchesPageState extends State<MatchesPage> {
         user.User matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
         matchedProfiles.add(matchedProfile);
-        RealmConnect.realmGetImage();
-        var matchedProfileImage = RealmConnect.picture;
+        var matchedProfileImage =
+            await RealmConnect.realmGetImage(matchedProfile.userID);
         photos.add(matchedProfileImage);
       } else {
         print("else");
         var matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user2}'")[0];
         matchedProfiles.add(matchedProfile);
-        RealmConnect.realmGetImage();
-        var matchedProfileImage = RealmConnect.picture;
+        await RealmConnect.realmGetImage(matchedProfile.userID);
+        var matchedProfileImage =
+            await RealmConnect.realmGetImage(matchedProfile.userID);
         photos.add(matchedProfileImage);
       }
     }
@@ -156,11 +157,16 @@ class _MatchesPageState extends State<MatchesPage> {
                                       Container(
                                         height: size.height * 0.11,
                                         width: size.width * 0.24,
-                                        decoration: const BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                                image: AssetImage(
-                                                    "lib/assets/user.png"))),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          image: photos[index] == null
+                                              ? const DecorationImage(
+                                                  image: AssetImage(
+                                                      "lib/assets/user.png"),
+                                                  fit: BoxFit.cover)
+                                              : DecorationImage(
+                                                  image: photos[index]),
+                                        ),
                                       ),
                                       Padding(
                                         padding:
@@ -183,13 +189,6 @@ class _MatchesPageState extends State<MatchesPage> {
                                                     fontSize: 20),
                                               ),
                                             ),
-                                            const Text(
-                                              "Üzenet",
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontWeight: FontWeight.normal,
-                                                  fontSize: 16),
-                                            )
                                           ],
                                         ),
                                       )
