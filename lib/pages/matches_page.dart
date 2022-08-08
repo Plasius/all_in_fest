@@ -15,8 +15,8 @@ class MatchesPage extends StatefulWidget {
 }
 
 class _MatchesPageState extends State<MatchesPage> {
-  var matches;
   var photos = [];
+  var matchQuery;
   var matchedProfiles = <user.User>[];
   bool ready = false;
 
@@ -25,7 +25,7 @@ class _MatchesPageState extends State<MatchesPage> {
     Configuration matchConfig = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
     Realm matchesRealm = Realm(matchConfig);
-    final matchQuery = matchesRealm
+    matchQuery = matchesRealm
         .all<Match>()
         .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
 
@@ -139,8 +139,9 @@ class _MatchesPageState extends State<MatchesPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ChatPage(
-                                          partnerUser:
-                                              matchedProfiles[index])));
+                                            partnerUser: matchedProfiles[index],
+                                            match: matchQuery[index],
+                                          )));
                             },
                             child: Column(
                               children: [
