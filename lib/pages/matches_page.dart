@@ -3,6 +3,7 @@
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user;
+import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
 
@@ -16,7 +17,7 @@ class MatchesPage extends StatefulWidget {
 class _MatchesPageState extends State<MatchesPage> {
   var matches;
   var photos = [];
-  var matchedProfiles = [];
+  var matchedProfiles = <user.User>[];
   bool ready = false;
 
   void loadMatches() async {
@@ -61,7 +62,7 @@ class _MatchesPageState extends State<MatchesPage> {
     for (int i = 0; i < matchQuery.length; i++) {
       if (matchQuery[i].user2 == RealmConnect.app.currentUser.id) {
         print("if");
-        var matchedProfile =
+        user.User matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
         matchedProfiles.add(matchedProfile);
         RealmConnect.realmGetImage();
@@ -133,7 +134,14 @@ class _MatchesPageState extends State<MatchesPage> {
                   children: List.generate(
                       matchedProfiles.length,
                       (index) => GestureDetector(
-                            onTap: () {},
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatPage(
+                                          partnerUser:
+                                              matchedProfiles[index])));
+                            },
                             child: Column(
                               children: [
                                 Padding(
@@ -166,7 +174,8 @@ class _MatchesPageState extends State<MatchesPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: size.width * 0.01625),
                                               child: Text(
-                                                matchedProfiles[index].name,
+                                                matchedProfiles[index].name ??
+                                                    "Partner",
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
