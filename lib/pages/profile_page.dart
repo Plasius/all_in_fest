@@ -206,14 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     Center(
                       child: GestureDetector(
-                        onTap: () => {
-                          RealmConnect.app.currentUser.logOut(),
-                          RealmConnect.currentUser = null,
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()))
-                        },
+                        onTap: logout,
                         child: Container(
                           width: size.width * 0.119,
                           height: size.width * 0.119,
@@ -435,5 +428,20 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           );
         });
+  }
+
+  void logout() {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
+    if (app.currentUser != null) {
+      app.currentUser?.logOut();
+      RealmConnect.currentUser = null;
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
+    }
   }
 }

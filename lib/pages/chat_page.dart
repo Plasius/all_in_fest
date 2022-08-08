@@ -63,12 +63,15 @@ class _ChatPageState extends State<ChatPage> {
 
   //initializes messages
   loadMessages() async {
+    var appConfig = AppConfiguration("application-0-bjnqv");
+    var app = App(appConfig);
+
     RealmResults<Message> messageQuery;
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Message.schema]);
     Realm realm = Realm(config);
     messageQuery = realm.all<Message>().query(
-        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.currentUser.id.toString()}'");
+        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${app.currentUser?.id.toString()}'");
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -98,11 +101,7 @@ class _ChatPageState extends State<ChatPage> {
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              title: const Image(
-                image: AssetImage("lib/assets/logo.png"),
-                height: 50,
-                fit: BoxFit.contain,
-              ),
+              title: Text(partnerName.toString()),
             ),
             body: messagesBody()));
   }

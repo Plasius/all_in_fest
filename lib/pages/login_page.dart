@@ -3,9 +3,11 @@
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
 import '../main.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -232,16 +234,12 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void login() async {
+  login() async {
     var appConfig = AppConfiguration("application-0-bjnqv");
     var app = App(appConfig);
 
-    if (app.currentUser != null) {
-      await app.currentUser?.logOut();
-    }
-
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      print("Please fill out all of the fields.");
+      Fluttertoast.showToast(msg: "Nem megfelelően kitöltött mezők.");
       return;
     }
 
@@ -249,11 +247,11 @@ class _LoginPageState extends State<LoginPage> {
         emailController.text, passwordController.text);
 
     if (app.currentUser != null) {
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) =>
-                  const MyHomePage(title: "Logged in succesfully")));
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const MyHomePage()),
+        (Route<dynamic> route) => false,
+      );
     }
   }
 }

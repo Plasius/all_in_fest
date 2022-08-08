@@ -9,6 +9,7 @@ import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:flutter/material.dart';
 
 import '../main.dart';
+import 'home_page.dart';
 
 class MenuBar extends StatelessWidget {
   final ImageProvider imageProvider;
@@ -45,10 +46,8 @@ class MenuBar extends StatelessWidget {
             title: const Text('Home'),
             leading: const Icon(Icons.home),
             onTap: () => {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MyHomePage(title: "Home")))
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage()))
             },
           ),
           ListTile(
@@ -99,10 +98,8 @@ class MenuBar extends StatelessWidget {
             title: const Text('Exit'),
             leading: const Icon(Icons.exit_to_app),
             onTap: () => {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const MyHomePage(title: "Exited")))
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => const MyHomePage()))
             },
           ),
         ],

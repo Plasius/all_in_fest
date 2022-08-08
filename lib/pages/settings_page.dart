@@ -145,8 +145,11 @@ class _SettingsPageState extends State<SettingsPage> {
     if (app.currentUser != null) {
       app.currentUser?.logOut();
       RealmConnect.currentUser = null;
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
     }
   }
 
