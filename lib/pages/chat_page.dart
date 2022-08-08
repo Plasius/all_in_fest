@@ -2,6 +2,7 @@
 
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:all_in_fest/models/match.dart' as swipeMatch;
@@ -31,6 +32,8 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController messageInput = TextEditingController();
 
   var messages = <Message>[];
+
+  Timer? timer;
 
   //initializes partnerImage and partnerName
   loadPartnerNameAndImage() async {
@@ -66,11 +69,6 @@ class _ChatPageState extends State<ChatPage> {
     Realm realm = Realm(config);
     messageQuery = realm.all<Message>().query(
         "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.currentUser.id.toString()}'");
-    messageQuery.changes.listen((event) {
-      event.inserted;
-      setState(() {});
-      print("message inserted");
-    });
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -89,6 +87,7 @@ class _ChatPageState extends State<ChatPage> {
     super.initState();
     loadPartnerNameAndImage();
     loadMessages();
+    timer = Timer.periodic(Duration(seconds: 5), (Timer t) => loadMessages());
   }
 
   @override
@@ -145,7 +144,7 @@ class _ChatPageState extends State<ChatPage> {
                                       child: Container(
                                         width: 40,
                                         height: 40,
-                                        decoration: BoxDecoration(
+                                        decoration: const BoxDecoration(
                                             shape: BoxShape.circle,
                                             image: DecorationImage(
                                                 image: AssetImage(
@@ -168,13 +167,15 @@ class _ChatPageState extends State<ChatPage> {
                                                     .size
                                                     .width *
                                                 0.018),
-                                        child: Text("Üzenet",
+                                        child: Text(
+                                            messages[index].message.toString(),
                                             textAlign: TextAlign.right,
                                             style: const TextStyle(
                                                 color: Colors.black,
                                                 fontSize: 22)),
                                       ),
                                     ),
+                                    const SizedBox(height: 50)
                                   ]))
                           : Align(
                               alignment: Alignment.bottomRight,
@@ -204,6 +205,7 @@ class _ChatPageState extends State<ChatPage> {
                                                 fontSize: 22)),
                                       ),
                                     ),
+                                    const SizedBox(height: 50)
                                   ]))))),
         ),
         Padding(
@@ -299,5 +301,11 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     messageInput.clear();
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 }
