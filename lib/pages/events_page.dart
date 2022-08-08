@@ -153,106 +153,117 @@ class _EventsPageState extends State<EventsPage> {
           padding: const EdgeInsets.all(8),
           child: GestureDetector(
             onTap: () => showModalBottomSheet(
-                context: context,
-                enableDrag: true,
-                isScrollControlled: true,
-                shape: RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(20))),
-                builder: (context) => Container(
-                      height: MediaQuery.of(context).size.height * 0.76,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Color.fromRGBO(232, 107, 62, 1),
-                            Color.fromRGBO(97, 42, 122, 1)
-                          ],
-                        ),
+              context: context,
+              enableDrag: true,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(20))),
+              builder: (context) => Container(
+                height: MediaQuery.of(context).size.height * 0.76,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Color.fromRGBO(232, 107, 62, 1),
+                      Color.fromRGBO(97, 42, 122, 1)
+                    ],
+                  ),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                        eventsQuery[index].name,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(15.0),
-                                    child: Text(
-                                      eventsQuery[index].name,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 10, left: 15),
-                                    child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            eventsQuery[index].date,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.5,
-                                                fontWeight: FontWeight.normal),
-                                          ),
-                                          SizedBox(width: 20),
-                                          Text(
-                                            eventsQuery[index].time,
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16.5,
-                                                fontWeight: FontWeight.normal),
-                                          )
-                                        ]),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.only(top: 20, left: 15),
-                                    child: Text(
-                                      eventsQuery[index].stage,
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.normal,
-                                          fontSize: 16.5),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: EdgeInsets.all(
-                                        MediaQuery.of(context).size.width *
-                                            0.144),
-                                    child: Container(
-                                      alignment: Alignment.center,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.664,
-                                      height:
-                                          MediaQuery.of(context).size.height *
-                                              0.33,
-                                      decoration: BoxDecoration(
-                                          color:
-                                              Colors.white.withOpacity(0.78)),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                                image: NetworkImage(
-                                                    "https://drive.google.com/uc?export=view&id=1NKugkHNAkncxpwmFxD83n9WY0qqGYXKx"))),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 10, left: 15),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              eventsQuery[index].date,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.normal),
+                            ),
+                            SizedBox(width: 20),
+                            Text(
+                              eventsQuery[index].time,
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16.5,
+                                  fontWeight: FontWeight.normal),
+                            )
+                          ]),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(top: 20, left: 15),
+                      child: Text(
+                        eventsQuery[index].stage,
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16.5),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              vertical:
+                                  MediaQuery.of(context).size.width * 0.144),
+                          child: Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width * 0.664,
+                            height: MediaQuery.of(context).size.height * 0.33,
+                            decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.78)),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: NetworkImage(
+                                          eventsQuery[index].image),
+                                      fit: BoxFit.cover)),
+                            ),
                           ),
+                        )
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Flexible(
+                            child: Align(
+                              alignment: Alignment.bottomCenter,
+                              child: Text(
+                                eventsQuery[index].description,
+                                style: TextStyle(color: Colors.white),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
                         ],
                       ),
-                    )),
+                    )
+                  ],
+                ),
+              ),
+            ),
             child: Container(
               height: MediaQuery.of(context).size.height * 0.095,
               child: Row(
