@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
+import 'package:url_launcher/url_launcher.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -257,12 +258,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ),
                               ),
                               CheckboxListTile(
-                                title: const Text(
-                                  "Elfogadod az ÁSZF-et?",
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.normal),
-                                ),
+                                title: InkWell(
+                                    child: const Text('Elfogadod az ÁSZF-et?'),
+                                    onTap: () => launchUrl(Uri.parse(
+                                        'https://ybg.hu/wp-content/uploads/2022/01/Adatkezelesi-es-adatvedelmi-szabalyzat.pdf'))),
                                 value: checkedValue,
                                 onChanged: (newValue) {
                                   setState(() {
@@ -352,7 +351,8 @@ class _RegisterPageState extends State<RegisterPage> {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        passwordConfirmController.text.isEmpty) {
+        passwordConfirmController.text.isEmpty ||
+        checkedValue == false) {
       print("Please fill out all of the fields.");
       return;
     }
