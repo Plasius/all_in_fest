@@ -114,7 +114,7 @@ class _ChatPageState extends State<ChatPage> {
         Timer.periodic(const Duration(seconds: 5), (Timer t) => loadMessages());
 
     WidgetsBinding.instance.addPostFrameCallback((_) =>
-        scrollController.jumpTo(scrollController.position.maxScrollExtent));
+        scrollController.jumpTo(scrollController.position.minScrollExtent));
   }
 
   @override
@@ -122,7 +122,7 @@ class _ChatPageState extends State<ChatPage> {
     return MaterialApp(
         title: 'Chat page',
         home: Scaffold(
-            resizeToAvoidBottomInset: false,
+            resizeToAvoidBottomInset: true,
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: Text(partnerName.toString()),
@@ -144,168 +144,181 @@ class _ChatPageState extends State<ChatPage> {
           ],
         ),
       ),
-      child: Column(children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.8 - 50,
-          child: SingleChildScrollView(
-              controller: scrollController,
-              child: Column(
-                  children: List.generate(
-                      messages.length,
-                      (index) => messages[index].from ==
-                              widget.partnerUser.userID
-                          ? Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                          right: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.043),
-                                      child: Container(
-                                        width: 40,
-                                        height: 40,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: partnerImage == null
-                                              ? const DecorationImage(
-                                                  image: AssetImage(
-                                                      "lib/assets/user.png"),
-                                                  fit: BoxFit.cover)
-                                              : DecorationImage(
-                                                  image: partnerImage),
+      child: SingleChildScrollView(
+        reverse: true,
+        physics: NeverScrollableScrollPhysics(),
+        child: Column(children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.8 - 25,
+            child: SingleChildScrollView(
+                controller: scrollController,
+                child: Column(
+                    children: List.generate(
+                        messages.length,
+                        (index) => messages[index].from ==
+                                widget.partnerUser.userID
+                            ? Align(
+                                alignment: Alignment.bottomLeft,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.043),
+                                        child: Container(
+                                          width: 40,
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: partnerImage == null
+                                                ? const DecorationImage(
+                                                    image: AssetImage(
+                                                        "lib/assets/user.png"),
+                                                    fit: BoxFit.cover)
+                                                : DecorationImage(
+                                                    image: partnerImage),
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.036,
-                                            vertical: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.018),
-                                        child: Text(
-                                            messages[index].message.toString(),
-                                            textAlign: TextAlign.right,
-                                            style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 22)),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.036,
+                                              vertical: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.018),
+                                          child: Text(
+                                              messages[index]
+                                                  .message
+                                                  .toString(),
+                                              textAlign: TextAlign.right,
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 22)),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 50)
-                                  ]))
-                          : Align(
-                              alignment: Alignment.bottomRight,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Container(
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(5)),
-                                      child: Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.036,
-                                            vertical: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.018),
-                                        child: Text(
-                                            messages[index].message.toString(),
-                                            textAlign: TextAlign.right,
-                                            style: const TextStyle(
-                                                color: Colors.black,
-                                                fontSize: 22)),
+                                      const SizedBox(height: 50)
+                                    ]))
+                            : Align(
+                                alignment: Alignment.bottomRight,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(5)),
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.036,
+                                              vertical: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.018),
+                                          child: Text(
+                                              messages[index]
+                                                  .message
+                                                  .toString(),
+                                              textAlign: TextAlign.right,
+                                              style: const TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 22)),
+                                        ),
                                       ),
-                                    ),
-                                    const SizedBox(height: 50)
-                                  ]))))),
-        ),
-        Padding(
-          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.065),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                padding: EdgeInsets.only(
-                    right: MediaQuery.of(context).size.width * 0.036),
-                child: Container(
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                          color: const Color.fromRGBO(254, 254, 254, 1),
-                          width: 1),
-                      borderRadius: BorderRadius.circular(5)),
-                  width: MediaQuery.of(context).size.width * 0.68,
-                  height: MediaQuery.of(context).size.height * 0.045,
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: Color.fromRGBO(254, 254, 254, 1),
-                                width: 1),
-                            borderRadius: BorderRadius.circular(5)),
-                        fillColor: const Color.fromRGBO(97, 42, 122, 1),
-                        hintText: "Üzenet írása...",
-                        hintStyle: TextStyle(
-                            color: Colors.white.withOpacity(0.5),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20),
-                        contentPadding: EdgeInsets.only(
-                            left: MediaQuery.of(context).size.width * 0.0325)),
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20),
-                    controller: messageInput,
-                  ),
-                ),
-              ),
-              GestureDetector(
-                  onTap: () {
-                    if (messageInput.text.isNotEmpty) {
-                      sendMessage();
-                    } else {
-                      Fluttertoast.showToast(msg: "Írj üzenetet!");
-                    }
-                  },
+                                      const SizedBox(height: 50)
+                                    ]))))),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: MediaQuery.of(context).size.width * 0.065,
+            ),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                      right: MediaQuery.of(context).size.width * 0.036),
                   child: Container(
-                    width: MediaQuery.of(context).size.width * 0.145,
-                    height: MediaQuery.of(context).size.height * 0.045,
                     decoration: BoxDecoration(
-                        color: const Color.fromRGBO(97, 42, 122, 1),
                         border: Border.all(
                             color: const Color.fromRGBO(254, 254, 254, 1),
                             width: 1),
                         borderRadius: BorderRadius.circular(5)),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: MediaQuery.of(context).size.width * 0.043,
-                          vertical: MediaQuery.of(context).size.height * 0.011),
-                      child: const Image(
-                        image: AssetImage('lib/assets/send_message.png'),
-                        fit: BoxFit.cover,
-                      ),
+                    width: MediaQuery.of(context).size.width * 0.68,
+                    height: MediaQuery.of(context).size.height * 0.045,
+                    child: TextFormField(
+                      decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                              borderSide: const BorderSide(
+                                  color: Color.fromRGBO(254, 254, 254, 1),
+                                  width: 1),
+                              borderRadius: BorderRadius.circular(5)),
+                          fillColor: const Color.fromRGBO(97, 42, 122, 1),
+                          hintText: "Üzenet írása...",
+                          hintStyle: TextStyle(
+                              color: Colors.white.withOpacity(0.5),
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20),
+                          contentPadding: EdgeInsets.only(
+                              left:
+                                  MediaQuery.of(context).size.width * 0.0325)),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20),
+                      controller: messageInput,
                     ),
-                  )),
-            ]),
+                  ),
+                ),
+                GestureDetector(
+                    onTap: () {
+                      if (messageInput.text.isNotEmpty) {
+                        sendMessage();
+                      } else {
+                        Fluttertoast.showToast(msg: "Írj üzenetet!");
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.145,
+                      height: MediaQuery.of(context).size.height * 0.045,
+                      decoration: BoxDecoration(
+                          color: const Color.fromRGBO(97, 42, 122, 1),
+                          border: Border.all(
+                              color: const Color.fromRGBO(254, 254, 254, 1),
+                              width: 1),
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal:
+                                MediaQuery.of(context).size.width * 0.043,
+                            vertical:
+                                MediaQuery.of(context).size.height * 0.011),
+                        child: const Image(
+                          image: AssetImage('lib/assets/send_message.png'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    )),
+              ]),
+            ),
           ),
-        )
-      ]),
+        ]),
+      ),
     );
   }
 
