@@ -72,19 +72,24 @@ class _SwipePageState extends State<SwipePage> {
       }
     }
 
+    //limit to 10
+
     Map<String, MemoryImage> photosMap =
         await loadImages(profileShuffle, ignoreList);
 
     final prefs = await SharedPreferences.getInstance();
     final List<String>? items = prefs.getStringList('Rejected');
 
-    for (int i = 0; i < profileShuffle.length; i++) {
+    int goodProfiles = 0;
+    for (int i = 0; i < profileShuffle.length && goodProfiles < 10; i++) {
       if (ignoreList.contains(profileShuffle[i].userID.toString())) continue;
 
       if (items != null &&
           items.contains(profileShuffle[i].userID.toString())) {
         continue;
       }
+
+      goodProfiles++;
 
       _swipeItems.add(SwipeItem(
         content: profileShuffle.isNotEmpty
@@ -254,11 +259,10 @@ class _SwipePageState extends State<SwipePage> {
 
   @override
   Widget build(BuildContext context) {
-    if (loaded == true && _swipeItems.isEmpty == false) {
-      return MaterialApp(
-        title: 'Welcome to Flutter',
-        home: Scaffold(
-            /* drawer: MenuBar(
+    return MaterialApp(
+      title: 'Welcome to Flutter',
+      home: Scaffold(
+          /* drawer: MenuBar(
                 imageProvider: MongoDatabase.picture != null
                     ? MongoDatabase.picture!
                     : AssetImage("lib/assets/user.png"),
@@ -268,38 +272,20 @@ class _SwipePageState extends State<SwipePage> {
                 email: 
                     ? MongoDatabase.email!
                     : ""), */ //MongoDatabase.email!),
-            appBar: AppBar(
-              backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              /*leading: const Icon(
+          appBar: AppBar(
+            backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+            /*leading: const Icon(
                 Icons.menu,
                 color: Colors.white,
               ),*/
-              title: const Image(
-                image: AssetImage("lib/assets/logo.png"),
-                height: 50,
-                fit: BoxFit.contain,
-              ),
+            title: const Image(
+              image: AssetImage("lib/assets/logo.png"),
+              height: 50,
+              fit: BoxFit.contain,
             ),
-            body: swipeBody()),
-      );
-    } else {
-      return MaterialApp(
-          title: 'Welcome to Flutter',
-          home: Scaffold(
-              appBar: AppBar(
-                backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-                /*leading: const Icon(
-          Icons.menu,
-          color: Colors.white,
-        ),*/
-                title: const Image(
-                  image: AssetImage("lib/assets/logo.png"),
-                  height: 50,
-                  fit: BoxFit.contain,
-                ),
-              ),
-              body: const CircularProgressIndicator()));
-    }
+          ),
+          body: swipeBody()),
+    );
   }
 
   Widget swipeBody() {
@@ -319,50 +305,18 @@ class _SwipePageState extends State<SwipePage> {
             SizedBox(
               height: MediaQuery.of(context).size.height / 2,
               width: MediaQuery.of(context).size.width,
-              child: SwipeCards(
-                matchEngine: _matchEngine!,
-                itemBuilder: (BuildContext context, int index) {
-                  return _swipeItems[index].content
-                      /*Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(48.0),
-                      child: Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                                  image: _swipeItems[index].content,
-                                  fit: BoxFit.cover))),
-                    ),
-                  )*/
-                      ;
-                },
-                onStackFinished: () => showHornyGif('Végig néztél mindenkit!'),
-                upSwipeAllowed: true,
-              ),
+              child: (loaded == true && _swipeItems.isEmpty == false)
+                  ? SwipeCards(
+                      matchEngine: _matchEngine!,
+                      itemBuilder: (BuildContext context, int index) {
+                        return _swipeItems[index].content;
+                      },
+                      onStackFinished: () =>
+                          showHornyGif('Végig néztél mindenkit!'),
+                      upSwipeAllowed: true,
+                    )
+                  : const CircularProgressIndicator(),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const MatchesPage())),
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.24,
-                  height: MediaQuery.of(context).size.height * 0.067,
-                  decoration: BoxDecoration(
-                      color: const Color.fromRGBO(97, 42, 122, 1),
-                      border: Border.all(
-                          color: const Color.fromRGBO(254, 254, 254, 1),
-                          width: 1),
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 30),
-                    child: Image.asset("lib/assets/chat_icon.png"),
-                  ),
-                ),
-              ),
-            )
           ],
         ),
       ),
@@ -372,7 +326,9 @@ class _SwipePageState extends State<SwipePage> {
   void liked(String otherUser) async {
     RealmConnect.realmOpen();
     final _match = Match(RealmConnect.app.currentUser.id + otherUser,
-        user1: RealmConnect.app.currentUser.id, user2: otherUser);
+        user1: RealmConnect.app.currentUser.id,
+        user2: otherUser,
+        lastActivity: DateTime.now().millisecondsSinceEpoch);
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
     Realm realm = Realm(config);
@@ -387,6 +343,9 @@ class _SwipePageState extends State<SwipePage> {
     realm.write(() {
       realm.add(_match);
     });
+
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const MatchesPage()));
   }
 
   void showNopeGif(var rejectedID) async {

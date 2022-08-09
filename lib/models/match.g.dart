@@ -11,10 +11,12 @@ class Match extends _Match with RealmEntity, RealmObject {
     String matchID, {
     String? user1,
     String? user2,
+    int? lastActivity,
   }) {
     RealmObject.set(this, '_id', matchID);
     RealmObject.set(this, 'user1', user1);
     RealmObject.set(this, 'user2', user2);
+    RealmObject.set(this, 'lastActivity', lastActivity);
   }
 
   Match._();
@@ -35,6 +37,11 @@ class Match extends _Match with RealmEntity, RealmObject {
   set user2(String? value) => RealmObject.set(this, 'user2', value);
 
   @override
+  int? get lastActivity => RealmObject.get<int>(this, 'lastActivity') as int?;
+  @override
+  set lastActivity(int? value) => RealmObject.set(this, 'lastActivity', value);
+
+  @override
   Stream<RealmObjectChanges<Match>> get changes =>
       RealmObject.getChanges<Match>(this);
 
@@ -47,6 +54,7 @@ class Match extends _Match with RealmEntity, RealmObject {
           mapTo: '_id', primaryKey: true),
       SchemaProperty('user1', RealmPropertyType.string, optional: true),
       SchemaProperty('user2', RealmPropertyType.string, optional: true),
+      SchemaProperty('lastActivity', RealmPropertyType.int, optional: true),
     ]);
   }
 }

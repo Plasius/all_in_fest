@@ -69,15 +69,6 @@ class _ProfilePageState extends State<ProfilePage> {
                 height: 50,
                 fit: BoxFit.contain,
               ),
-              actions: [
-                IconButton(
-                  onPressed: ((() => saveProfile())),
-                  icon: const Icon(
-                    Icons.save,
-                    color: Colors.white,
-                  ),
-                )
-              ],
             ),
             body: editBody(context)));
   }
@@ -214,9 +205,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               shape: BoxShape.circle),
                           child: Padding(
                             padding: EdgeInsets.all(size.width * 0.025),
-                            child: const Image(
-                              image: AssetImage("lib/assets/logout.png"),
-                              fit: BoxFit.cover,
+                            child: const Icon(
+                              Icons.save,
+                              color: Colors.white,
                             ),
                           ),
                         ),

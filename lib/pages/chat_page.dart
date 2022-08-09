@@ -12,6 +12,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
 import '../models/image.dart';
+import '../models/match.dart' as match;
 
 class ChatPage extends StatefulWidget {
   const ChatPage({Key? key, required this.partnerUser, required this.match})
@@ -82,6 +83,19 @@ class _ChatPageState extends State<ChatPage> {
     await realm.subscriptions.waitForSynchronization();
 
     messages = messageQuery.toList();
+
+    messages.sort(
+      (a, b) {
+        if (a.datetime != null && b.datetime != null) {
+          if (a.datetime! < b.datetime!) {
+            return -1;
+          } else {
+            return 1;
+          }
+        }
+        return 0;
+      },
+    );
 
     setState(() {});
 
@@ -297,12 +311,17 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage() async {
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Message.schema]);
+        RealmConnect.app.currentUser, [Message.schema, match.Match.schema]);
     Realm realm = Realm(config);
+
     final messageQuery = realm.all<Message>();
+    final matchesQuery = realm.all<match.Match>().query(
+        "_id CONTAINS '${widget.match.user2}' AND _id CONTAINS '${widget.match.user1}'");
+
     SubscriptionSet messageSubscriptions = realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
+      mutableSubscriptions.add(matchesQuery, name: "Matches", update: true);
     });
     await realm.subscriptions.waitForSynchronization();
 
@@ -314,6 +333,7 @@ class _ChatPageState extends State<ChatPage> {
 
     realm.write(() {
       realm.add(_message);
+      matchesQuery[0].lastActivity = DateTime.now().millisecondsSinceEpoch;
     });
 
     messageInput.clear();

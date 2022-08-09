@@ -1,5 +1,6 @@
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
+import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/settings_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
@@ -27,6 +28,20 @@ class _MyHomePageState extends State<MyHomePage> {
                 ? MongoDatabase.email!
                 : ""), //MongoDatabase.email!), */
         appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const SettingsPage()));
+                },
+                child: const Icon(Icons.settings),
+              ),
+            )
+          ],
           backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
           title: const Image(
             image: AssetImage("lib/assets/logo.png"),
@@ -286,7 +301,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       onTap: () => Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const SettingsPage())),
+                              builder: (context) => const MatchesPage())),
                       child: Container(
                         decoration: BoxDecoration(
                             borderRadius:
@@ -297,11 +312,11 @@ class _MyHomePageState extends State<MyHomePage> {
                         height: MediaQuery.of(context).size.height * 0.21,
                         child: Column(
                           children: [
-                            Icon(Icons.settings,
+                            Icon(Icons.chat_bubble_outline,
                                 color: Colors.white,
-                                size: MediaQuery.of(context).size.width * 0.3),
+                                size: MediaQuery.of(context).size.width * 0.28),
                             Text(
-                              "Beállítások",
+                              "Beszélgetések",
                               style: TextStyle(
                                   fontSize:
                                       MediaQuery.of(context).size.height * 0.02,

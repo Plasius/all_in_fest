@@ -5,6 +5,7 @@ import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user;
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:realm/realm.dart';
 
 class MatchesPage extends StatefulWidget {
@@ -31,10 +32,24 @@ class _MatchesPageState extends State<MatchesPage> {
 
     SubscriptionSet subscriptions = matchesRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "events", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
     });
 
     await matchesRealm.subscriptions.waitForSynchronization();
+
+    matchQuery = (matchQuery as RealmResults<Match>).toList();
+    (matchQuery as List<Match>).sort(
+      (a, b) {
+        if (a.lastActivity != null && b.lastActivity != null) {
+          if (a.lastActivity! < b.lastActivity!) {
+            return 1;
+          } else {
+            return -1;
+          }
+        }
+        return 0;
+      },
+    );
 
     print(matchQuery.length);
 
@@ -52,7 +67,7 @@ class _MatchesPageState extends State<MatchesPage> {
 
     SubscriptionSet subscriptions2 = userRealm.subscriptions;
     subscriptions2.update((mutableSubscriptions) {
-      mutableSubscriptions.add(users, name: "events", update: true);
+      mutableSubscriptions.add(users, name: "Users", update: true);
     });
 
     await userRealm.subscriptions.waitForSynchronization();
@@ -112,11 +127,7 @@ class _MatchesPageState extends State<MatchesPage> {
           Icons.menu,
           color: Colors.white,
         ),*/
-              title: const Image(
-                image: AssetImage("lib/assets/logo.png"),
-                height: 50,
-                fit: BoxFit.contain,
-              ),
+              title: const Text("Beszélgetések"),
             ),
             body: Container(
               constraints: const BoxConstraints.expand(),
@@ -189,6 +200,21 @@ class _MatchesPageState extends State<MatchesPage> {
                                                     fontSize: 20),
                                               ),
                                             ),
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  bottom: size.width * 0.01625),
+                                              child: Text(
+                                                DateFormat('HH:mm').format(DateTime
+                                                    .fromMicrosecondsSinceEpoch(
+                                                        matchQuery[index]
+                                                                .lastActivity *
+                                                            1000)),
+                                                style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
+                                              ),
+                                            )
                                           ],
                                         ),
                                       )

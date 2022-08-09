@@ -10,4 +10,5 @@ class _Match {
 
   late String? user1;
   late String? user2;
+  late int? lastActivity;
 }
