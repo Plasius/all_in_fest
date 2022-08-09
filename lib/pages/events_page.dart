@@ -225,8 +225,8 @@ class _EventsPageState extends State<EventsPage> {
                                   MediaQuery.of(context).size.width * 0.144),
                           child: Container(
                             alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width * 0.664,
-                            height: MediaQuery.of(context).size.height * 0.33,
+                            width: 200,
+                            height: 200,
                             decoration: BoxDecoration(
                                 color: Colors.white.withOpacity(0.78)),
                             child: Container(
@@ -240,23 +240,25 @@ class _EventsPageState extends State<EventsPage> {
                         )
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Flexible(
-                            child: Align(
-                              alignment: Alignment.bottomCenter,
-                              child: Text(
-                                eventsQuery[index].description,
-                                style: const TextStyle(color: Colors.white),
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
+                    SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: Align(
+                                alignment: Alignment.bottomCenter,
+                                child: Text(
+                                  eventsQuery[index].description,
+                                  style: const TextStyle(color: Colors.white),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                            ),
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       ),
                     )
                   ],
@@ -275,12 +277,11 @@ class _EventsPageState extends State<EventsPage> {
                     width: MediaQuery.of(context).size.width * 0.036,
                   ),
                   Container(
-                    height: MediaQuery.of(context).size.height * 0.095,
-                    width: MediaQuery.of(context).size.width * 0.9,
+                    width: MediaQuery.of(context).size.width * 0.88,
                     decoration: const BoxDecoration(
                         image: DecorationImage(
-                      image: AssetImage("lib/assets/event_container.png"),
-                    )),
+                            image: AssetImage("lib/assets/event_container.png"),
+                            fit: BoxFit.contain)),
                     child: Row(
                       children: [
                         Column(

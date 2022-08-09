@@ -270,10 +270,10 @@ class _SwipePageState extends State<SwipePage> {
                     : ""), */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              leading: const Icon(
+              /*leading: const Icon(
                 Icons.menu,
                 color: Colors.white,
-              ),
+              ),*/
               title: const Image(
                 image: AssetImage("lib/assets/logo.png"),
                 height: 50,
