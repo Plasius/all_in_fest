@@ -33,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
       home: Scaffold(
         resizeToAvoidBottomInset: true,
         body: SingleChildScrollView(
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           reverse: true,
           child: Container(
             constraints: BoxConstraints.tight(MediaQuery.of(context).size),

@@ -146,7 +146,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
       child: SingleChildScrollView(
         reverse: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         child: Column(children: [
           SizedBox(
             height: MediaQuery.of(context).size.height * 0.8 - 25,
