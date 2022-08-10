@@ -93,7 +93,8 @@ class _LoginPageState extends State<LoginPage> {
                                 bottom: size.width * 0.041),
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(255, 255, 255, 0.4),
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.4),
                                   border:
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
@@ -129,7 +130,8 @@ class _LoginPageState extends State<LoginPage> {
                                 bottom: size.width * 0.082),
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: const Color.fromRGBO(255, 255, 255, 0.4),
+                                  color:
+                                      const Color.fromRGBO(255, 255, 255, 0.4),
                                   border:
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
@@ -196,7 +198,8 @@ class _LoginPageState extends State<LoginPage> {
                                           bottom: size.height * 0.013),
                                       child: const Text("Még nincs fiókod?",
                                           style: TextStyle(
-                                              color: Colors.white, fontSize: 20)),
+                                              color: Colors.white,
+                                              fontSize: 20)),
                                     ),
                                     GestureDetector(
                                       onTap: () => Navigator.push(

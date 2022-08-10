@@ -64,6 +64,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     : ""),  */ //MongoDatabase.email!),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
+              actions: [
+                IconButton(
+                  onPressed: ((() => saveProfile())),
+                  icon: const Icon(
+                    Icons.save,
+                    color: Colors.white,
+                  ),
+                )
+              ],
               title: const Image(
                 image: AssetImage("lib/assets/logo.png"),
                 height: 50,
@@ -89,12 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   left: MediaQuery.of(context).size.width * 0.04,
                   top: MediaQuery.of(context).size.height * 0.15,
                   bottom: MediaQuery.of(context).size.height * 0.026),
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.65,
-                decoration: BoxDecoration(
-                    color: const Color.fromRGBO(97, 42, 122, 1),
-                    borderRadius: BorderRadius.circular(5)),
-              ),
             ),
             Center(
               child: Padding(
@@ -152,7 +155,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         decoration: BoxDecoration(
                             color: const Color.fromRGBO(255, 255, 255, 0.4),
-                            border: Border.all(color: Colors.white, width: 3),
+                            border: Border.all(color: Colors.purple, width: 2),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
                           controller: nameController,
@@ -177,7 +180,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Container(
                         decoration: BoxDecoration(
                             color: const Color.fromRGBO(255, 255, 255, 0.4),
-                            border: Border.all(color: Colors.white, width: 3),
+                            border: Border.all(color: Colors.purple, width: 2),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
                           controller: bioController,
@@ -194,25 +197,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                       ),
                     ),
-                    Center(
-                      child: GestureDetector(
-                        onTap: logout,
-                        child: Container(
-                          width: size.width * 0.119,
-                          height: size.width * 0.119,
-                          decoration: const BoxDecoration(
-                              color: Color.fromRGBO(232, 107, 62, 1),
-                              shape: BoxShape.circle),
-                          child: Padding(
-                            padding: EdgeInsets.all(size.width * 0.025),
-                            child: const Icon(
-                              Icons.save,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
                   ],
                 ),
               ),
