@@ -182,45 +182,41 @@ class _LoginPageState extends State<LoginPage> {
                           const SizedBox(
                             height: 4,
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Padding(
-                              padding: EdgeInsets.only(
-                                  top: size.height * 0.020,
-                                  right: size.height * 0.022,
-                                  bottom: size.height * 0.035),
-                              child: Align(
-                                alignment: Alignment.bottomRight,
-                                child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            bottom: size.height * 0.013),
-                                        child: const Text("Még nincs fiókod?",
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 20)),
-                                      ),
-                                      GestureDetector(
-                                        onTap: () => Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const RegisterPage())),
-                                        child: const Text(
-                                          "Regisztráció",
+                          Padding(
+                            padding: EdgeInsets.only(
+                                top: size.height * 0.020,
+                                right: size.height * 0.022,
+                                bottom: size.height * 0.035),
+                            child: Align(
+                              alignment: Alignment.bottomRight,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          bottom: size.height * 0.013),
+                                      child: const Text("Még nincs fiókod?",
                                           style: TextStyle(
                                               color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20),
-                                        ),
-                                      )
-                                    ]),
-                              ),
+                                              fontSize: 20)),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const RegisterPage())),
+                                      child: const Text(
+                                        "Regisztráció",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20),
+                                      ),
+                                    )
+                                  ]),
                             ),
-                          )
+                          ),
                         ]),
                   ),
                 ),
