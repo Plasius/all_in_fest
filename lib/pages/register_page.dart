@@ -376,6 +376,7 @@ class _RegisterPageState extends State<RegisterPage> {
     await realm.subscriptions.waitForSynchronization();
 
     realm.write(() => {realm.add(_user)});
+    print("writed");
     Navigator.pop(context);
 
     /*try {
