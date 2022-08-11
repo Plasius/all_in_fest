@@ -1,9 +1,15 @@
+import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:all_in_fest/models/user.dart' as user_model;
+
+import '../models/image.dart';
+import '../models/message.dart';
+import 'menu_sidebar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -19,20 +25,53 @@ class _SettingsPageState extends State<SettingsPage> {
   var password_1 = TextEditingController();
   var password_2 = TextEditingController();
 
+  user_model.User? currentUser;
+  var pic;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Future.delayed(Duration.zero, () => loadProfile());
+    getPic();
+  }
+
+  Future<void> getPic() async {
+    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+  }
+
+  void loadProfile() async {
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm
+        .all<user_model.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet userSubscriptions = realm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
+    var user = userQuery[0];
+    print(user.name);
+
+    setState(() {
+      currentUser = user;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            /* drawer: MenuBar(
-                imageProvider: MongoDatabase.picture != null
-                    ? MongoDatabase.picture!
-                    : const AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.currentUser["name"]
-                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.email!
-                    : ""), */ //MongoDatabase.email!),
+            drawer: MenuBar(
+                imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
+                userName:
+                    currentUser != null ? currentUser?.name : "Jelentkezz be!"),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               /*leading: const Icon(
@@ -49,90 +88,125 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget editBody() {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(15),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              controller: email_1,
-              decoration: InputDecoration(
-                  labelText: 'E-mail megerősítése',
-                  labelStyle: const TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'radev.anthony@uni-corvinus.hu',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            TextFormField(
-              controller: password_1,
-              decoration: InputDecoration(
-                  labelText: 'Új jelszó',
-                  labelStyle: const TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'wellbe#top100',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            TextFormField(
-              controller: password_2,
-              decoration: InputDecoration(
-                  labelText: 'Új jelszó újra',
-                  labelStyle: const TextStyle(
-                      color: Colors.redAccent,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold),
-                  hintText: 'wellbe#top100',
-                  hintStyle: TextStyle(
-                      color: Colors.grey.withOpacity(0.3),
-                      fontSize: 18,
-                      fontWeight: FontWeight.normal),
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            const SizedBox(
-              height: 15,
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  child: const Text('Change password'),
-                  onPressed: () => jelszoCsere(),
-                ),
-                const SizedBox(
-                  width: 15,
-                ),
-                ElevatedButton(onPressed: logout, child: const Text("Log out")),
-                const SizedBox(
-                  width: 15,
-                ),
-                ElevatedButton(
-                    onPressed: clearRejected, child: const Text("Swipe reset"))
-              ],
-            )
-          ],
+    return Container(
+      constraints: BoxConstraints.expand(),
+      decoration: const BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage("lib/assets/background.png"),
+              fit: BoxFit.cover)),
+      child: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            children: [
+              const SizedBox(
+                height: 20,
+              ),
+              TextFormField(
+                controller: email_1,
+                decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromRGBO(255, 255, 255, 0.8),
+                    labelText: 'E-mail megerősítése',
+                    labelStyle: const TextStyle(
+                        color: Colors.purple,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold),
+                    hintText: 'radev.anthony@uni-corvinus.hu',
+                    hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.3),
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.purple),
+                        borderRadius: BorderRadius.circular(15)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.purple),
+                        borderRadius: BorderRadius.circular(15))),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              TextFormField(
+                  controller: password_1,
+                  decoration: InputDecoration(
+                      filled: true,
+                      fillColor: const Color.fromRGBO(255, 255, 255, 0.8),
+                      labelText: 'Új jelszó',
+                      labelStyle: const TextStyle(
+                          color: Colors.purple,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                      hintText: 'wellbe#top100',
+                      hintStyle: TextStyle(
+                          color: Colors.grey.withOpacity(0.3),
+                          fontSize: 18,
+                          fontWeight: FontWeight.normal),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(color: Colors.purple)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          borderSide: BorderSide(color: Colors.purple)))),
+              const SizedBox(
+                height: 15,
+              ),
+              TextFormField(
+                controller: password_2,
+                decoration: InputDecoration(
+                    filled: true,
+                    fillColor: const Color.fromRGBO(255, 255, 255, 0.8),
+                    labelText: 'Új jelszó újra',
+                    labelStyle: const TextStyle(
+                        color: Colors.purple,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold),
+                    hintText: 'wellbe#top100',
+                    hintStyle: TextStyle(
+                        color: Colors.grey.withOpacity(0.3),
+                        fontSize: 18,
+                        fontWeight: FontWeight.normal),
+                    enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.purple),
+                        borderRadius: BorderRadius.circular(15)),
+                    focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        borderSide: BorderSide(color: Colors.purple))),
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(primary: Colors.purple),
+                    child: const Text('Jelszó cseréje'),
+                    onPressed: () => jelszoCsere(),
+                  ),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.purple),
+                      onPressed: logout,
+                      child: const Text("Kijelentkezés")),
+                  const SizedBox(
+                    width: 15,
+                  ),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.purple),
+                      onPressed: clearRejected,
+                      child: const Text("Balra húzottak visszaállítása")),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(primary: Colors.purple),
+                      onPressed: () =>
+                          Future.delayed(Duration.zero, (() => deleteUser())),
+                      child: const Text("Fiók törlése"))
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
@@ -196,5 +270,70 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: Colors.black,
         textColor: Colors.white,
         fontSize: 16.0);
+  }
+
+  Future<void> deleteUser() async {
+    RealmConnect.realmOpen();
+    Configuration userConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm userRealm = Realm(userConfig);
+    var userQuery = userRealm
+        .all<user_model.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+    SubscriptionSet userSubscriptions = userRealm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await userRealm.subscriptions.waitForSynchronization();
+
+    RealmResults<UserImage> imageQuery;
+    Configuration imageConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [UserImage.schema]);
+    Realm imageRealm = Realm(imageConfig);
+    imageQuery = imageRealm
+        .all<UserImage>()
+        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'");
+    SubscriptionSet imageSubscriptions = imageRealm.subscriptions;
+    imageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+    await imageRealm.subscriptions.waitForSynchronization();
+
+    RealmResults<Message> messageQuery;
+    Configuration messageConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Message.schema]);
+    Realm messageRealm = Realm(messageConfig);
+    messageQuery = messageRealm.all<Message>().query(
+        "matchID CONTAINS '${RealmConnect.app.currentUser?.id.toString()}'");
+    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
+    messageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(messageQuery, name: "Message", update: true);
+    });
+    await messageRealm.subscriptions.waitForSynchronization();
+
+    RealmResults<Match> matchQuery;
+    Configuration matchConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Match.schema]);
+    Realm matchesRealm = Realm(matchConfig);
+    matchQuery = matchesRealm
+        .all<Match>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+    SubscriptionSet matchSubscription = matchesRealm.subscriptions;
+    matchSubscription.update((mutableSubscriptions) {
+      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
+    });
+    await matchesRealm.subscriptions.waitForSynchronization();
+
+    var user = userQuery[0];
+    var currentImage = imageQuery[0];
+
+    userRealm.write(() => {userRealm.delete(user)});
+    imageRealm.write(() => {imageRealm.delete(currentImage)});
+    messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
+    matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
+
+    await RealmConnect.app.currentUser.logOut;
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }

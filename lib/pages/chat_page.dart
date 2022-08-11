@@ -168,7 +168,10 @@ class _ChatPageState extends State<ChatPage> {
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.only(
-                                          top: MediaQuery.of(context).size.width*0.036,
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.036,
                                             right: MediaQuery.of(context)
                                                     .size
                                                     .width *
@@ -189,7 +192,11 @@ class _ChatPageState extends State<ChatPage> {
                                         ),
                                       ),
                                       Container(
-                                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
+                                        constraints: BoxConstraints(
+                                            maxWidth: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.7),
                                         decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius:
@@ -222,9 +229,21 @@ class _ChatPageState extends State<ChatPage> {
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Padding(
-                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.width*0.036,right: MediaQuery.of(context).size.width*0.036),
+                                        padding: EdgeInsets.only(
+                                            top: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.036,
+                                            right: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.036),
                                         child: Container(
-                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
+                                          constraints: BoxConstraints(
+                                              maxWidth: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.7),
                                           decoration: BoxDecoration(
                                               color: const Color.fromRGBO(
                                                   187, 229, 243, 1),
@@ -232,10 +251,11 @@ class _ChatPageState extends State<ChatPage> {
                                                   BorderRadius.circular(5)),
                                           child: Padding(
                                             padding: EdgeInsets.symmetric(
-                                                horizontal: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.036,
+                                                horizontal:
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.036,
                                                 vertical: MediaQuery.of(context)
                                                         .size
                                                         .width *

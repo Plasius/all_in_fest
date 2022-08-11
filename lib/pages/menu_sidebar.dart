@@ -1,3 +1,4 @@
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
@@ -13,10 +14,7 @@ import 'home_page.dart';
 class MenuBar extends StatelessWidget {
   final ImageProvider imageProvider;
   final String? userName;
-  const MenuBar(
-      {Key? key,
-      required this.imageProvider,
-      required this.userName})
+  const MenuBar({Key? key, required this.imageProvider, required this.userName})
       : super(key: key);
 
   @override
@@ -31,19 +29,16 @@ class MenuBar extends StatelessWidget {
             accountEmail: null,
             currentAccountPicture: Container(
               decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: imageProvider,
-                  fit: BoxFit.cover
-                )
-              ),
+                  shape: BoxShape.circle,
+                  image:
+                      DecorationImage(image: imageProvider, fit: BoxFit.cover)),
             ),
             decoration: const BoxDecoration(
               color: Color.fromRGBO(232, 107, 62, 1),
             ),
           ),
           ListTile(
-            title: const Text('Home'),
+            title: const Text('Főoldal'),
             leading: const Icon(Icons.home),
             onTap: () => {
               Navigator.push(context,
@@ -58,42 +53,43 @@ class MenuBar extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.people_outline),
-            title: const Text('Matches'),
+            title: const Text('Párjaim'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MatchesPage())),
           ),
           ListTile(
             leading: const Icon(Icons.calendar_today),
-            title: const Text('Events'),
+            title: const Text('Események'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const EventsPage())),
           ),
           ListTile(
             leading: const Icon(Icons.map_outlined),
-            title: const Text('Map'),
+            title: const Text('Térkép'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const MapPage())),
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text('Settings'),
+            title: const Text('Beállítások'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const SettingsPage())),
           ),
           ListTile(
             leading: const Icon(Icons.person_outline),
-            title: const Text('Profile'),
+            title: const Text('Profilom'),
             onTap: () => Navigator.push(context,
                 MaterialPageRoute(builder: (context) => const ProfilePage())),
           ),
           const Divider(),
           ListTile(
-            title: const Text('Exit'),
+            title: const Text('Kilépés'),
             leading: const Icon(Icons.exit_to_app),
             onTap: () => {
+              RealmConnect.app.currentUser.logOut,
               Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()))
+                  MaterialPageRoute(builder: (context) => const LoginPage()))
             },
           ),
         ],
