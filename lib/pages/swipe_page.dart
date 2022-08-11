@@ -10,7 +10,9 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
-import 'package:all_in_fest/models/user.dart' as user;
+import 'package:all_in_fest/models/user.dart' as user_model;
+
+import 'menu_sidebar.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
@@ -24,13 +26,15 @@ class _SwipePageState extends State<SwipePage> {
   final List<SwipeItem> _swipeItems = <SwipeItem>[];
 
   bool loaded = false;
+  var pic;
+  user_model.User? currentUser;
 
   void getProfiles() async {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user.User.schema]);
+        RealmConnect.app.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
-    RealmResults<user.User> _profiles = realm.all<user.User>();
+    RealmResults<user_model.User> _profiles = realm.all<user_model.User>();
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -244,17 +248,47 @@ class _SwipePageState extends State<SwipePage> {
     setState(() {});
   }
 
+  Future<void> getPic() async {
+    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+  }
+
+  void loadProfile() async {
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm
+        .all<user_model.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet userSubscriptions = realm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
+    var user = userQuery[0];
+    print(user.name);
+
+    setState(() {
+      currentUser = user;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
     //getMatches();
     Future.delayed(Duration.zero, () {
+      loadProfile();
       if (loaded == false) {
         getProfiles();
       }
 
       _matchEngine = MatchEngine(swipeItems: _swipeItems);
     });
+    getPic();
   }
 
   @override
@@ -262,16 +296,10 @@ class _SwipePageState extends State<SwipePage> {
     return MaterialApp(
       title: 'Welcome to Flutter',
       home: Scaffold(
-          /* drawer: MenuBar(
-                imageProvider: MongoDatabase.picture != null
-                    ? MongoDatabase.picture!
-                    : AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.currentUser["name"]
-                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: 
-                    ? MongoDatabase.email!
-                    : ""), */ //MongoDatabase.email!),
+          drawer: MenuBar(
+              imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
+              userName:
+                  currentUser != null ? currentUser?.name : "Jelentkezz be!"),
           appBar: AppBar(
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             /*leading: const Icon(
@@ -372,10 +400,11 @@ class _SwipePageState extends State<SwipePage> {
         fontSize: 16.0);
   }
 
-  loadImages(List<user.User> profileShuffle, List<String> ignoreList) async {
+  loadImages(
+      List<user_model.User> profileShuffle, List<String> ignoreList) async {
     Map<String, MemoryImage> photosMap = {};
 
-    for (user.User profile in profileShuffle) {
+    for (user_model.User profile in profileShuffle) {
       if (ignoreList.contains(profile.userID)) continue;
 
       MemoryImage? potentialImage =

@@ -2,11 +2,13 @@
 
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
-import 'package:all_in_fest/models/user.dart' as user;
+import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:realm/realm.dart';
+
+import 'menu_sidebar.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({Key? key}) : super(key: key);
@@ -18,8 +20,10 @@ class MatchesPage extends StatefulWidget {
 class _MatchesPageState extends State<MatchesPage> {
   var photos = [];
   var matchQuery;
-  var matchedProfiles = <user.User>[];
+  var matchedProfiles = <user_model.User>[];
   bool ready = false;
+  user_model.User? currentUser;
+  var pic;
 
   void loadMatches() async {
     RealmConnect.realmOpen();
@@ -61,9 +65,9 @@ class _MatchesPageState extends State<MatchesPage> {
     print(images.length);
  */
     Configuration userConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user.User.schema]);
+        RealmConnect.app.currentUser, [user_model.User.schema]);
     Realm userRealm = Realm(userConfig);
-    var users = userRealm.all<user.User>();
+    var users = userRealm.all<user_model.User>();
 
     SubscriptionSet subscriptions2 = userRealm.subscriptions;
     subscriptions2.update((mutableSubscriptions) {
@@ -77,7 +81,7 @@ class _MatchesPageState extends State<MatchesPage> {
     for (int i = 0; i < matchQuery.length; i++) {
       if (matchQuery[i].user2 == RealmConnect.app.currentUser.id) {
         print("if");
-        user.User matchedProfile =
+        user_model.User matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
         matchedProfiles.add(matchedProfile);
         var matchedProfileImage =
@@ -102,6 +106,35 @@ class _MatchesPageState extends State<MatchesPage> {
   initState() {
     super.initState();
     loadMatches();
+    Future.delayed(Duration.zero, () => {loadProfile(), getPic()});
+  }
+
+  Future<void> getPic() async {
+    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+  }
+
+  void loadProfile() async {
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm
+        .all<user_model.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet userSubscriptions = realm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
+    var user = userQuery[0];
+    print(user.name);
+
+    setState(() {
+      currentUser = user;
+    });
   }
 
   @override
@@ -110,18 +143,13 @@ class _MatchesPageState extends State<MatchesPage> {
     return MaterialApp(
         title: 'Welcome to Flutter',
         home: Scaffold(
-            /* drawer: MenuBar(
-                imageProvider: MongoDatabase.picture != null
-                    ? MongoDatabase.picture!
-                    : const AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.currentUser["name"]
-                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.email!
-                    : ""), */ //MongoDatabase.email!),
+            drawer: MenuBar(
+                imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
+                userName:
+                    currentUser != null ? currentUser?.name : "Jelentkezz be!"),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
+              elevation: 0,
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               /*leading: const Icon(
           Icons.menu,

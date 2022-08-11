@@ -12,13 +12,11 @@ import 'home_page.dart';
 
 class MenuBar extends StatelessWidget {
   final ImageProvider imageProvider;
-  final String userName;
-  final String email;
+  final String? userName;
   const MenuBar(
       {Key? key,
       required this.imageProvider,
-      required this.userName,
-      required this.email})
+      required this.userName})
       : super(key: key);
 
   @override
@@ -29,13 +27,16 @@ class MenuBar extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: [
           UserAccountsDrawerHeader(
-            accountName: Text(userName),
-            accountEmail: Text(email),
-            currentAccountPicture: CircleAvatar(
-              child: ClipOval(
-                  child: Image(
-                image: imageProvider,
-              )),
+            accountName: Text(userName!),
+            accountEmail: null,
+            currentAccountPicture: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: imageProvider,
+                  fit: BoxFit.cover
+                )
+              ),
             ),
             decoration: const BoxDecoration(
               color: Color.fromRGBO(232, 107, 62, 1),
@@ -48,12 +49,6 @@ class MenuBar extends StatelessWidget {
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const MyHomePage()))
             },
-          ),
-          ListTile(
-            leading: const Icon(Icons.login),
-            title: const Text('Login'),
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginPage())),
           ),
           ListTile(
             leading: const Icon(Icons.person_add_alt),

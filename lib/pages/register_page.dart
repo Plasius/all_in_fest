@@ -2,6 +2,7 @@
 
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:realm/realm.dart';
 import 'package:realm/src/user.dart' as realmUser;
@@ -35,6 +36,17 @@ class _RegisterPageState extends State<RegisterPage> {
     return MaterialApp(
       title: 'Login',
       home: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          leading: IconButton(
+            onPressed: () => {
+              Navigator.pop(context)
+            },
+            icon: Icon(Icons.arrow_back_ios, color: Colors.white,),
+          ),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+        ),
         resizeToAvoidBottomInset: true,
         body: Container(
           constraints: const BoxConstraints.expand(),
@@ -339,15 +351,18 @@ class _RegisterPageState extends State<RegisterPage> {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
-        passwordConfirmController.text.isEmpty ||
-        checkedValue == false) {
-      print("Please fill out all of the fields.");
+        passwordConfirmController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "Töltsd ki az összes mezőt!", backgroundColor: Colors.red.withOpacity(0.8));
       return;
     }
 
     if (passwordConfirmController.text != passwordController.text) {
-      print("Passwords don't match.");
+      Fluttertoast.showToast(msg: "A jelszavak nem egyeznek!", backgroundColor: Colors.red.withOpacity(0.8));
       return;
+    }
+    
+    if(!checkedValue){
+      Fluttertoast.showToast(msg: "Fogadd el az ÁSZF-et!", backgroundColor: Colors.red.withOpacity(0.8));
     }
 
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");

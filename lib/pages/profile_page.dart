@@ -12,6 +12,8 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:image_picker/image_picker.dart';
 import 'package:realm/realm.dart';
 
+import 'menu_sidebar.dart';
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
@@ -52,16 +54,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return MaterialApp(
         home: Scaffold(
             resizeToAvoidBottomInset: false,
-            /* drawer: MenuBar(
-                imageProvider: MongoDatabase.picture != null
-                    ? MongoDatabase.picture!
+            drawer: MenuBar(
+                imageProvider: provider != null
+                    ? provider!
                     : const AssetImage("lib/assets/user.png"),
-                userName: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.currentUser["name"]
-                    : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-                email: FirebaseAuth.instance.currentUser != null
-                    ? MongoDatabase.email!
-                    : ""),  */ //MongoDatabase.email!),
+                userName: RealmConnect.app.currentUser != null
+                    ? userName
+                    : "Jelentkezz be!"),
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               actions: [

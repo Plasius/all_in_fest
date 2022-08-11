@@ -1,11 +1,14 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
+import 'package:all_in_fest/models/user.dart' as user_model;
 
 import '../models/event.dart';
+import 'menu_sidebar.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -17,11 +20,15 @@ class EventsPage extends StatefulWidget {
 class _EventsPageState extends State<EventsPage> {
   String _selectedStage = "";
   String _selectedDate = "";
+  final TextEditingController _searchText = TextEditingController();
+  bool _isSearching = false;
 
   var eventsQuery;
+  ImageProvider? pic;
+  user_model.User? currentUser;
 
   List<Text> stages = [
-    const Text(""),
+    const Text("Minden színpad"),
     const Text("E.ON Mainstage"),
     const Text("Miller x Wild Boar Project Stage"),
   ];
@@ -29,7 +36,8 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-
+    Future.delayed(Duration.zero, () => loadProfile());
+    getPic();
     loadEvents();
   }
 
@@ -43,17 +51,17 @@ class _EventsPageState extends State<EventsPage> {
         Configuration.flexibleSync(app.currentUser!, [Event.schema]);
     Realm eventsRealm = Realm(eventsConfig);
 
-    if (_selectedDate == "" && _selectedStage == "") {
+    if (_selectedDate == "" && _selectedStage == "Minden színpad") {
       eventsQ = eventsRealm.all<Event>();
-    } else if (_selectedDate == "" && _selectedStage != "") {
-      eventsQ =
-          eventsRealm.all<Event>().query("stage CONTAINS '$_selectedStage'");
-    } else if (_selectedDate != "" && _selectedStage == "") {
-      eventsQ =
-          eventsRealm.all<Event>().query("date CONTAINS '$_selectedDate'");
+    } else if (_selectedDate == "" && _selectedStage != "Minden színpad") {
+      eventsQ = eventsRealm.all<Event>().query(
+          "stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
+    } else if (_selectedDate != "" && _selectedStage == "Minden színpad") {
+      eventsQ = eventsRealm.all<Event>().query(
+          "date CONTAINS '$_selectedDate' and name CONTAINS ${_searchText.text.toString()}");
     } else {
       eventsQ = eventsRealm.all<Event>().query(
-          "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage'");
+          "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     }
 
     SubscriptionSet subscriptions = eventsRealm.subscriptions;
@@ -79,6 +87,30 @@ class _EventsPageState extends State<EventsPage> {
     setState(() {});
   }
 
+  void loadProfile() async {
+    RealmConnect.realmOpen();
+    Configuration config = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm realm = Realm(config);
+
+    var userQuery = realm
+        .all<user_model.User>()
+        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+
+    SubscriptionSet userSubscriptions = realm.subscriptions;
+    userSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm.subscriptions.waitForSynchronization();
+
+    var user = userQuery[0];
+    print(user.name);
+
+    setState(() {
+      currentUser = user;
+    });
+  }
+
   ListView buildEvents() {
     var eventwidgets = [];
     var eventPhotos = [];
@@ -93,51 +125,67 @@ class _EventsPageState extends State<EventsPage> {
       eventwidgets.add(
         Padding(
           padding: EdgeInsets.only(
-              left: MediaQuery.of(context).size.width * 0.036,
-              right: MediaQuery.of(context).size.width * 0.036,
-              top: MediaQuery.of(context).size.width * 0.054),
+            left: MediaQuery.of(context).size.width * 0.036,
+            right: MediaQuery.of(context).size.width * 0.036,
+          ),
           child: Row(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        right: MediaQuery.of(context).size.width * 0.036),
-                    child: SizedBox(
+              Container(
+                decoration: BoxDecoration(
+                    color: event.stage == "E.ON Mainstage"
+                        ? Colors.yellow
+                        : Colors.orange),
+                width: MediaQuery.of(context).size.width * 0.036,
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.width * 0.038,
+                    left: MediaQuery.of(context).size.width * 0.027),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.only(
+                          right: MediaQuery.of(context).size.width * 0.036),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.45,
+                        child: Text(
+                          event.name ?? "event",
+                          style: const TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                    SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Text(
-                        event.name ?? "event",
-                        style: const TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                        event.stage ?? "stage",
+                        style: const TextStyle(color: Colors.white),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.45,
-                    child: Text(
-                      event.stage ?? "stage",
-                      style: const TextStyle(color: Colors.white),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              Column(
-                children: [
-                  Text(
-                    event.date,
-                    style: const TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    event.time,
-                    style: const TextStyle(color: Colors.white),
-                  )
-                ],
+              Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.width * 0.038),
+                child: Column(
+                  children: [
+                    Text(
+                      event.date,
+                      style: const TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      event.time,
+                      style: const TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
               )
             ],
           ),
@@ -160,9 +208,11 @@ class _EventsPageState extends State<EventsPage> {
                       BorderRadius.vertical(top: Radius.circular(20))),
               builder: (context) => Container(
                 height: MediaQuery.of(context).size.height * 0.76,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: const LinearGradient(
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadiusDirectional.only(
+                      topStart: Radius.circular(20),
+                      topEnd: Radius.circular(20)),
+                  gradient: LinearGradient(
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                     colors: [
@@ -266,33 +316,15 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ),
             child: SizedBox(
-              height: MediaQuery.of(context).size.height * 0.095,
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                        color: eventsQuery[index].stage == "E.ON Mainstage"
-                            ? Colors.yellow
-                            : Colors.orange),
-                    width: MediaQuery.of(context).size.width * 0.036,
-                  ),
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.88,
-                    decoration: const BoxDecoration(
-                        image: DecorationImage(
-                            image: AssetImage("lib/assets/event_container.png"),
-                            fit: BoxFit.contain)),
-                    child: Row(
-                      children: [
-                        Column(
-                          children: [eventwidgets[index]],
-                        )
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
+                height: MediaQuery.of(context).size.height * 0.095,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  decoration: const BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("lib/assets/event_container.png"),
+                          fit: BoxFit.contain)),
+                  child: eventwidgets[index],
+                )),
           ),
         );
       },
@@ -303,28 +335,55 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     //var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
-      /* drawer: MenuBar(
-          imageProvider: MongoDatabase.picture != null
-              ? MongoDatabase.picture!
-              : const AssetImage("lib/assets/user.png"),
-          userName: FirebaseAuth.instance.currentUser != null
-              ? MongoDatabase.currentUser["name"]
-              : "Jelentkezz be!", //MongoDatabase.currentUser["name"],
-          email: FirebaseAuth.instance.currentUser != null
-              ? MongoDatabase.email!
-              : ""), */ //MongoDatabase.email!),
+      drawer: MenuBar(
+          imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
+          userName: currentUser != null
+              ? currentUser?.name
+              : "Jelentkezz be!"), //MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
         /*leading: const Icon(
           Icons.menu,
           color: Colors.white,
         ),*/
-        title: const Image(
-          image: AssetImage("lib/assets/logo.png"),
-          height: 50,
-          fit: BoxFit.contain,
-        ),
+        title: !_isSearching
+            ? const Image(
+                image: AssetImage("lib/assets/logo.png"),
+                height: 50,
+                fit: BoxFit.contain,
+              )
+            : Container(
+                height: 30,
+                decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 255, 255, 0.4),
+                    border: Border.all(color: Colors.white, width: 3),
+                    borderRadius: BorderRadius.circular(5)),
+                child: TextFormField(
+                  maxLines: 1,
+                  textAlignVertical: TextAlignVertical.center,
+                  controller: _searchText,
+                  decoration: const InputDecoration(
+                      contentPadding: EdgeInsets.all(9),
+                      hintText: "Esemény neve",
+                      hintStyle: TextStyle(color: Colors.white),
+                      border: InputBorder.none),
+                ),
+              ),
         actions: [
+          IconButton(
+              onPressed: () => setState(() {
+                    _isSearching = !_isSearching;
+                    if (_searchText.text.isNotEmpty) {
+                      loadEvents();
+                      _searchText.clear();
+                    } else {
+                      loadEvents();
+                    }
+                  }),
+              icon: const Icon(
+                Icons.search,
+                color: Colors.white,
+              )),
           IconButton(
             icon: const Icon(Icons.filter_alt_outlined),
             color: Colors.white,
@@ -541,88 +600,7 @@ class _EventsPageState extends State<EventsPage> {
         });
   }
 
-  /*Widget eventDetails(var favorite, DocumentSnapshot document) {
-    favorite = context.watch<FavoriteModel>();
-    return CupertinoPopupSurface(
-        isSurfacePainted: true,
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.74,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Color.fromRGBO(232, 107, 62, 1),
-                Color.fromRGBO(97, 42, 122, 1)
-              ],
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: const Text(
-                          "Fellépő neve",
-                          style: TextStyle(color: Colors.white, fontSize: 20),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10, left: 15),
-                        child: Row(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Nap",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.5,
-                                    fontWeight: FontWeight.normal),
-                              ),
-                              SizedBox(width: 20),
-                              const Text(
-                                "9:50-11:20",
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16.5,
-                                    fontWeight: FontWeight.normal),
-                              )
-                            ]),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 20, left: 15),
-                        child: const Text(
-                          "Helyszín",
-                          style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.normal,
-                              fontSize: 16.5),
-                        ),
-                      )
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 35.0),
-                    child: GestureDetector(
-                        child: Icon(
-                          _isFavorite == true
-                              ? CupertinoIcons.heart_fill
-                              : CupertinoIcons.heart,
-                          color: Colors.white,
-                          size: 40,
-                        ),
-                        onTap: () => _toggleIconColor()),
-                  )
-                ],
-              ),
-            ],
-          ),
-        ));
-  }*/
+  Future<void> getPic() async {
+    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+  }
 }

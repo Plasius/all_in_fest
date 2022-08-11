@@ -124,6 +124,10 @@ class _ChatPageState extends State<ChatPage> {
         home: Scaffold(
             resizeToAvoidBottomInset: true,
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back_ios),
+              ),
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: Text(partnerName.toString()),
             ),
@@ -164,10 +168,11 @@ class _ChatPageState extends State<ChatPage> {
                                     children: [
                                       Padding(
                                         padding: EdgeInsets.only(
+                                          top: MediaQuery.of(context).size.width*0.036,
                                             right: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.043),
+                                                0.03),
                                         child: Container(
                                           width: 40,
                                           height: 40,
@@ -184,6 +189,7 @@ class _ChatPageState extends State<ChatPage> {
                                         ),
                                       ),
                                       Container(
+                                        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
                                         decoration: BoxDecoration(
                                             color: Colors.white,
                                             borderRadius:
@@ -202,7 +208,7 @@ class _ChatPageState extends State<ChatPage> {
                                               messages[index]
                                                   .message
                                                   .toString(),
-                                              textAlign: TextAlign.right,
+                                              textAlign: TextAlign.left,
                                               style: const TextStyle(
                                                   color: Colors.black,
                                                   fontSize: 22)),
@@ -215,29 +221,34 @@ class _ChatPageState extends State<ChatPage> {
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.036,
-                                              vertical: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.018),
-                                          child: Text(
-                                              messages[index]
-                                                  .message
-                                                  .toString(),
-                                              textAlign: TextAlign.right,
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 22)),
+                                      Padding(
+                                        padding: EdgeInsets.only(top: MediaQuery.of(context).size.width*0.036,right: MediaQuery.of(context).size.width*0.036),
+                                        child: Container(
+                                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width*0.7),
+                                          decoration: BoxDecoration(
+                                              color: const Color.fromRGBO(
+                                                  187, 229, 243, 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(5)),
+                                          child: Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.036,
+                                                vertical: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.018),
+                                            child: Text(
+                                                messages[index]
+                                                    .message
+                                                    .toString(),
+                                                textAlign: TextAlign.left,
+                                                style: const TextStyle(
+                                                    color: Colors.black,
+                                                    fontSize: 22)),
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 50)
