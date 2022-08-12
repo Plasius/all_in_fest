@@ -1,11 +1,14 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
+import 'dart:io';
 import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -220,9 +223,9 @@ class _SwipePageState extends State<SwipePage> {
                                       image: AssetImage("lib/assets/user.png"),
                                       fit: BoxFit.cover)
                                   : DecorationImage(
-                                      image: photosMap[profileShuffle[i]
-                                          .userID
-                                          .toString()]!),
+                                      image: photosMap[
+                                          profileShuffle[i].userID.toString()]!,
+                                      fit: BoxFit.cover),
                             ),
                           ),
                         ),
@@ -339,9 +342,29 @@ class _SwipePageState extends State<SwipePage> {
                       itemBuilder: (BuildContext context, int index) {
                         return _swipeItems[index].content;
                       },
-                      onStackFinished: () =>
-                          showHornyGif('Végig néztél mindenkit!'),
-                      upSwipeAllowed: true,
+                      onStackFinished: () => showCupertinoDialog(
+                          barrierDismissible: true,
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                                title: const Text(
+                                    "Sajnos nem találtunk neked profilokat :("),
+                                content: const Text(
+                                    "Menj, és bulizz egy jót a többiekkel!"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                      child:
+                                          const Text("Máris indulok bulizni!"),
+                                      onPressed: () => exit(0)),
+                                  CupertinoDialogAction(
+                                    child: const Text("Inkább chatelnék!"),
+                                    onPressed: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MatchesPage())),
+                                  )
+                                ],
+                              )),
                     )
                   : const CircularProgressIndicator(),
             ),
@@ -372,8 +395,8 @@ class _SwipePageState extends State<SwipePage> {
       realm.add(_match);
     });
 
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const MatchesPage()));
+    /* Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const MatchesPage())); */
   }
 
   void showNopeGif(var rejectedID) async {

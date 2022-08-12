@@ -7,6 +7,9 @@ import 'package:all_in_fest/models/match.dart' as swipeMatch;
 import 'package:all_in_fest/models/message.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user;
+import 'package:all_in_fest/pages/home_page.dart';
+import 'package:all_in_fest/pages/matches_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
@@ -130,6 +133,37 @@ class _ChatPageState extends State<ChatPage> {
               ),
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               title: Text(partnerName.toString()),
+              actions: [
+                IconButton(
+                    onPressed: () => showCupertinoDialog(
+                        context: context,
+                        builder: (context) => CupertinoAlertDialog(
+                              title: Text(
+                                "Szétválsz $partnerName-tól?",
+                              ),
+                              content: const Text(
+                                  "Biztosan szeretnéd a szétválasztást? Így minden üzeneted törlődik"),
+                              actions: [
+                                CupertinoDialogAction(
+                                  child: const Text("Igen",
+                                      style: TextStyle(color: Colors.red)),
+                                  onPressed: () => {
+                                    deleteOptions(),
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                MyHomePage())))
+                                  },
+                                ),
+                                CupertinoDialogAction(
+                                  child: const Text("Mégsem"),
+                                  onPressed: () => Navigator.pop(context),
+                                )
+                              ],
+                            )),
+                    icon: const Icon(Icons.delete))
+              ],
             ),
             body: messagesBody()));
   }
@@ -387,5 +421,36 @@ class _ChatPageState extends State<ChatPage> {
   void dispose() {
     timer?.cancel();
     super.dispose();
+  }
+
+  Future<void> deleteOptions() async {
+    RealmResults<Message> messageQuery;
+    Configuration messageConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [Message.schema]);
+    Realm messageRealm = Realm(messageConfig);
+    messageQuery = messageRealm
+        .all<Message>()
+        .query("matchID CONTAINS '${widget.match.matchID}'");
+    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
+    messageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(messageQuery, name: "Message", update: true);
+    });
+    await messageRealm.subscriptions.waitForSynchronization();
+
+    var matchQuery;
+    Configuration matchConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [swipeMatch.Match.schema]);
+    Realm matchesRealm = Realm(matchConfig);
+    matchQuery = matchesRealm
+        .all<swipeMatch.Match>()
+        .query("_id CONTAINS '${widget.match.matchID}'");
+    SubscriptionSet matchSubscription = matchesRealm.subscriptions;
+    matchSubscription.update((mutableSubscriptions) {
+      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
+    });
+    await matchesRealm.subscriptions.waitForSynchronization();
+
+    messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
+    matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
   }
 }

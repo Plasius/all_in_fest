@@ -36,9 +36,8 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => loadProfile());
+    Future.delayed(Duration.zero, () => {loadProfile(), loadEvents()});
     getPic();
-    loadEvents();
   }
 
   void loadEvents() async {
@@ -123,72 +122,67 @@ class _EventsPageState extends State<EventsPage> {
     for (var event in eventsQuery) {
       eventPhotos.add(event.image);
       eventwidgets.add(
-        Padding(
-          padding: EdgeInsets.only(
-            left: MediaQuery.of(context).size.width * 0.036,
-            right: MediaQuery.of(context).size.width * 0.036,
-          ),
-          child: Row(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                    color: event.stage == "E.ON Mainstage"
-                        ? Colors.yellow
-                        : Colors.orange),
-                width: MediaQuery.of(context).size.width * 0.036,
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.width * 0.038,
-                    left: MediaQuery.of(context).size.width * 0.027),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.only(
-                          right: MediaQuery.of(context).size.width * 0.036),
-                      child: SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.45,
-                        child: Text(
-                          event.name ?? "event",
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ),
-                    SizedBox(
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  color: event.stage == "E.ON Mainstage"
+                      ? const Color.fromRGBO(254, 183, 1, 1)
+                      : Color.fromRGBO(231, 32, 67, 1)),
+              width: MediaQuery.of(context).size.width * 0.036,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.width * 0.038,
+                  left: MediaQuery.of(context).size.width * 0.027),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                        right: MediaQuery.of(context).size.width * 0.036),
+                    child: SizedBox(
                       width: MediaQuery.of(context).size.width * 0.45,
                       child: Text(
-                        event.stage ?? "stage",
-                        style: const TextStyle(color: Colors.white),
+                        event.name ?? "event",
+                        style: const TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.bold),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.width * 0.038),
-                child: Column(
-                  children: [
-                    Text(
-                      event.date,
-                      style: const TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      event.time,
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.45,
+                    child: Text(
+                      event.stage ?? "stage",
                       style: const TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.width * 0.038),
+              child: Column(
+                children: [
+                  Text(
+                    event.date,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    event.time,
+                    style: const TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       );
     }
@@ -197,7 +191,7 @@ class _EventsPageState extends State<EventsPage> {
       itemCount: eventwidgets.length,
       itemBuilder: (context, index) {
         return Padding(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
           child: GestureDetector(
             onTap: () => showModalBottomSheet(
               context: context,
@@ -208,18 +202,27 @@ class _EventsPageState extends State<EventsPage> {
                       BorderRadius.vertical(top: Radius.circular(20))),
               builder: (context) => Container(
                 height: MediaQuery.of(context).size.height * 0.76,
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadiusDirectional.only(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadiusDirectional.only(
                       topStart: Radius.circular(20),
                       topEnd: Radius.circular(20)),
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color.fromRGBO(232, 107, 62, 1),
-                      Color.fromRGBO(97, 42, 122, 1)
-                    ],
-                  ),
+                  gradient: eventsQuery[index].stage == "E.ON Mainstage"
+                      ? const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(254, 183, 1, 1),
+                            Color.fromRGBO(97, 42, 122, 1)
+                          ],
+                        )
+                      : const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(231, 32, 67, 1),
+                            Color.fromRGBO(97, 42, 122, 1)
+                          ],
+                        ),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

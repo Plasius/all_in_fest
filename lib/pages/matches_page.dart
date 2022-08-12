@@ -187,7 +187,7 @@ class _MatchesPageState extends State<MatchesPage> {
                               children: [
                                 Padding(
                                   padding: EdgeInsets.only(
-                                      left: size.width * 0.065,
+                                      left: size.width * 0.09,
                                       right: size.width * 0.065,
                                       top: size.width * 0.065,
                                       bottom: size.width * 0.01625),
@@ -204,12 +204,14 @@ class _MatchesPageState extends State<MatchesPage> {
                                                       "lib/assets/user.png"),
                                                   fit: BoxFit.cover)
                                               : DecorationImage(
-                                                  image: photos[index]),
+                                                  image: photos[index],
+                                                  fit: BoxFit.cover),
                                         ),
                                       ),
                                       Padding(
-                                        padding:
-                                            EdgeInsets.all(size.width * 0.0325),
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: size.width * 0.0325,
+                                            horizontal: size.width * 0.065),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
