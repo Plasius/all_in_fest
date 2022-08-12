@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
-import 'dart:io';
 import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
@@ -9,7 +8,6 @@ import 'package:all_in_fest/pages/home_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -359,7 +357,7 @@ class _SwipePageState extends State<SwipePage> {
                                           context,
                                           MaterialPageRoute(
                                               builder: (context) =>
-                                                  MyHomePage()))),
+                                                  const MyHomePage()))),
                                   CupertinoDialogAction(
                                     child: const Text("Inkább chatelnék!"),
                                     onPressed: () => Navigator.push(

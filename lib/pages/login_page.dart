@@ -54,7 +54,7 @@ class _LoginPageState extends State<LoginPage> {
                       borderRadius: BorderRadius.circular(5)),
                   width: MediaQuery.of(context).size.width,
                   child: SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
+                    physics: const AlwaysScrollableScrollPhysics(),
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,

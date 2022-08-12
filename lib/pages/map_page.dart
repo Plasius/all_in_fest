@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:realm/realm.dart';
@@ -22,8 +24,8 @@ class _MapPageState extends State<MapPage> {
     super.initState();
     Future.delayed(Duration.zero, () => loadProfile());
     getPic();
-
   }
+
   void loadProfile() async {
     RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
@@ -41,30 +43,26 @@ class _MapPageState extends State<MapPage> {
     await realm.subscriptions.waitForSynchronization();
 
     var user = userQuery[0];
-    print(user.name);
 
     setState(() {
       currentUser = user;
     });
   }
 
-
   Future<void> getPic() async {
     pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
   }
-
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Map',
       home: Scaffold(
-        extendBodyBehindAppBar: true,
+          extendBodyBehindAppBar: true,
           drawer: MenuBar(
               imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
-              userName: currentUser != null
-                  ? currentUser?.name
-                  : "Jelentkezz be!"),
+              userName:
+                  currentUser != null ? currentUser?.name : "Jelentkezz be!"),
           appBar: AppBar(
             elevation: 0,
             backgroundColor: Colors.transparent,
@@ -75,8 +73,8 @@ class _MapPageState extends State<MapPage> {
             ),
           ),
           body: PhotoView(
-            minScale: PhotoViewComputedScale.contained,
-              maxScale: PhotoViewComputedScale.covered*3,
+              minScale: PhotoViewComputedScale.contained,
+              maxScale: PhotoViewComputedScale.covered * 3,
               imageProvider: const AssetImage("lib/assets/terkep.png"))
           /*MediaQuery.of(context).size.height)*/
 

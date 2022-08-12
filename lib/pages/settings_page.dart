@@ -26,11 +26,11 @@ class _SettingsPageState extends State<SettingsPage> {
   var password_2 = TextEditingController();
 
   user_model.User? currentUser;
+  // ignore: prefer_typing_uninitialized_variables
   var pic;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero, () => loadProfile());
     getPic();
@@ -57,7 +57,6 @@ class _SettingsPageState extends State<SettingsPage> {
     await realm.subscriptions.waitForSynchronization();
 
     var user = userQuery[0];
-    print(user.name);
 
     setState(() {
       currentUser = user;
@@ -89,7 +88,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget editBody() {
     return Container(
-      constraints: BoxConstraints.expand(),
+      constraints: const BoxConstraints.expand(),
       decoration: const BoxDecoration(
           image: DecorationImage(
               image: AssetImage("lib/assets/background.png"),
@@ -118,10 +117,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 18,
                         fontWeight: FontWeight.normal),
                     enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.purple),
+                        borderSide: const BorderSide(color: Colors.purple),
                         borderRadius: BorderRadius.circular(15)),
                     focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.purple),
+                        borderSide: const BorderSide(color: Colors.purple),
                         borderRadius: BorderRadius.circular(15))),
               ),
               const SizedBox(
@@ -144,10 +143,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           fontWeight: FontWeight.normal),
                       enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: Colors.purple)),
+                          borderSide: const BorderSide(color: Colors.purple)),
                       focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide: BorderSide(color: Colors.purple)))),
+                          borderSide: const BorderSide(color: Colors.purple)))),
               const SizedBox(
                 height: 15,
               ),
@@ -167,11 +166,11 @@ class _SettingsPageState extends State<SettingsPage> {
                         fontSize: 18,
                         fontWeight: FontWeight.normal),
                     enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.purple),
+                        borderSide: const BorderSide(color: Colors.purple),
                         borderRadius: BorderRadius.circular(15)),
                     focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(15),
-                        borderSide: BorderSide(color: Colors.purple))),
+                        borderSide: const BorderSide(color: Colors.purple))),
               ),
               const SizedBox(
                 height: 15,

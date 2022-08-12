@@ -8,7 +8,6 @@ import 'package:realm/realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 
 import '../models/event.dart';
-import 'menu_sidebar.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -21,7 +20,6 @@ class _EventsPageState extends State<EventsPage> {
   String _selectedStage = "";
   String _selectedDate = "";
   final TextEditingController _searchText = TextEditingController();
-  bool _isSearching = false;
 
   var eventsQuery;
   ImageProvider? pic;
@@ -129,7 +127,7 @@ class _EventsPageState extends State<EventsPage> {
               decoration: BoxDecoration(
                   color: event.stage == "E.ON Mainstage"
                       ? const Color.fromRGBO(254, 183, 1, 1)
-                      : Color.fromRGBO(231, 32, 67, 1)),
+                      : const Color.fromRGBO(231, 32, 67, 1)),
               width: MediaQuery.of(context).size.width * 0.036,
             ),
             Padding(
@@ -356,7 +354,7 @@ class _EventsPageState extends State<EventsPage> {
         ],
         leading: IconButton(
           onPressed: () => Navigator.pop(context),
-          icon: Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios),
         ),
       ),
       body: Container(

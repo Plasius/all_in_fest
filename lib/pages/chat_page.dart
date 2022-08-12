@@ -8,7 +8,6 @@ import 'package:all_in_fest/models/message.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user;
 import 'package:all_in_fest/pages/home_page.dart';
-import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -153,7 +152,7 @@ class _ChatPageState extends State<ChatPage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: ((context) =>
-                                                MyHomePage())))
+                                                const MyHomePage())))
                                   },
                                 ),
                                 CupertinoDialogAction(

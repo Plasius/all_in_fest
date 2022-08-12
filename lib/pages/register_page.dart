@@ -39,10 +39,11 @@ class _RegisterPageState extends State<RegisterPage> {
         extendBodyBehindAppBar: true,
         appBar: AppBar(
           leading: IconButton(
-            onPressed: () => {
-              Navigator.pop(context)
-            },
-            icon: Icon(Icons.arrow_back_ios, color: Colors.white,),
+            onPressed: () => {Navigator.pop(context)},
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+            ),
           ),
           elevation: 0,
           backgroundColor: Colors.transparent,
@@ -352,17 +353,23 @@ class _RegisterPageState extends State<RegisterPage> {
         emailController.text.isEmpty ||
         passwordController.text.isEmpty ||
         passwordConfirmController.text.isEmpty) {
-      Fluttertoast.showToast(msg: "Töltsd ki az összes mezőt!", backgroundColor: Colors.red.withOpacity(0.8));
+      Fluttertoast.showToast(
+          msg: "Töltsd ki az összes mezőt!",
+          backgroundColor: Colors.red.withOpacity(0.8));
       return;
     }
 
     if (passwordConfirmController.text != passwordController.text) {
-      Fluttertoast.showToast(msg: "A jelszavak nem egyeznek!", backgroundColor: Colors.red.withOpacity(0.8));
+      Fluttertoast.showToast(
+          msg: "A jelszavak nem egyeznek!",
+          backgroundColor: Colors.red.withOpacity(0.8));
       return;
     }
-    
-    if(!checkedValue){
-      Fluttertoast.showToast(msg: "Fogadd el az ÁSZF-et!", backgroundColor: Colors.red.withOpacity(0.8));
+
+    if (!checkedValue) {
+      Fluttertoast.showToast(
+          msg: "Fogadd el az ÁSZF-et!",
+          backgroundColor: Colors.red.withOpacity(0.8));
     }
 
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
