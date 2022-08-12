@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/pages/home_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -354,7 +355,11 @@ class _SwipePageState extends State<SwipePage> {
                                   CupertinoDialogAction(
                                       child:
                                           const Text("Máris indulok bulizni!"),
-                                      onPressed: () => exit(0)),
+                                      onPressed: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  MyHomePage()))),
                                   CupertinoDialogAction(
                                     child: const Text("Inkább chatelnék!"),
                                     onPressed: () => Navigator.push(

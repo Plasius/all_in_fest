@@ -338,55 +338,14 @@ class _EventsPageState extends State<EventsPage> {
   Widget build(BuildContext context) {
     //var favoriteEvent = context.read<FavoriteModel>();
     return Scaffold(
-      drawer: MenuBar(
-          imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
-          userName: currentUser != null
-              ? currentUser?.name
-              : "Jelentkezz be!"), //MongoDatabase.email!),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-        /*leading: const Icon(
-          Icons.menu,
-          color: Colors.white,
-        ),*/
-        title: !_isSearching
-            ? const Image(
-                image: AssetImage("lib/assets/logo.png"),
-                height: 50,
-                fit: BoxFit.contain,
-              )
-            : Container(
-                height: 30,
-                decoration: BoxDecoration(
-                    color: const Color.fromRGBO(255, 255, 255, 0.4),
-                    border: Border.all(color: Colors.white, width: 3),
-                    borderRadius: BorderRadius.circular(5)),
-                child: TextFormField(
-                  maxLines: 1,
-                  textAlignVertical: TextAlignVertical.center,
-                  controller: _searchText,
-                  decoration: const InputDecoration(
-                      contentPadding: EdgeInsets.all(9),
-                      hintText: "Esemény neve",
-                      hintStyle: TextStyle(color: Colors.white),
-                      border: InputBorder.none),
-                ),
-              ),
+        title: const Image(
+          image: AssetImage("lib/assets/logo.png"),
+          height: 50,
+          fit: BoxFit.contain,
+        ),
         actions: [
-          IconButton(
-              onPressed: () => setState(() {
-                    _isSearching = !_isSearching;
-                    if (_searchText.text.isNotEmpty) {
-                      loadEvents();
-                      _searchText.clear();
-                    } else {
-                      loadEvents();
-                    }
-                  }),
-              icon: const Icon(
-                Icons.search,
-                color: Colors.white,
-              )),
           IconButton(
             icon: const Icon(Icons.filter_alt_outlined),
             color: Colors.white,
@@ -395,6 +354,10 @@ class _EventsPageState extends State<EventsPage> {
             },
           )
         ],
+        leading: IconButton(
+          onPressed: () => Navigator.pop(context),
+          icon: Icon(Icons.arrow_back_ios),
+        ),
       ),
       body: Container(
         constraints: const BoxConstraints.expand(),
