@@ -122,6 +122,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Chat page',
         home: Scaffold(
             resizeToAvoidBottomInset: true,

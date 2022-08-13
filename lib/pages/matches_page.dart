@@ -141,6 +141,7 @@ class _MatchesPageState extends State<MatchesPage> {
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
     return MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Welcome to Flutter',
         home: Scaffold(
             drawer: MenuBar(
