@@ -272,7 +272,7 @@ class _SettingsPageState extends State<SettingsPage> {
         fontSize: 16.0);
   }
 
-  Future<void> deleteUser() async {
+  Future<void> deleteUserData() async {
     RealmConnect.realmOpen();
     Configuration userConfig = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [user_model.User.schema]);
@@ -331,14 +331,10 @@ class _SettingsPageState extends State<SettingsPage> {
     imageRealm.write(() => {imageRealm.delete(currentImage)});
     messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
     matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
-
-    await RealmConnect.app.currentUser.logOut;
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 
   Future<void> deleteAuthUser() async {
-    await deleteUser();
+    await deleteUserData();
 
     final prefs = await SharedPreferences.getInstance();
     var email = prefs.getStringList('EmailPassword')![0],
@@ -353,5 +349,10 @@ class _SettingsPageState extends State<SettingsPage> {
         'password': pass,
       },
     );
+
+    RealmConnect.currentUser = null;
+
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => const LoginPage()));
   }
 }
