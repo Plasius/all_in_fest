@@ -1,6 +1,7 @@
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/login_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
@@ -200,8 +201,28 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: const Text("Balra húzottak visszaállítása")),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(primary: Colors.purple),
-                      onPressed: () => Future.delayed(
-                          Duration.zero, (() => deleteAuthUser())),
+                      onPressed: () => showCupertinoDialog(
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                                title: const Text(
+                                  "Biztosan törölnéd fiókod?",
+                                ),
+                                content: const Text(
+                                    "Profil, üzenetek, adatok mind törlödni fognak."),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text("Igen",
+                                        style: TextStyle(color: Colors.red)),
+                                    onPressed: () => {
+                                      deleteAuthUser(),
+                                    },
+                                  ),
+                                  CupertinoDialogAction(
+                                    child: const Text("Mégsem"),
+                                    onPressed: () => Navigator.pop(context),
+                                  )
+                                ],
+                              )),
                       child: const Text("Fiók törlése"))
                 ],
               )
@@ -324,11 +345,8 @@ class _SettingsPageState extends State<SettingsPage> {
     });
     await matchesRealm.subscriptions.waitForSynchronization();
 
-    var user = userQuery[0];
-    var currentImage = imageQuery[0];
-
-    userRealm.write(() => {userRealm.delete(user)});
-    imageRealm.write(() => {imageRealm.delete(currentImage)});
+    userRealm.write(() => {userRealm.deleteMany(userQuery)});
+    imageRealm.write(() => {imageRealm.deleteMany(imageQuery)});
     messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
     matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
   }
@@ -351,6 +369,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
 
     RealmConnect.currentUser = null;
+
+    Fluttertoast.showToast(msg: "Fiókod töröltük.");
 
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => const LoginPage()));
