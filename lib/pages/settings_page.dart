@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
+import 'package:http/http.dart' as http;
 
 import '../models/image.dart';
 import '../models/message.dart';
@@ -199,8 +200,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: const Text("Balra húzottak visszaállítása")),
                   ElevatedButton(
                       style: ElevatedButton.styleFrom(primary: Colors.purple),
-                      onPressed: () =>
-                          Future.delayed(Duration.zero, (() => deleteUser())),
+                      onPressed: () => Future.delayed(
+                          Duration.zero, (() => deleteAuthUser())),
                       child: const Text("Fiók törlése"))
                 ],
               )
@@ -334,5 +335,23 @@ class _SettingsPageState extends State<SettingsPage> {
     await RealmConnect.app.currentUser.logOut;
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => const LoginPage()));
+  }
+
+  Future<void> deleteAuthUser() async {
+    await deleteUser();
+
+    final prefs = await SharedPreferences.getInstance();
+    var email = prefs.getStringList('EmailPassword')![0],
+        pass = prefs.getStringList('EmailPassword')![1];
+
+    final http.Response response = await http.delete(
+      Uri.parse(
+          'https://eu-central-1.aws.data.mongodb-api.com/app/application-0-bjnqv/endpoint/deleteuser'),
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+        'email': email,
+        'password': pass,
+      },
+    );
   }
 }

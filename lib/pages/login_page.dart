@@ -5,6 +5,7 @@ import 'package:all_in_fest/pages/register_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home_page.dart';
 
@@ -243,6 +244,10 @@ class _LoginPageState extends State<LoginPage> {
         emailController.text, passwordController.text);
 
     if (app.currentUser != null) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('EmailPassword',
+          <String>[emailController.text, passwordController.text]);
+
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const MyHomePage()),
