@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
     var appConfig = AppConfiguration("application-0-bjnqv");
     var app = App(appConfig);
 
-    if (app.currentUser == null) {
+    if (app.currentUser == null || RealmConnect.currentUser == null) {
       RealmConnect.currentUser = app.currentUser;
       return const LoginPage();
     } else {
