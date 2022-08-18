@@ -182,6 +182,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                       builder: (context) => ChatPage(
                                             partnerUser: matchedProfiles[index],
                                             match: matchQuery[index],
+                                            firstTime: false,
                                           )));
                             },
                             child: Column(

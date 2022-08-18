@@ -116,6 +116,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
+                                style: const TextStyle(color: Colors.white),
                                 controller: nameController,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
@@ -153,6 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
+                                style: const TextStyle(color: Colors.white),
                                 controller: emailController,
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
@@ -190,6 +192,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
+                                  style: const TextStyle(color: Colors.white),
                                   controller: passwordController,
                                   obscureText: _showPassword ? false : true,
                                   decoration: InputDecoration(
@@ -238,6 +241,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
+                                  style: const TextStyle(color: Colors.white),
                                   controller: passwordConfirmController,
                                   obscureText: _showPassword ? false : true,
                                   decoration: InputDecoration(
@@ -261,8 +265,11 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
                           CheckboxListTile(
-                            title: InkWell(
-                                child: const Text('Elfogadod az ÁSZF-et?'),
+                            title: GestureDetector(
+                                child: const Text(
+                                  'Elfogadod az ÁSZF-et?',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                                 onTap: () => launchUrl(Uri.parse(
                                     'https://ybg.hu/wp-content/uploads/2022/01/Adatkezelesi-es-adatvedelmi-szabalyzat.pdf'))),
                             value: checkedValue,
@@ -370,6 +377,7 @@ class _RegisterPageState extends State<RegisterPage> {
       Fluttertoast.showToast(
           msg: "Fogadd el az ÁSZF-et!",
           backgroundColor: Colors.red.withOpacity(0.8));
+      return;
     }
 
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
@@ -398,19 +406,7 @@ class _RegisterPageState extends State<RegisterPage> {
     await realm.subscriptions.waitForSynchronization();
 
     realm.write(() => {realm.add(_user)});
-    print("writed");
     Navigator.pop(context);
-
-    /*try {
-      MongoDatabase.users.insertOne({
-        'name': name,
-        'bio': "Always all in.",
-        'since': DateTime.now().millisecondsSinceEpoch,
-        'userID': auth.currentUser?.uid
-      });
-    } catch (e) {
-      print(e.runtimeType);
-    }*/
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -418,5 +414,7 @@ class _RegisterPageState extends State<RegisterPage> {
     if (counter == null) {
       await prefs.setInt('counter', 0);
     }
+
+    Fluttertoast.showToast(msg: 'Jelentkezz be.');
   }
 }

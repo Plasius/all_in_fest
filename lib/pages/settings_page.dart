@@ -358,7 +358,7 @@ class _SettingsPageState extends State<SettingsPage> {
     var email = prefs.getStringList('EmailPassword')![0],
         pass = prefs.getStringList('EmailPassword')![1];
 
-    final http.Response response = await http.delete(
+    await http.delete(
       Uri.parse(
           'https://eu-central-1.aws.data.mongodb-api.com/app/application-0-bjnqv/endpoint/deleteuser'),
       headers: <String, String>{

@@ -39,6 +39,7 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   void loadEvents() async {
+    eventsQuery = null;
     RealmResults<Event> eventsQ;
 
     var appConfig = AppConfiguration("application-0-bjnqv");
@@ -54,8 +55,8 @@ class _EventsPageState extends State<EventsPage> {
       eventsQ = eventsRealm.all<Event>().query(
           "stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     } else if (_selectedDate != "" && _selectedStage == "Minden színpad") {
-      eventsQ = eventsRealm.all<Event>().query(
-          "date CONTAINS '$_selectedDate' and name CONTAINS ${_searchText.text.toString()}");
+      eventsQ =
+          eventsRealm.all<Event>().query("date CONTAINS '$_selectedDate'");
     } else {
       eventsQ = eventsRealm.all<Event>().query(
           "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");

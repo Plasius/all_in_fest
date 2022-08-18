@@ -4,6 +4,7 @@ import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/home_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -235,6 +236,10 @@ class _SwipePageState extends State<SwipePage> {
                               fontWeight: FontWeight.bold,
                               fontSize: 25),
                         ),
+                        const Text(
+                          '*click a bio megtekintéséhez*',
+                          style: TextStyle(color: Colors.white, fontSize: 12),
+                        )
                       ],
                     )),
               )
@@ -242,6 +247,12 @@ class _SwipePageState extends State<SwipePage> {
         likeAction: () => {liked(profileShuffle[i].userID)},
         nopeAction: () => showNopeGif(profileShuffle[i].userID),
       ));
+    }
+
+    if (_swipeItems.isEmpty == false) {
+      Fluttertoast.showToast(
+          msg: 'Húzd jobbra aki tetszik, balra aki nem.',
+          toastLength: Toast.LENGTH_LONG);
     }
 
     _swipeItems.add(SwipeItem(content: const Text("")));
@@ -383,6 +394,7 @@ class _SwipePageState extends State<SwipePage> {
         user1: RealmConnect.app.currentUser.id,
         user2: otherUser,
         lastActivity: DateTime.now().millisecondsSinceEpoch);
+
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Match.schema]);
     Realm realm = Realm(config);
@@ -398,8 +410,23 @@ class _SwipePageState extends State<SwipePage> {
       realm.add(_match);
     });
 
-    /* Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const MatchesPage())); */
+    Configuration config2 = Configuration.flexibleSync(
+        RealmConnect.app.currentUser, [user_model.User.schema]);
+    Realm realm2 = Realm(config2);
+
+    final userQuery =
+        realm2.all<user_model.User>().query("_id CONTAINS '$otherUser'");
+    SubscriptionSet userSubsriptions = realm.subscriptions;
+    userSubsriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await realm2.subscriptions.waitForSynchronization();
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => ChatPage(
+                partnerUser: userQuery[0], match: _match, firstTime: true)));
   }
 
   void showNopeGif(var rejectedID) async {

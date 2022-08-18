@@ -102,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
                                 controller: emailController,
+                                style: const TextStyle(color: Colors.white),
                                 decoration: const InputDecoration(
                                   border: InputBorder.none,
                                   prefixIcon: Icon(
@@ -138,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                                       Border.all(color: Colors.white, width: 3),
                                   borderRadius: BorderRadius.circular(5)),
                               child: TextFormField(
+                                  style: const TextStyle(color: Colors.white),
                                   controller: passwordController,
                                   obscureText: _showPassword ? false : true,
                                   decoration: InputDecoration(

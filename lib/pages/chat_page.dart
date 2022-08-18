@@ -17,11 +17,16 @@ import '../models/image.dart';
 import '../models/match.dart' as match;
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key, required this.partnerUser, required this.match})
+  ChatPage(
+      {Key? key,
+      required this.partnerUser,
+      required this.match,
+      required this.firstTime})
       : super(key: key);
 
   final user.User partnerUser;
   final swipeMatch.Match match;
+  bool firstTime;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -99,7 +104,12 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
 
-    setState(() {});
+    setState(() {
+      if (widget.firstTime) {
+        _showActionSheet(context);
+        widget.firstTime = false;
+      }
+    });
 
     Future.delayed(const Duration(milliseconds: 1000), () {
       scrollController.jumpTo(scrollController.position.maxScrollExtent);
@@ -113,7 +123,7 @@ class _ChatPageState extends State<ChatPage> {
     loadMessages();
 
     timer =
-        Timer.periodic(const Duration(seconds: 5), (Timer t) => loadMessages());
+        Timer.periodic(const Duration(seconds: 3), (Timer t) => loadMessages());
 
     WidgetsBinding.instance.addPostFrameCallback((_) =>
         scrollController.jumpTo(scrollController.position.minScrollExtent));
@@ -132,40 +142,111 @@ class _ChatPageState extends State<ChatPage> {
                 icon: const Icon(Icons.arrow_back_ios),
               ),
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-              title: Text(partnerName.toString()),
+              title:
+                  Text(partnerName.toString(), overflow: TextOverflow.ellipsis),
               actions: [
-                IconButton(
-                    onPressed: () => showCupertinoDialog(
-                        context: context,
-                        builder: (context) => CupertinoAlertDialog(
-                              title: Text(
-                                "Szétválsz $partnerName-tól?",
-                              ),
-                              content: const Text(
-                                  "Biztosan szeretnéd a szétválasztást? Így minden üzeneted törlődik"),
-                              actions: [
-                                CupertinoDialogAction(
-                                  child: const Text("Igen",
-                                      style: TextStyle(color: Colors.red)),
-                                  onPressed: () => {
-                                    deleteOptions(),
-                                    Navigator.push(
+                Center(
+                  child: GestureDetector(
+                      onTap: () => showCupertinoDialog(
+                          context: context,
+                          builder: (context) => CupertinoAlertDialog(
+                                title: Text(
+                                  "Szétválsz $partnerName-tól?",
+                                ),
+                                content: const Text(
+                                    "Biztosan szeretnéd a szétválasztást? Így minden üzeneted törlődik"),
+                                actions: [
+                                  CupertinoDialogAction(
+                                    child: const Text("Igen",
+                                        style: TextStyle(color: Colors.red)),
+                                    onPressed: () => {
+                                      deleteOptions(),
+                                      Navigator.pushAndRemoveUntil(
                                         context,
                                         MaterialPageRoute(
-                                            builder: ((context) =>
-                                                const MyHomePage())))
-                                  },
-                                ),
-                                CupertinoDialogAction(
-                                  child: const Text("Mégsem"),
-                                  onPressed: () => Navigator.pop(context),
-                                )
-                              ],
-                            )),
-                    icon: const Icon(Icons.delete))
+                                            builder: (context) =>
+                                                const MyHomePage()),
+                                        (Route<dynamic> route) => false,
+                                      )
+                                    },
+                                  ),
+                                  CupertinoDialogAction(
+                                    child: const Text("Mégsem"),
+                                    onPressed: () => Navigator.pop(context),
+                                  )
+                                ],
+                              )),
+                      child: const Text("Unmatch  ")),
+                )
               ],
             ),
             body: messagesBody()));
+  }
+
+  void _showActionSheet(BuildContext context) {
+    showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext context) => CupertinoActionSheet(
+        title: const Text('Válassz üdvözletet'),
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Majd írok én jobbat.'),
+        ),
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            /// This parameter indicates the action would be a default
+            /// defualt behavior, turns the action's text to bold text
+            onPressed: () {
+              sendMessage('Szia Hölgyem/Uram!');
+              Navigator.pop(context);
+            },
+            child: const Text('Szia Hölgyem/Uram!'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              sendMessage('Pultnál tali?');
+              Navigator.pop(context);
+            },
+            child: const Text('Pultnál tali?'),
+          ),
+          CupertinoActionSheetAction(
+            /// This parameter indicates the action would perform
+            /// a destructive action such as delete or exit and turns
+            /// the action's text color to red.
+            isDestructiveAction: false,
+            onPressed: () {
+              sendMessage('Egy sört csak megiszunk, nem?');
+              Navigator.pop(context);
+            },
+            child: const Text('Egy sört csak megiszunk, nem?'),
+          ),
+          CupertinoActionSheetAction(
+            /// This parameter indicates the action would perform
+            /// a destructive action such as delete or exit and turns
+            /// the action's text color to red.
+            isDestructiveAction: false,
+            onPressed: () {
+              sendMessage('Filmezünk az ágyban?');
+              Navigator.pop(context);
+            },
+            child: const Text('Filmezünk az ágyban?'),
+          ),
+          CupertinoActionSheetAction(
+            /// This parameter indicates the action would perform
+            /// a destructive action such as delete or exit and turns
+            /// the action's text color to red.
+            isDestructiveAction: false,
+            onPressed: () {
+              sendMessage('Van kedved csillagokat nézni?');
+              Navigator.pop(context);
+            },
+            child: const Text('Van kedved csillagokat nézni?'),
+          )
+        ],
+      ),
+    );
   }
 
   Widget messagesBody() {
@@ -353,7 +434,7 @@ class _ChatPageState extends State<ChatPage> {
                 GestureDetector(
                     onTap: () {
                       if (messageInput.text.isNotEmpty) {
-                        sendMessage();
+                        sendMessage(null);
                       } else {
                         Fluttertoast.showToast(msg: "Írj üzenetet!");
                       }
@@ -387,7 +468,7 @@ class _ChatPageState extends State<ChatPage> {
     );
   }
 
-  void sendMessage() async {
+  void sendMessage(String? text) async {
     Configuration config = Configuration.flexibleSync(
         RealmConnect.app.currentUser, [Message.schema, match.Match.schema]);
     Realm realm = Realm(config);
@@ -405,7 +486,7 @@ class _ChatPageState extends State<ChatPage> {
 
     final _message = Message(ObjectId().toString(),
         from: RealmConnect.app.currentUser.id,
-        message: messageInput.text,
+        message: text ?? messageInput.text,
         datetime: DateTime.now().millisecondsSinceEpoch,
         matchID: widget.match.matchID);
 
@@ -415,6 +496,7 @@ class _ChatPageState extends State<ChatPage> {
     });
 
     messageInput.clear();
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   @override

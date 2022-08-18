@@ -8,6 +8,7 @@ import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realm/realm.dart';
@@ -64,11 +65,13 @@ class _ProfilePageState extends State<ProfilePage> {
             appBar: AppBar(
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               actions: [
-                IconButton(
-                  onPressed: ((() => saveProfile())),
-                  icon: const Icon(
-                    Icons.save,
-                    color: Colors.white,
+                Center(
+                  child: GestureDetector(
+                    onTap: ((() => saveProfile())),
+                    child: const Text(
+                      'Mentés  ',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 )
               ],
@@ -157,6 +160,8 @@ class _ProfilePageState extends State<ProfilePage> {
                             border: Border.all(color: Colors.purple, width: 2),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
+                          maxLength: 12,
+                          maxLines: 1,
                           controller: nameController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -182,6 +187,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             border: Border.all(color: Colors.purple, width: 2),
                             borderRadius: BorderRadius.circular(5)),
                         child: TextFormField(
+                          keyboardType: TextInputType.text,
                           controller: bioController,
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -324,13 +330,13 @@ class _ProfilePageState extends State<ProfilePage> {
               myUser.name = nameController.text,
               myUser.bio = bioController.text
             });
-        print("Successful update");
+        Fluttertoast.showToast(msg: 'Adatok frissítve.');
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
         realm.write(() => {myUser.name = nameController.text});
-        print("Name updated");
+        Fluttertoast.showToast(msg: 'Név frissítve.');
       } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
         realm.write(() => {myUser.bio = bioController.text});
-        print("Bio updated");
+        Fluttertoast.showToast(msg: 'Bio frissítve.');
       } else {
         print("Please provide new name or bio");
       }
