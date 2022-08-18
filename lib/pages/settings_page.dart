@@ -372,7 +372,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
     Fluttertoast.showToast(msg: "Fiókod töröltük.");
 
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => const LoginPage()));
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginPage()),
+      (Route<dynamic> route) => false,
+    );
   }
 }
