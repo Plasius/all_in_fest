@@ -1,5 +1,11 @@
 PODS:
+  - awesome_notifications (0.0.3):
+    - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - Flutter (1.0.0)
+  - flutter_background_service_ios (0.0.3):
+    - Flutter
   - flutter_image_compress (0.0.1):
     - Flutter
     - Mantle
@@ -10,19 +16,19 @@ PODS:
     - Toast
   - image_picker_ios (0.0.1):
     - Flutter
-  - libwebp (1.2.1):
-    - libwebp/demux (= 1.2.1)
-    - libwebp/mux (= 1.2.1)
-    - libwebp/webp (= 1.2.1)
-  - libwebp/demux (1.2.1):
+  - libwebp (1.2.3):
+    - libwebp/demux (= 1.2.3)
+    - libwebp/mux (= 1.2.3)
+    - libwebp/webp (= 1.2.3)
+  - libwebp/demux (1.2.3):
     - libwebp/webp
-  - libwebp/mux (1.2.1):
+  - libwebp/mux (1.2.3):
     - libwebp/demux
-  - libwebp/webp (1.2.1)
+  - libwebp/webp (1.2.3)
   - Mantle (2.2.0):
     - Mantle/extobjc (= 2.2.0)
   - Mantle/extobjc (2.2.0)
-  - "realm (0.3.1+beta)":
+  - "realm (0.3.2+beta)":
     - Flutter
   - SDWebImage (5.13.2):
     - SDWebImage/Core (= 5.13.2)
@@ -37,7 +43,10 @@ PODS:
     - Flutter
 
 DEPENDENCIES:
+  - awesome_notifications (from `.symlinks/plugins/awesome_notifications/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - Flutter (from `Flutter`)
+  - flutter_background_service_ios (from `.symlinks/plugins/flutter_background_service_ios/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
@@ -54,8 +63,14 @@ SPEC REPOS:
     - Toast
 
 EXTERNAL SOURCES:
+  awesome_notifications:
+    :path: ".symlinks/plugins/awesome_notifications/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   Flutter:
     :path: Flutter
+  flutter_background_service_ios:
+    :path: ".symlinks/plugins/flutter_background_service_ios/ios"
   flutter_image_compress:
     :path: ".symlinks/plugins/flutter_image_compress/ios"
   fluttertoast:
@@ -70,19 +85,22 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
+  awesome_notifications: 04530aafec8dac4635244ed4b4072f4aea6cc938
+  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
+  flutter_background_service_ios: e30e0d3ee69e4cee66272d0c78eacd48c2e94aac
   flutter_image_compress: fd2b476345226e1a10ea352fa306af95704642c1
   fluttertoast: 16fbe6039d06a763f3533670197d01fc73459037
   image_picker_ios: b786a5dcf033a8336a657191401bfdf12017dabb
-  libwebp: 98a37e597e40bfdb4c911fc98f2c53d0b12d05fc
+  libwebp: 60305b2e989864154bd9be3d772730f08fc6a59c
   Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
-  realm: f168aea1ad38d3ab7f98805bf2a228206f052b85
+  realm: 4d1dda2943100bc4d7da31c7bdced42d040db7d8
   SDWebImage: 72f86271a6f3139cc7e4a89220946489d4b9a866
   SDWebImageWebPCoder: 3dc350894112feab5375cfba9ce0986544a66a69
   shared_preferences_ios: 548a61f8053b9b8a49ac19c1ffbc8b92c50d68ad
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
   url_launcher_ios: 839c58cdb4279282219f5e248c3321761ff3c4de
 
-PODFILE CHECKSUM: aafe91acc616949ddb318b77800a7f51bffa2a4c
+PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
 
 COCOAPODS: 1.11.3
