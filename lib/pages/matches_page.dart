@@ -5,6 +5,7 @@ import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:realm/realm.dart';
 
@@ -26,21 +27,23 @@ class _MatchesPageState extends State<MatchesPage> {
   var pic;
 
   void loadMatches() async {
-    RealmConnect.realmOpen();
-    Configuration matchConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Match.schema]);
+    Fluttertoast.showToast(msg: 'A beszélgetések betöltés alatt.');
+
+    Configuration matchConfig =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
     Realm matchesRealm = Realm(matchConfig);
     matchQuery = matchesRealm
         .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet subscriptions = matchesRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
     });
-
+    //get matches for the current logged in user
     await matchesRealm.subscriptions.waitForSynchronization();
 
+    //sort the matches based on last activity
     matchQuery = (matchQuery as RealmResults<Match>).toList();
     (matchQuery as List<Match>).sort(
       (a, b) {
@@ -57,15 +60,8 @@ class _MatchesPageState extends State<MatchesPage> {
 
     print(matchQuery.length);
 
-    /*  RealmConnect.realmOpen();
-    Configuration photoConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [UserImage.schema]);
-    Realm imagesRealm = Realm(photoConfig);
-    var images = imagesRealm.all<UserImage>();
-    print(images.length);
- */
     Configuration userConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm userRealm = Realm(userConfig);
     var users = userRealm.all<user_model.User>();
 
@@ -74,12 +70,13 @@ class _MatchesPageState extends State<MatchesPage> {
       mutableSubscriptions.add(users, name: "Users", update: true);
     });
 
+    //get all the user profiles
     await userRealm.subscriptions.waitForSynchronization();
 
-    print(users.length);
-
+    //go through matches to find corresponding profile
     for (int i = 0; i < matchQuery.length; i++) {
-      if (matchQuery[i].user2 == RealmConnect.app.currentUser.id) {
+      //if we are user 2
+      if (matchQuery[i].user2 == RealmConnect.currentUser.id) {
         print("if");
         user_model.User matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
@@ -88,40 +85,40 @@ class _MatchesPageState extends State<MatchesPage> {
             await RealmConnect.realmGetImage(matchedProfile.userID);
         photos.add(matchedProfileImage);
       } else {
+        //if we are user 1
         print("else");
         var matchedProfile =
             users.query("_id CONTAINS '${matchQuery[i].user2}'")[0];
         matchedProfiles.add(matchedProfile);
-        await RealmConnect.realmGetImage(matchedProfile.userID);
         var matchedProfileImage =
             await RealmConnect.realmGetImage(matchedProfile.userID);
         photos.add(matchedProfileImage);
       }
     }
-    print(photos.length);
+
     setState(() {});
   }
 
   @override
   initState() {
     super.initState();
-    loadMatches();
+
+    Future.delayed(Duration.zero, () => {loadMatches()});
     Future.delayed(Duration.zero, () => {loadProfile(), getPic()});
   }
 
   Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+    pic = await RealmConnect.realmGetImage(RealmConnect.currentUser.id);
   }
 
   void loadProfile() async {
-    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm
         .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet userSubscriptions = realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
@@ -182,7 +179,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                       builder: (context) => ChatPage(
                                             partnerUser: matchedProfiles[index],
                                             match: matchQuery[index],
-                                            firstTime: false,
+                                            firstTimeImm: false,
                                           )));
                             },
                             child: Column(
@@ -204,10 +201,10 @@ class _MatchesPageState extends State<MatchesPage> {
                                               ? const DecorationImage(
                                                   image: AssetImage(
                                                       "lib/assets/user.png"),
-                                                  fit: BoxFit.cover)
+                                                  fit: BoxFit.fill)
                                               : DecorationImage(
                                                   image: photos[index],
-                                                  fit: BoxFit.cover),
+                                                  fit: BoxFit.fill),
                                         ),
                                       ),
                                       Padding(

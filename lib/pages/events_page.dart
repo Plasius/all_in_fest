@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
-import 'package:all_in_fest/models/open_realm.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -8,6 +7,7 @@ import 'package:realm/realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 
 import '../models/event.dart';
+import '../models/open_realm.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -34,19 +34,17 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => {loadProfile(), loadEvents()});
-    getPic();
+    Future.delayed(Duration.zero, () => {loadEvents()});
   }
 
   void loadEvents() async {
+    Fluttertoast.showToast(msg: 'Események betöltés alatt.');
+
     eventsQuery = null;
     RealmResults<Event> eventsQ;
 
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
-    Configuration eventsConfig =
-        Configuration.flexibleSync(app.currentUser!, [Event.schema]);
+    Configuration eventsConfig = Configuration.flexibleSync(
+        RealmConnect.app.currentUser!, [Event.schema]);
     Realm eventsRealm = Realm(eventsConfig);
 
     if (_selectedDate == "" && _selectedStage == "Minden színpad") {
@@ -72,41 +70,10 @@ class _EventsPageState extends State<EventsPage> {
     eventsQuery = eventsQ.toList();
 
     if (eventsQuery.length == 0) {
-      Fluttertoast.showToast(
-          msg: "Az események még nem töltödtek be.",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 1,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-          fontSize: 16.0);
+      Fluttertoast.showToast(msg: "Az események nem töltödtek be.");
     }
 
     setState(() {});
-  }
-
-  void loadProfile() async {
-    RealmConnect.realmOpen();
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-
-    var userQuery = realm
-        .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
-
-    SubscriptionSet userSubscriptions = realm.subscriptions;
-    userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    var user = userQuery[0];
-    print(user.name);
-
-    setState(() {
-      currentUser = user;
-    });
   }
 
   ListView buildEvents() {
@@ -563,9 +530,5 @@ class _EventsPageState extends State<EventsPage> {
                 looping: false,
               ));
         });
-  }
-
-  Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
   }
 }

@@ -39,18 +39,17 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+    pic = await RealmConnect.realmGetImage(RealmConnect.currentUser.id);
   }
 
   void loadProfile() async {
-    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm
         .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet userSubscriptions = realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
@@ -214,7 +213,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                     child: const Text("Igen",
                                         style: TextStyle(color: Colors.red)),
                                     onPressed: () => {
-                                      deleteAuthUser(),
+                                      deleteUser(),
                                     },
                                   ),
                                   CupertinoDialogAction(
@@ -234,11 +233,8 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   void logout() {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
-    if (app.currentUser != null) {
-      app.currentUser?.logOut();
+    if (RealmConnect.currentUser != null) {
+      RealmConnect.currentUser?.logOut();
       RealmConnect.currentUser = null;
       Navigator.pushAndRemoveUntil(
         context,
@@ -252,10 +248,8 @@ class _SettingsPageState extends State<SettingsPage> {
     if (email_1.text.isEmpty == false &&
         password_1.text == password_2.text &&
         password_1.text.isEmpty == false) {
-      var appConfig = AppConfiguration("application-0-bjnqv");
-      var app = App(appConfig);
-
-      EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
+      EmailPasswordAuthProvider authProvider =
+          EmailPasswordAuthProvider(RealmConnect.app);
       await authProvider.callResetPasswordFunction(
           email_1.text, password_1.text,
           functionArgs: []);
@@ -293,66 +287,77 @@ class _SettingsPageState extends State<SettingsPage> {
         fontSize: 16.0);
   }
 
-  Future<void> deleteUserData() async {
-    RealmConnect.realmOpen();
+  Future<void> deleteUser() async {
     Configuration userConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm userRealm = Realm(userConfig);
     var userQuery = userRealm
         .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
     SubscriptionSet userSubscriptions = userRealm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
+    //delete user data objeck
     await userRealm.subscriptions.waitForSynchronization();
 
     RealmResults<UserImage> imageQuery;
     Configuration imageConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [UserImage.schema]);
+        RealmConnect.currentUser, [UserImage.schema]);
     Realm imageRealm = Realm(imageConfig);
     imageQuery = imageRealm
         .all<UserImage>()
-        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("user CONTAINS '${RealmConnect.currentUser.id}'");
     SubscriptionSet imageSubscriptions = imageRealm.subscriptions;
     imageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
+    //delete user image
     await imageRealm.subscriptions.waitForSynchronization();
 
     RealmResults<Message> messageQuery;
-    Configuration messageConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Message.schema]);
+    Configuration messageConfig =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Message.schema]);
     Realm messageRealm = Realm(messageConfig);
-    messageQuery = messageRealm.all<Message>().query(
-        "matchID CONTAINS '${RealmConnect.app.currentUser?.id.toString()}'");
+    messageQuery = messageRealm
+        .all<Message>()
+        .query("matchID CONTAINS '${RealmConnect.currentUser?.id.toString()}'");
     SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
+    //delete user messages
     await messageRealm.subscriptions.waitForSynchronization();
 
     RealmResults<Match> matchQuery;
-    Configuration matchConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Match.schema]);
+    Configuration matchConfig =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
     Realm matchesRealm = Realm(matchConfig);
     matchQuery = matchesRealm
         .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
     SubscriptionSet matchSubscription = matchesRealm.subscriptions;
     matchSubscription.update((mutableSubscriptions) {
       mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
     });
+    //delete user matches
     await matchesRealm.subscriptions.waitForSynchronization();
 
-    userRealm.write(() => {userRealm.deleteMany(userQuery)});
-    imageRealm.write(() => {imageRealm.deleteMany(imageQuery)});
-    messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
-    matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
-  }
+    if (userQuery.isEmpty == false) {
+      userRealm.write(() => {userRealm.deleteMany(userQuery)});
+    }
 
-  Future<void> deleteAuthUser() async {
-    await deleteUserData();
+    if (imageQuery.isEmpty == false) {
+      imageRealm.write(() => {imageRealm.deleteMany(imageQuery)});
+    }
+
+    if (messageQuery.isEmpty == false) {
+      messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
+    }
+
+    if (matchQuery.isEmpty == false) {
+      matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
+    }
 
     final prefs = await SharedPreferences.getInstance();
     var email = prefs.getStringList('EmailPassword')![0],

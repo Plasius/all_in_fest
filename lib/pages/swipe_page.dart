@@ -33,9 +33,8 @@ class _SwipePageState extends State<SwipePage> {
   user_model.User? currentUser;
 
   void getProfiles() async {
-    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
     RealmResults<user_model.User> _profiles = realm.all<user_model.User>();
 
@@ -54,12 +53,12 @@ class _SwipePageState extends State<SwipePage> {
       profileShuffle[a] = profileShuffle[b];
       profileShuffle[b] = temp;
     }
-    Configuration config2 = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Match.schema]);
+    Configuration config2 =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
     Realm realm2 = Realm(config2);
     RealmResults<Match> _matches = realm2
         .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet subscriptions2 = realm2.subscriptions;
     subscriptions2.update((mutableSubscriptions) {
@@ -69,10 +68,10 @@ class _SwipePageState extends State<SwipePage> {
     await realm2.subscriptions.waitForSynchronization();
 
     //szures
-    var ignoreList = <String>[RealmConnect.app.currentUser.id];
+    var ignoreList = <String>[RealmConnect.currentUser.id];
 
     for (int i = 0; i < _matches.length; i++) {
-      if (_matches[i].user2 == RealmConnect.app.currentUser.id) {
+      if (_matches[i].user2 == RealmConnect.currentUser.id) {
         ignoreList.add(_matches[i].user1.toString());
       } else {
         ignoreList.add(_matches[i].user2.toString());
@@ -253,27 +252,27 @@ class _SwipePageState extends State<SwipePage> {
       Fluttertoast.showToast(
           msg: 'Húzd jobbra aki tetszik, balra aki nem.',
           toastLength: Toast.LENGTH_LONG);
+    } else {
+      _swipeItems.add(SwipeItem(content: const Text("")));
+      showDialog();
     }
-
-    _swipeItems.add(SwipeItem(content: const Text("")));
 
     loaded = true;
     setState(() {});
   }
 
   Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.app.currentUser.id);
+    pic = await RealmConnect.realmGetImage(RealmConnect.currentUser.id);
   }
 
   void loadProfile() async {
-    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm
         .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet userSubscriptions = realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
@@ -352,34 +351,7 @@ class _SwipePageState extends State<SwipePage> {
                       itemBuilder: (BuildContext context, int index) {
                         return _swipeItems[index].content;
                       },
-                      onStackFinished: () => showCupertinoDialog(
-                          barrierDismissible: true,
-                          context: context,
-                          builder: (context) => CupertinoAlertDialog(
-                                title: const Text(
-                                    "Sajnos nem találtunk neked profilokat :("),
-                                content: const Text(
-                                    "Menj, és bulizz egy jót a többiekkel!"),
-                                actions: [
-                                  CupertinoDialogAction(
-                                      child:
-                                          const Text("Máris indulok bulizni!"),
-                                      onPressed: () => Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const MyHomePage()))),
-                                  CupertinoDialogAction(
-                                    child: const Text("Inkább chatelnék!"),
-                                    onPressed: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MatchesPage())),
-                                  )
-                                ],
-                              )),
-                    )
+                      onStackFinished: () => showDialog())
                   : const CircularProgressIndicator(),
             ),
           ],
@@ -388,15 +360,39 @@ class _SwipePageState extends State<SwipePage> {
     );
   }
 
+  void showDialog() {
+    showCupertinoDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+              title: const Text("Sajnos nem találtunk neked profilokat :("),
+              content: const Text("Menj, és bulizz egy jót a többiekkel!"),
+              actions: [
+                CupertinoDialogAction(
+                    child: const Text("Máris indulok bulizni!"),
+                    onPressed: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const MyHomePage()))),
+                CupertinoDialogAction(
+                  child: const Text("Inkább chatelnék!"),
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const MatchesPage())),
+                )
+              ],
+            ));
+  }
+
   void liked(String otherUser) async {
-    RealmConnect.realmOpen();
-    final _match = Match(RealmConnect.app.currentUser.id + otherUser,
-        user1: RealmConnect.app.currentUser.id,
+    final _match = Match(RealmConnect.currentUser.id + otherUser,
+        user1: RealmConnect.currentUser.id,
         user2: otherUser,
         lastActivity: DateTime.now().millisecondsSinceEpoch);
 
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Match.schema]);
+    Configuration config =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
     Realm realm = Realm(config);
 
     final matchQuery = realm.all<Match>();
@@ -411,7 +407,7 @@ class _SwipePageState extends State<SwipePage> {
     });
 
     Configuration config2 = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm2 = Realm(config2);
 
     final userQuery =
@@ -426,7 +422,7 @@ class _SwipePageState extends State<SwipePage> {
         context,
         MaterialPageRoute(
             builder: (context) => ChatPage(
-                partnerUser: userQuery[0], match: _match, firstTime: true)));
+                partnerUser: userQuery[0], match: _match, firstTimeImm: true)));
   }
 
   void showNopeGif(var rejectedID) async {

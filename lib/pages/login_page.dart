@@ -242,10 +242,29 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    await RealmConnect.realmLogin(
+    RealmConnect.app = app;
+    Credentials emailPwCredentials = Credentials.emailPassword(
         emailController.text, passwordController.text);
 
+    try {
+      await app.logIn(emailPwCredentials);
+    } catch (e) {
+      Fluttertoast.showToast(
+          msg: "Nem sikerült bejelentkezni.",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
+
+      return;
+    }
+
     if (app.currentUser != null) {
+      RealmConnect.app = app;
+      RealmConnect.currentUser = app.currentUser;
+
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList('EmailPassword',
           <String>[emailController.text, passwordController.text]);
@@ -255,6 +274,8 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (context) => const MyHomePage()),
         (Route<dynamic> route) => false,
       );
+
+      Fluttertoast.showToast(msg: 'Sikeres bejelentkezés.');
     }
   }
 }

@@ -37,6 +37,7 @@ class MyApp extends StatelessWidget {
 
     if (app.currentUser != null) {
       RealmConnect.currentUser = app.currentUser;
+      RealmConnect.app = app;
       return const MyHomePage();
     } else {
       RealmConnect.currentUser = null;

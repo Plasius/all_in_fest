@@ -17,16 +17,16 @@ import '../models/image.dart';
 import '../models/match.dart' as match;
 
 class ChatPage extends StatefulWidget {
-  ChatPage(
+  const ChatPage(
       {Key? key,
       required this.partnerUser,
       required this.match,
-      required this.firstTime})
+      required this.firstTimeImm})
       : super(key: key);
 
   final user.User partnerUser;
   final swipeMatch.Match match;
-  bool firstTime;
+  final bool firstTimeImm;
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -35,6 +35,8 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   var partnerImage;
   var partnerName;
+  var firstTime;
+  bool firstLoad = true;
 
   TextEditingController messageInput = TextEditingController();
   final ScrollController scrollController = ScrollController();
@@ -47,7 +49,7 @@ class _ChatPageState extends State<ChatPage> {
   loadPartnerNameAndImage() async {
     RealmResults<UserImage> imageQuery;
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [UserImage.schema]);
+        RealmConnect.currentUser, [UserImage.schema]);
     Realm realm = Realm(config);
     imageQuery = realm
         .all<UserImage>()
@@ -72,15 +74,12 @@ class _ChatPageState extends State<ChatPage> {
 
   //initializes messages
   loadMessages() async {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
     RealmResults<Message> messageQuery;
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Message.schema]);
+    Configuration config =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Message.schema]);
     Realm realm = Realm(config);
     messageQuery = realm.all<Message>().query(
-        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${app.currentUser?.id.toString()}'");
+        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.currentUser?.id.toString()}'");
 
     SubscriptionSet subscriptions = realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
@@ -105,20 +104,26 @@ class _ChatPageState extends State<ChatPage> {
     );
 
     setState(() {
-      if (widget.firstTime) {
+      if (firstTime) {
         _showActionSheet(context);
-        widget.firstTime = false;
+        firstTime = false;
       }
     });
 
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      scrollController.jumpTo(scrollController.position.maxScrollExtent);
-    });
+    if (firstLoad == true) {
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      });
+      firstLoad = false;
+    }
   }
 
   @override
   initState() {
     super.initState();
+
+    firstTime = widget.firstTimeImm;
+
     loadPartnerNameAndImage();
     loadMessages();
 
@@ -278,116 +283,131 @@ class _ChatPageState extends State<ChatPage> {
                                 widget.partnerUser.userID
                             ? Align(
                                 alignment: Alignment.bottomLeft,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            top: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.036,
-                                            right: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.03),
-                                        child: Container(
-                                          width: 40,
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            image: partnerImage == null
-                                                ? const DecorationImage(
-                                                    image: AssetImage(
-                                                        "lib/assets/user.png"),
-                                                    fit: BoxFit.cover)
-                                                : DecorationImage(
-                                                    image: partnerImage),
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        constraints: BoxConstraints(
-                                            maxWidth: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.7),
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(5)),
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.036,
-                                              vertical: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.018),
-                                          child: Text(
-                                              messages[index]
-                                                  .message
-                                                  .toString(),
-                                              textAlign: TextAlign.left,
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 22)),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 50)
-                                    ]))
-                            : Align(
-                                alignment: Alignment.bottomRight,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Padding(
-                                        padding: EdgeInsets.only(
-                                            top: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.036,
-                                            right: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.036),
-                                        child: Container(
-                                          constraints: BoxConstraints(
-                                              maxWidth: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.7),
-                                          decoration: BoxDecoration(
-                                              color: const Color.fromRGBO(
-                                                  187, 229, 243, 1),
-                                              borderRadius:
-                                                  BorderRadius.circular(5)),
-                                          child: Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal:
-                                                    MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.036,
-                                                vertical: MediaQuery.of(context)
+                                child: Column(
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                top: MediaQuery.of(context)
                                                         .size
                                                         .width *
-                                                    0.018),
-                                            child: Text(
-                                                messages[index]
-                                                    .message
-                                                    .toString(),
-                                                textAlign: TextAlign.left,
-                                                style: const TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 22)),
+                                                    0.036,
+                                                right: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
+                                            child: Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: partnerImage == null
+                                                    ? const DecorationImage(
+                                                        image: AssetImage(
+                                                            "lib/assets/user.png"),
+                                                        fit: BoxFit.cover)
+                                                    : DecorationImage(
+                                                        image: partnerImage),
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                      ),
-                                      const SizedBox(height: 50)
-                                    ]))))),
+                                          Container(
+                                            constraints: BoxConstraints(
+                                                maxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.7),
+                                            decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Padding(
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.036,
+                                                  vertical:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.018),
+                                              child: Text(
+                                                  messages[index]
+                                                      .message
+                                                      .toString(),
+                                                  textAlign: TextAlign.left,
+                                                  style: const TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 22)),
+                                            ),
+                                          ),
+                                        ]),
+                                    const SizedBox(height: 10)
+                                  ],
+                                ))
+                            : Align(
+                                alignment: Alignment.bottomRight,
+                                child: Column(
+                                  children: [
+                                    Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                top: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.036,
+                                                right: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.036),
+                                            child: Container(
+                                              constraints: BoxConstraints(
+                                                  maxWidth:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.7),
+                                              decoration: BoxDecoration(
+                                                  color: const Color.fromRGBO(
+                                                      187, 229, 243, 1),
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              child: Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.036,
+                                                    vertical:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.018),
+                                                child: Text(
+                                                    messages[index]
+                                                        .message
+                                                        .toString(),
+                                                    textAlign: TextAlign.left,
+                                                    style: const TextStyle(
+                                                        color: Colors.black,
+                                                        fontSize: 22)),
+                                              ),
+                                            ),
+                                          ),
+                                        ]),
+                                    const SizedBox(height: 10)
+                                  ],
+                                ),
+                              )))),
           ),
           Padding(
             padding: EdgeInsets.symmetric(
@@ -470,7 +490,7 @@ class _ChatPageState extends State<ChatPage> {
 
   void sendMessage(String? text) async {
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Message.schema, match.Match.schema]);
+        RealmConnect.currentUser, [Message.schema, match.Match.schema]);
     Realm realm = Realm(config);
 
     final messageQuery = realm.all<Message>();
@@ -485,7 +505,7 @@ class _ChatPageState extends State<ChatPage> {
     await realm.subscriptions.waitForSynchronization();
 
     final _message = Message(ObjectId().toString(),
-        from: RealmConnect.app.currentUser.id,
+        from: RealmConnect.currentUser.id,
         message: text ?? messageInput.text,
         datetime: DateTime.now().millisecondsSinceEpoch,
         matchID: widget.match.matchID);
@@ -507,8 +527,8 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> deleteOptions() async {
     RealmResults<Message> messageQuery;
-    Configuration messageConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [Message.schema]);
+    Configuration messageConfig =
+        Configuration.flexibleSync(RealmConnect.currentUser, [Message.schema]);
     Realm messageRealm = Realm(messageConfig);
     messageQuery = messageRealm
         .all<Message>()
@@ -521,7 +541,7 @@ class _ChatPageState extends State<ChatPage> {
 
     var matchQuery;
     Configuration matchConfig = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [swipeMatch.Match.schema]);
+        RealmConnect.currentUser, [swipeMatch.Match.schema]);
     Realm matchesRealm = Realm(matchConfig);
     matchQuery = matchesRealm
         .all<swipeMatch.Match>()

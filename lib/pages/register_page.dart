@@ -1,13 +1,15 @@
 // ignore_for_file: library_prefixes, implementation_imports, avoid_print
 
+import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:realm/realm.dart';
-import 'package:realm/src/user.dart' as realmUser;
 import 'package:all_in_fest/models/user.dart' as user;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import 'profile_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -373,6 +375,13 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
+    if (passwordController.text.length < 6) {
+      Fluttertoast.showToast(
+          msg: 'Nem elég hosszú a jelszó',
+          backgroundColor: Colors.red.withOpacity(0.8));
+      return;
+    }
+
     if (!checkedValue) {
       Fluttertoast.showToast(
           msg: "Fogadd el az ÁSZF-et!",
@@ -382,39 +391,54 @@ class _RegisterPageState extends State<RegisterPage> {
 
     AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
     App app = App(appConfig);
+
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
+
     await authProvider.registerUser(
         emailController.text, passwordController.text);
+
     Credentials emailPwCredentials = Credentials.emailPassword(
         emailController.text, passwordController.text);
-    realmUser.User currentUser = await app.logIn(emailPwCredentials);
 
-    final _user = user.User(currentUser.id,
-        name: nameController.text,
-        bio: "Allways all in",
-        since: DateTime.now().millisecondsSinceEpoch);
+    await app.logIn(emailPwCredentials);
 
-    Configuration config =
-        Configuration.flexibleSync(currentUser, [user.User.schema]);
-    Realm realm = Realm(config);
+    if (app.currentUser != null) {
+      RealmConnect.app = app;
+      RealmConnect.currentUser = app.currentUser;
 
-    final userQuery = realm.all<user.User>();
-    SubscriptionSet subscriptions = realm.subscriptions;
-    subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setStringList('EmailPassword',
+          <String>[emailController.text, passwordController.text]);
 
-    realm.write(() => {realm.add(_user)});
-    Navigator.pop(context);
+      final _user = user.User(RealmConnect.currentUser!.id,
+          name: nameController.text,
+          bio: "Always all in",
+          since: DateTime.now().millisecondsSinceEpoch);
 
-    final prefs = await SharedPreferences.getInstance();
+      Configuration config = Configuration.flexibleSync(
+          RealmConnect.currentUser!, [user.User.schema]);
+      Realm realm = Realm(config);
 
-    final int? counter = prefs.getInt('counter');
-    if (counter == null) {
-      await prefs.setInt('counter', 0);
+      final userQuery = realm.all<user.User>();
+      SubscriptionSet subscriptions = realm.subscriptions;
+      subscriptions.update((mutableSubscriptions) {
+        mutableSubscriptions.add(userQuery, name: "User", update: true);
+      });
+      await realm.subscriptions.waitForSynchronization();
+
+      realm.write(() => {realm.add(_user)});
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const ProfilePage()),
+        (Route<dynamic> route) => false,
+      );
+
+      Fluttertoast.showToast(
+          msg: 'Sikeres regisztráció. Állítsd be a profilod.');
+    } else {
+      Fluttertoast.showToast(
+          msg: 'Nem sikerült bejelentkezni az új profillal.');
     }
-
-    Fluttertoast.showToast(msg: 'Jelentkezz be.');
   }
 }

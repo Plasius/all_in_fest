@@ -36,12 +36,6 @@
 	<string>Post videos to profile</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Kérjük, tölts fel egy profilképet magadról, hogy a barátaid könnyebben megtaláljanak</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>fetch</string>
-		<string>processing</string>
-		<string>remote-notification</string>
-	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

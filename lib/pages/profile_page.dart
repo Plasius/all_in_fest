@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
-import 'package:all_in_fest/pages/login_page.dart';
+import 'package:all_in_fest/pages/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -28,9 +28,8 @@ class _ProfilePageState extends State<ProfilePage> {
   final ImagePicker _picker = ImagePicker();
   ImageProvider? provider = const AssetImage("lib/assets/user.png");
   var flag = false;
-  String userName = "Adj meg egy nevet";
-  String bio = "Adj meg egy bio-t";
-  String? email = "example@bit.hu";
+  String userName = "Betöltés alatt.";
+  String bio = "Betöltés alatt.";
 
   var nameController = TextEditingController();
 
@@ -41,7 +40,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     nameController.text = userName;
     bioController.text = bio;
-    RealmConnect.realmOpen();
+
     loadImage();
     Future.delayed(
         Duration.zero,
@@ -59,7 +58,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 imageProvider: provider != null
                     ? provider!
                     : const AssetImage("lib/assets/user.png"),
-                userName: RealmConnect.app.currentUser != null
+                userName: RealmConnect.currentUser != null
                     ? userName
                     : "Jelentkezz be!"),
             appBar: AppBar(
@@ -225,11 +224,10 @@ class _ProfilePageState extends State<ProfilePage> {
             quality: 70);
 
         var image = UserImage(pickedFile.path.split("/").last,
-            base64Encode(_cmpressed_image), RealmConnect.app.currentUser.id);
+            base64Encode(_cmpressed_image), RealmConnect.currentUser.id);
 
-        RealmConnect.realmOpen();
         Configuration config = Configuration.flexibleSync(
-            RealmConnect.app.currentUser, [UserImage.schema]);
+            RealmConnect.currentUser, [UserImage.schema]);
         Realm realm = Realm(config);
 
         imageQuery = realm.all<UserImage>();
@@ -251,8 +249,8 @@ class _ProfilePageState extends State<ProfilePage> {
       print('No image selected.');
     }
 
-    var img = imageQuery
-        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
+    var img =
+        imageQuery.query("user CONTAINS '${RealmConnect.currentUser.id}'")[0];
 
     setState(() {
       provider = MemoryImage(base64Decode(img.data));
@@ -273,11 +271,10 @@ class _ProfilePageState extends State<ProfilePage> {
             quality: 70);
 
         var image = UserImage(pickedFile.path.split("/").last,
-            base64Encode(_cmpressed_image), RealmConnect.app.currentUser.id);
+            base64Encode(_cmpressed_image), RealmConnect.currentUser.id);
 
-        RealmConnect.realmOpen();
         Configuration config = Configuration.flexibleSync(
-            RealmConnect.app.currentUser, [UserImage.schema]);
+            RealmConnect.currentUser, [UserImage.schema]);
         Realm realm = Realm(config);
 
         imageQuery = realm.all<UserImage>();
@@ -298,8 +295,8 @@ class _ProfilePageState extends State<ProfilePage> {
       print('No image selected.');
     }
 
-    var img = imageQuery
-        .query("user CONTAINS '${RealmConnect.app.currentUser.id}'")[0];
+    var img =
+        imageQuery.query("user CONTAINS '${RealmConnect.currentUser.id}'")[0];
 
     setState(() {
       provider = MemoryImage(base64Decode(img.data));
@@ -309,10 +306,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> saveProfile() async {
     //get user id and realm connection
-    var uid = RealmConnect.app.currentUser.id;
-    RealmConnect.realmOpen();
+    var uid = RealmConnect.currentUser.id;
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm.all<user_model.User>().query("_id == '$uid'");
@@ -331,12 +327,27 @@ class _ProfilePageState extends State<ProfilePage> {
               myUser.bio = bioController.text
             });
         Fluttertoast.showToast(msg: 'Adatok frissítve.');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          (Route<dynamic> route) => false,
+        );
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
         realm.write(() => {myUser.name = nameController.text});
         Fluttertoast.showToast(msg: 'Név frissítve.');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          (Route<dynamic> route) => false,
+        );
       } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
         realm.write(() => {myUser.bio = bioController.text});
         Fluttertoast.showToast(msg: 'Bio frissítve.');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
+          (Route<dynamic> route) => false,
+        );
       } else {
         print("Please provide new name or bio");
       }
@@ -344,10 +355,8 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> loadImage() async {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
-    var pic = await RealmConnect.realmGetImage(app.currentUser!.id.toString());
+    var pic = await RealmConnect.realmGetImage(
+        RealmConnect.currentUser!.id.toString());
     if (pic == null) {
       provider = const AssetImage("lib/assets/user.png");
     } else {
@@ -358,14 +367,13 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void loadProfile() async {
-    RealmConnect.realmOpen();
     Configuration config = Configuration.flexibleSync(
-        RealmConnect.app.currentUser, [user_model.User.schema]);
+        RealmConnect.currentUser, [user_model.User.schema]);
     Realm realm = Realm(config);
 
     var userQuery = realm
         .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.app.currentUser.id}'");
+        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
     SubscriptionSet userSubscriptions = realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
@@ -410,20 +418,5 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           );
         });
-  }
-
-  void logout() {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
-    if (app.currentUser != null) {
-      app.currentUser?.logOut();
-      RealmConnect.currentUser = null;
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (Route<dynamic> route) => false,
-      );
-    }
   }
 }
