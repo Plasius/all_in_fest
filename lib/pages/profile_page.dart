@@ -41,10 +41,10 @@ class _ProfilePageState extends State<ProfilePage> {
     nameController.text = userName;
     bioController.text = bio;
 
-    loadImage();
     Future.delayed(
         Duration.zero,
         (() => {
+              loadImage(),
               loadProfile(),
             }));
   }

@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -5,10 +8,6 @@ import 'package:all_in_fest/pages/profile_page.dart';
 import 'package:all_in_fest/pages/settings_page.dart';
 import 'package:all_in_fest/pages/swipe_page.dart';
 import 'package:flutter/material.dart';
-import 'package:realm/realm.dart';
-
-import '../models/open_realm.dart';
-import 'login_page.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -18,21 +17,20 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  Timer? timer;
+
   @override
   void initState() {
     super.initState();
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-    if (app.currentUser == null || RealmConnect.currentUser == null) {
-      app.currentUser?.logOut();
-      RealmConnect.currentUser = null;
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const LoginPage()),
-        (Route<dynamic> route) => false,
-      );
-    }
+    timer = Timer.periodic(
+        const Duration(seconds: 3), (Timer t) => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -156,10 +154,12 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: 1,
                         height: 20,
                       ),
-                      SizedBox(
+                      Container(
                         width: MediaQuery.of(context).size.width * 0.4,
-                        child: const Image(
-                            image: AssetImage("lib/assets/leanykak.png")),
+                        child: ClipRRect(
+                          child: Image(image: refreshImage()),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
                       ),
                       const SizedBox(
                         width: 1,
@@ -482,5 +482,12 @@ class _MyHomePageState extends State<MyHomePage> {
         )*/
 
         );
+  }
+
+  AssetImage refreshImage() {
+    var rng = Random();
+    return AssetImage(
+      "lib/assets/home_page_" + (rng.nextInt(6) + 1).toString() + ".png",
+    );
   }
 }

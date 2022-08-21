@@ -1,9 +1,9 @@
 import 'package:realm/realm.dart';
 
-part 'event.g.dart';
+part 'timed_event.g.dart';
 
 @RealmModel()
-class _Event {
+class _TimedEvent {
   @PrimaryKey()
   @MapTo("_id")
   late ObjectId eventID;
@@ -11,7 +11,8 @@ class _Event {
   late String? name;
   late String? stage;
   late String? date;
-  late String? time;
+  late String? start;
+  late String? end;
   late String? description;
   late String? image;
 }
