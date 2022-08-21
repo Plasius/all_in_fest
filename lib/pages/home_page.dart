@@ -154,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         width: 1,
                         height: 20,
                       ),
-                      Container(
+                      SizedBox(
                         width: MediaQuery.of(context).size.width * 0.4,
                         child: ClipRRect(
                           child: Image(image: refreshImage()),
