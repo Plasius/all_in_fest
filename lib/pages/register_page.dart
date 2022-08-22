@@ -391,70 +391,77 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    var app = App(AppConfiguration("application-0-bjnqv"));
+    var appConfig = AppConfiguration('application-0-bjnqv');
+    var app = App(appConfig);
 
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
 
-    await authProvider.registerUser(
-        emailController.text, passwordController.text);
+    try {
+      await authProvider.registerUser(
+          emailController.text, passwordController.text);
 
-    Credentials emailPwCredentials = Credentials.emailPassword(
-        emailController.text, passwordController.text);
+      Credentials emailPwCredentials = Credentials.emailPassword(
+          emailController.text, passwordController.text);
 
-    RealmConnect.currentUser = await app.logIn(emailPwCredentials);
-
-    if (app.currentUser != null) {
-      RealmConnect();
-      //create token for current device
-      String? tokenString = await FirebaseMessaging.instance.getToken();
-
-      final tokenQuery = RealmConnect.realm
-          .query<Token>("_id CONTAINS '${RealmConnect.currentUser.id}'");
-      SubscriptionSet tokenSubscriptions = RealmConnect.realm.subscriptions;
-      tokenSubscriptions.update((mutableSubscriptions) {
-        mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
-      });
-
-      await RealmConnect.realm.subscriptions.waitForSynchronization();
-
-      if (tokenQuery.isEmpty) {
-        Token t = Token(RealmConnect.currentUser.id);
-        t.token = tokenString;
-        RealmConnect.realm.write(() => RealmConnect.realm.add(t));
-      } else {
-        RealmConnect.realm.write(() => tokenQuery[0].token = tokenString);
-      }
-
-      //save emailpasscombo
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList('EmailPassword',
-          <String>[emailController.text, passwordController.text]);
-
-      final _user = user.User(RealmConnect.currentUser!.id,
-          name: nameController.text,
-          bio: "Always all in",
-          since: DateTime.now().millisecondsSinceEpoch);
-
-      final userQuery = RealmConnect.realm.all<user.User>();
-      SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
-      subscriptions.update((mutableSubscriptions) {
-        mutableSubscriptions.add(userQuery, name: "User", update: true);
-      });
-      await RealmConnect.realm.subscriptions.waitForSynchronization();
-
-      RealmConnect.realm.write(() => {RealmConnect.realm.add(_user)});
-
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const ProfilePage()),
-        (Route<dynamic> route) => false,
-      );
-
-      Fluttertoast.showToast(
-          msg: 'Sikeres regisztráció. Állítsd be a profilod.');
-    } else {
-      Fluttertoast.showToast(
-          msg: 'Nem sikerült bejelentkezni az új profillal.');
+      RealmConnect.realmUser = await app.logIn(emailPwCredentials);
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'A regisztrálás nem sikerült');
+      return;
     }
+
+    //create token for current device
+    String? tokenString = await FirebaseMessaging.instance.getToken();
+    Realm tokenRealm =
+        await RealmConnect.getRealm([Token.schema], 'RegisterToken');
+    final tokenQuery =
+        tokenRealm.query<Token>("_id CONTAINS '${RealmConnect.realmUser.id}'");
+
+    SubscriptionSet tokenSubscriptions = tokenRealm.subscriptions;
+    tokenSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
+    });
+
+    await tokenRealm.subscriptions.waitForSynchronization();
+
+    if (tokenQuery.isEmpty) {
+      Token t = Token(RealmConnect.realmUser.id);
+      t.token = tokenString;
+      tokenRealm.write(() => tokenRealm.add(t));
+    } else {
+      tokenRealm.write(() => tokenQuery[0].token = tokenString);
+    }
+    tokenRealm.close();
+
+    //save emailpass combo
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('EmailPassword',
+        <String>[emailController.text, passwordController.text]);
+
+    //create userdata
+    Realm userRealm =
+        await RealmConnect.getRealm([user.User.schema], 'RegisterUser');
+    final _user = user.User(RealmConnect.realmUser.id,
+        name: nameController.text,
+        bio: "Always all in",
+        since: DateTime.now().millisecondsSinceEpoch);
+
+    final userQuery = userRealm.all<user.User>();
+    SubscriptionSet subscriptions = userRealm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await userRealm.subscriptions.waitForSynchronization();
+
+    userRealm.write(() => {userRealm.add(_user)});
+
+    userRealm.close();
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const ProfilePage()),
+      (Route<dynamic> route) => false,
+    );
+
+    Fluttertoast.showToast(msg: 'Sikeres regisztráció. Állítsd be a profilod.');
   }
 }

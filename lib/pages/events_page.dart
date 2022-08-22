@@ -68,28 +68,30 @@ class _EventsPageState extends State<EventsPage> {
     Fluttertoast.showToast(msg: 'Események betöltés alatt.');
 
     eventsQuery = null;
+
+    Realm eventsRealm =
+        await RealmConnect.getRealm([TimedEvent.schema], 'EventEvent');
     RealmResults<TimedEvent> eventsQ;
 
     if (_selectedDate == "" && _selectedStage == "Minden színpad") {
-      eventsQ = RealmConnect.realm.all<TimedEvent>();
+      eventsQ = eventsRealm.all<TimedEvent>();
     } else if (_selectedDate == "" && _selectedStage != "Minden színpad") {
-      eventsQ = RealmConnect.realm.all<TimedEvent>().query(
+      eventsQ = eventsRealm.all<TimedEvent>().query(
           "stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     } else if (_selectedDate != "" && _selectedStage == "Minden színpad") {
-      eventsQ = RealmConnect.realm
-          .all<TimedEvent>()
-          .query("date CONTAINS '$_selectedDate'");
+      eventsQ =
+          eventsRealm.all<TimedEvent>().query("date CONTAINS '$_selectedDate'");
     } else {
-      eventsQ = RealmConnect.realm.all<TimedEvent>().query(
+      eventsQ = eventsRealm.all<TimedEvent>().query(
           "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     }
 
-    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
+    SubscriptionSet subscriptions = eventsRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(eventsQ, name: "Event", update: true);
     });
 
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await eventsRealm.subscriptions.waitForSynchronization();
 
     //sort the events based start time
     eventsQuery = eventsQ.toList();

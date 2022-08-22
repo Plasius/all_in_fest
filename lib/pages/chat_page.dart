@@ -42,6 +42,11 @@ class _ChatPageState extends State<ChatPage> {
   String? token;
   bool firstLoad = true;
 
+  late Realm tokenRealm;
+  late Realm imageRealm;
+  late Realm messageRealm;
+  late Realm matchRealm;
+
   TextEditingController messageInput = TextEditingController();
   final ScrollController scrollController = ScrollController();
 
@@ -51,23 +56,26 @@ class _ChatPageState extends State<ChatPage> {
 
   //initializes partnerImage and partnerName
   loadPartnerNameAndImage() async {
-    RealmResults<UserImage> imageQuery;
-    RealmResults<Token> tokenQuery;
-    imageQuery = RealmConnect.realm
-        .all<UserImage>()
-        .query("user CONTAINS '${widget.partnerUser.userID}'");
-    tokenQuery = RealmConnect.realm
-        .query<Token>("_id CONTAINS '${widget.partnerUser.userID}'");
+    tokenRealm = await RealmConnect.getRealm([Token.schema], 'ChatToken');
 
-    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
-    subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    RealmResults<Token> tokenQuery =
+        tokenRealm.query<Token>("_id CONTAINS '${widget.partnerUser.userID}'");
+    SubscriptionSet tokenSubscriptions = tokenRealm.subscriptions;
+    tokenSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
     });
-
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
-
+    await tokenRealm.subscriptions.waitForSynchronization();
     if (tokenQuery.isEmpty == false) token = tokenQuery[0].token;
+
+    imageRealm = await RealmConnect.getRealm([UserImage.schema], 'ChatImage');
+    RealmResults<UserImage> imageQuery = imageRealm
+        .all<UserImage>()
+        .query("user CONTAINS '${widget.partnerUser.userID}'");
+    SubscriptionSet imageSubscriptions = imageRealm.subscriptions;
+    imageSubscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+    await imageRealm.subscriptions.waitForSynchronization();
 
     if (imageQuery.toList().isEmpty == false) {
       var picdata = imageQuery[0];
@@ -75,22 +83,22 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     partnerName = widget.partnerUser.name;
-    setState(() {});
-    scrollController.jumpTo(scrollController.position.maxScrollExtent);
+
+    setState(() {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+    });
   }
 
   //initializes messages
   loadMessages() async {
-    RealmResults<Message> messageQuery;
-    messageQuery = RealmConnect.realm.all<Message>().query(
-        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.currentUser?.id.toString()}'");
-
-    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
+    messageRealm = await RealmConnect.getRealm([Message.schema], 'ChatMessage');
+    RealmResults<Message> messageQuery = messageRealm.all<Message>().query(
+        "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.realmUser.id}'");
+    SubscriptionSet subscriptions = messageRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
-
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await messageRealm.subscriptions.waitForSynchronization();
 
     int previousMessageNum = messages.length;
     messages = messageQuery.toList();
@@ -107,13 +115,14 @@ class _ChatPageState extends State<ChatPage> {
         return 0;
       },
     );
-
-    setState(() {
-      if (firstTime) {
-        _showActionSheet(context);
-        firstTime = false;
-      }
-    });
+    if (mounted) {
+      setState(() {
+        if (firstTime) {
+          _showActionSheet(context);
+          firstTime = false;
+        }
+      });
+    }
 
     if (firstLoad == true) {
       Future.delayed(const Duration(milliseconds: 1000), () {
@@ -500,31 +509,39 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage(String? text) async {
-    final messageQuery = RealmConnect.realm.all<Message>();
-    final matchesQuery = RealmConnect.realm.all<match.Match>().query(
-        "_id CONTAINS '${widget.match.user2}' AND _id CONTAINS '${widget.match.user1}'");
-
-    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
+    Realm messageRealm =
+        await RealmConnect.getRealm([Message.schema], 'ChatSendMessage');
+    final messageQuery = messageRealm.all<Message>();
+    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
+    });
+    await messageRealm.subscriptions.waitForSynchronization();
+
+    matchRealm = await RealmConnect.getRealm([match.Match.schema], 'ChatMatch');
+    final matchesQuery = matchRealm.all<match.Match>().query(
+        "_id CONTAINS '${widget.match.user2}' AND _id CONTAINS '${widget.match.user1}'");
+    SubscriptionSet matchesSubscription = matchRealm.subscriptions;
+    matchesSubscription.update((mutableSubscriptions) {
       mutableSubscriptions.add(matchesQuery, name: "Match", update: true);
     });
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await matchRealm.subscriptions.waitForSynchronization();
 
     final _message = Message(ObjectId().toString(),
-        from: RealmConnect.currentUser.id,
+        from: RealmConnect.realmUser.id,
         message: text ?? messageInput.text,
         datetime: DateTime.now().millisecondsSinceEpoch,
         matchID: widget.match.matchID);
 
-    RealmConnect.realm.write(() {
-      RealmConnect.realm.add(_message);
+    messageRealm.write(() {
+      messageRealm.add(_message);
+    });
+
+    matchRealm.write(() {
       matchesQuery[0].lastActivity = DateTime.now().millisecondsSinceEpoch;
     });
 
     sendPushNotification();
-
-    print('sending');
 
     messageInput.clear();
     FocusManager.instance.primaryFocus?.unfocus();
@@ -537,29 +554,28 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   Future<void> deleteOptions() async {
-    RealmResults<Message> messageQuery;
-    messageQuery = RealmConnect.realm
+    RealmResults<Message> messageQuery = messageRealm
         .all<Message>()
         .query("matchID CONTAINS '${widget.match.matchID}'");
-    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
+    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await messageRealm.subscriptions.waitForSynchronization();
 
+    matchRealm = await RealmConnect.getRealm([match.Match.schema], 'realmName');
     var matchQuery;
-    matchQuery = RealmConnect.realm
+    matchQuery = matchRealm
         .all<swipeMatch.Match>()
         .query("_id CONTAINS '${widget.match.matchID}'");
-    SubscriptionSet matchSubscription = RealmConnect.realm.subscriptions;
+    SubscriptionSet matchSubscription = matchRealm.subscriptions;
     matchSubscription.update((mutableSubscriptions) {
       mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await matchRealm.subscriptions.waitForSynchronization();
 
-    RealmConnect.realm
-        .write(() => {RealmConnect.realm.deleteMany(messageQuery)});
-    RealmConnect.realm.write(() => {RealmConnect.realm.deleteMany(matchQuery)});
+    messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
+    matchRealm.write(() => {matchRealm.deleteMany(matchQuery)});
   }
 
   Future<void> sendPushNotification() async {

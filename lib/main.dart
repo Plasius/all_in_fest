@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:realm/realm.dart';
 
 import 'pages/home_page.dart';
 import 'pages/login_page.dart';
@@ -70,8 +71,11 @@ class MyApp extends StatelessWidget {
   }
 
   StatefulWidget loadHome() {
-    RealmConnect();
-    if (RealmConnect.initialized) {
+    var appConfig = AppConfiguration('application-0-bjnqv');
+    var app = App(appConfig);
+
+    if (app.currentUser != null) {
+      RealmConnect.realmUser = app.currentUser!;
       return const MyHomePage();
     } else {
       return const LoginPage();

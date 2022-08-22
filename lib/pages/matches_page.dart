@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/user.dart' as user_model;
+import 'package:all_in_fest/models/user.dart' as user;
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -23,37 +23,47 @@ class MatchesPage extends StatefulWidget {
 class _MatchesPageState extends State<MatchesPage> {
   var photos = [];
   var matches = <Match>[];
-  var matchedProfiles = <user_model.User>[];
+  var matchedProfiles = <user.User>[];
+
+  late Realm matchRealm;
+  late Realm userRealm;
+  late Realm imageRealm;
+
   bool ready = false;
-  user_model.User? currentUser;
+  user.User? currentUser;
   var pic;
 
   void loadMatches() async {
     Fluttertoast.showToast(msg: 'A beszélgetések betöltés alatt.');
 
-    var matchQuery = RealmConnect.realm
-        .query<Match>("_id CONTAINS '${RealmConnect.currentUser.id}'");
-
-    var userQuery = RealmConnect.realm.all<user_model.User>();
-
-    RealmResults<UserImage> imageQuery = RealmConnect.realm.all<UserImage>();
-
-    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
-    subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
+    userRealm = await RealmConnect.getRealm([user.User.schema], 'MatchUser');
+    RealmResults<user.User> userQuery = userRealm.all<user.User>();
+    SubscriptionSet userSub = userRealm.subscriptions;
+    userSub.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
+    });
+    await userRealm.subscriptions.waitForSynchronization();
+
+    imageRealm = await RealmConnect.getRealm([UserImage.schema], 'MatchImage');
+    RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
+    SubscriptionSet imageSub = imageRealm.subscriptions;
+    imageSub.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
-    //get matches for the current logged in user
-    await RealmConnect.realm.subscriptions.waitForSynchronization();
+    await imageRealm.subscriptions.waitForSynchronization();
+
+    matchRealm = await RealmConnect.getRealm([Match.schema], 'MatchMatch');
+    RealmResults<Match> matchQuery =
+        matchRealm.query<Match>("_id CONTAINS '${RealmConnect.realmUser.id}'");
+    SubscriptionSet matchSub = matchRealm.subscriptions;
+    matchSub.update((mutableSubscriptions) {
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
+    });
+    await matchRealm.subscriptions.waitForSynchronization();
 
     //sort the matches based on last activity
 
-    matches = <Match>[];
-    for (var match in matchQuery) {
-      matches.add(match);
-    }
-
+    matches = matchQuery.toList();
     matches.sort(
       (a, b) {
         if (a.lastActivity != null && b.lastActivity != null) {
@@ -72,9 +82,9 @@ class _MatchesPageState extends State<MatchesPage> {
     //go through matches to find corresponding profile
     for (int i = 0; i < matches.length; i++) {
       //if we are user 2
-      if (matches[i].user2 == RealmConnect.currentUser!.id) {
+      if (matches[i].user2 == RealmConnect.realmUser.id) {
         print("if");
-        user_model.User matchedProfile =
+        user.User matchedProfile =
             userQuery.query("_id CONTAINS '${matches[i].user1}'")[0];
         matchedProfiles.add(matchedProfile);
         var matchedProfileImage =
@@ -152,8 +162,15 @@ class _MatchesPageState extends State<MatchesPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ChatPage(
-                                            partnerUser: matchedProfiles[index],
-                                            match: matches[index],
+                                            partnerUser: user.User(
+                                                matchedProfiles[index].userID,
+                                                name: matchedProfiles[index]
+                                                    .name),
+                                            match: Match(matches[index].matchID,
+                                                user1: matches[index].user1,
+                                                user2: matches[index].user2,
+                                                lastActivity: matches[index]
+                                                    .lastActivity),
                                             firstTimeImm: false,
                                           )));
                             },

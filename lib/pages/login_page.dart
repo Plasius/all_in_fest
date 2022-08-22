@@ -245,8 +245,10 @@ class _LoginPageState extends State<LoginPage> {
         emailController.text, passwordController.text);
 
     try {
-      await App(AppConfiguration('application-0-bjnqv'))
-          .logIn(emailPwCredentials);
+      RealmConnect.realmUser =
+          await App(AppConfiguration('application-0-bjnqv'))
+              .logIn(emailPwCredentials);
+      print(RealmConnect.realmUser.id);
     } catch (e) {
       Fluttertoast.showToast(
           msg: "Nem sikerült bejelentkezni.",
@@ -260,28 +262,32 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    RealmConnect();
     //create token for current device
     String? tokenString = await FirebaseMessaging.instance.getToken();
 
     if (tokenString != null) {
-      final tokenQuery = RealmConnect.realm!
-          .query<Token>("_id CONTAINS '${RealmConnect.currentUser.id}'");
-      SubscriptionSet tokenSubscriptions = RealmConnect.realm.subscriptions;
+      Realm tokenRealm = await RealmConnect.getRealm(
+        [Token.schema],
+        'LoginToken',
+      );
+      final tokenQuery = tokenRealm
+          .query<Token>("_id CONTAINS '${RealmConnect.realmUser.id}'");
+      SubscriptionSet tokenSubscriptions = tokenRealm.subscriptions;
       tokenSubscriptions.update((mutableSubscriptions) {
         mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
       });
-
-      await RealmConnect.realm.subscriptions.waitForSynchronization();
+      await tokenRealm.subscriptions.waitForSynchronization();
 
       if (tokenQuery.isEmpty) {
-        Token t = Token(RealmConnect.currentUser.id);
+        Token t = Token(RealmConnect.realmUser.id);
         t.token = tokenString;
-        RealmConnect.realm.write(() => RealmConnect.realm.add(t));
+        tokenRealm.write(() => tokenRealm.add(t));
       } else {
-        RealmConnect.realm.write(() => tokenQuery[0].token = tokenString);
+        tokenRealm.write(() => tokenQuery[0].token = tokenString);
       }
+      tokenRealm.close();
     }
+
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('EmailPassword',
         <String>[emailController.text, passwordController.text]);

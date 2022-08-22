@@ -2,10 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:realm/realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
-
-import '../models/realm_connect.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({Key? key}) : super(key: key);
@@ -21,34 +18,6 @@ class _MapPageState extends State<MapPage> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () => loadProfile());
-    getPic();
-  }
-
-  void loadProfile() async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-
-    var userQuery = realm
-        .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
-
-    SubscriptionSet userSubscriptions = realm.subscriptions;
-    userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    var user = userQuery[0];
-
-    setState(() {
-      currentUser = user;
-    });
-  }
-
-  Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.currentUser.id);
   }
 
   @override

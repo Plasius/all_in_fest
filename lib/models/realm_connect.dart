@@ -1,89 +1,89 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print, library_prefixes, implementation_imports
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/message.dart';
-import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/timed_event.dart';
-import 'package:all_in_fest/models/token.dart';
-import 'package:all_in_fest/models/user.dart' as userData;
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:realm/realm.dart';
 
 class RealmConnect {
-  static var currentUser = null;
-  static var realm = null;
-  static bool initialized = false;
+  static late User realmUser;
 
-  RealmConnect() {
-    if (App(AppConfiguration("application-0-bjnqv")).currentUser != null) {
-      realm = Realm(Configuration.flexibleSync(
-          App(AppConfiguration("application-0-bjnqv")).currentUser!, [
-        UserImage.schema,
-        Message.schema,
-        Match.schema,
-        TimedEvent.schema,
-        Token.schema,
-        userData.User.schema
-      ]));
-
-      currentUser = App(AppConfiguration("application-0-bjnqv")).currentUser;
-
-      initialized = true;
-    }
+  static Future<Realm> getRealm(
+      List<SchemaObject> list, String realmName) async {
+    return Realm(Configuration.flexibleSync(realmUser, list,
+        path: await absolutePath(
+            "db_${DateTime.now().millisecondsSinceEpoch.toString()}.realm")));
   }
 
   static Future<MemoryImage?> realmGetImage(String userID) async {
+    Realm imageRealm = await getRealm([UserImage.schema], 'RealmImageGet');
     RealmResults<UserImage> imageQuery;
-    imageQuery = realm.all<UserImage>().query("user CONTAINS '$userID'");
+    imageQuery = imageRealm.all<UserImage>().query("user CONTAINS '$userID'");
 
-    SubscriptionSet subscriptions = realm.subscriptions;
+    SubscriptionSet subscriptions = imageRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
 
-    await realm.subscriptions.waitForSynchronization();
+    await imageRealm.subscriptions.waitForSynchronization();
 
     if (imageQuery.toList().isEmpty == false) {
       var currentProfilePic = imageQuery[0];
-
       return MemoryImage(base64Decode(currentProfilePic.data));
     }
-
     return null;
   }
 
   static realmDeleteImage() async {
+    Realm imageRealm = await getRealm([UserImage.schema], 'RealmImage');
     RealmResults<UserImage> imageQuery;
-    imageQuery = realm
+    imageQuery = imageRealm
         .all<UserImage>()
-        .query("user CONTAINS '${RealmConnect.currentUser.id}'");
+        .query("user CONTAINS '${RealmConnect.realmUser.id}'");
 
-    SubscriptionSet subscriptions = realm.subscriptions;
+    SubscriptionSet subscriptions = imageRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
 
-    await realm.subscriptions.waitForSynchronization();
+    await imageRealm.subscriptions.waitForSynchronization();
 
     if (imageQuery.toList().isEmpty == false) {
-      realm.write(() => realm.delete(imageQuery[0]));
+      imageRealm.write(() => imageRealm.delete(imageQuery[0]));
     }
+
+    imageRealm.close();
   }
 
   static realmLogin(String email, String password) async {}
 
   static void realmSendMessage(Message _message) async {
-    final messageQuery = realm.all<Message>();
-    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    Realm messageRealm =
+        await RealmConnect.getRealm([Message.schema], 'RealmMessageSend');
+    final messageQuery = messageRealm.all<Message>();
+    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await messageRealm.subscriptions.waitForSynchronization();
 
-    realm.write(() {
-      realm.add(_message);
+    messageRealm.write(() {
+      messageRealm.add(_message);
     });
+
+    messageRealm.close();
+  }
+
+  static Future<String> absolutePath(String fileName) async {
+    final appDocsDirectory = await getApplicationDocumentsDirectory();
+    final realmDirectory = '${appDocsDirectory.path}/mongodb-realm';
+    if (!Directory(realmDirectory).existsSync()) {
+      await Directory(realmDirectory).create(recursive: true);
+    }
+    return "$realmDirectory/$fileName";
   }
 }

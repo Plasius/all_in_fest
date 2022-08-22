@@ -74,7 +74,7 @@ class MenuBar extends StatelessWidget {
             title: const Text('Kilépés'),
             leading: const Icon(Icons.exit_to_app),
             onTap: () => {
-              RealmConnect.currentUser.logOut,
+              RealmConnect.realmUser.logOut(),
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()))
             },
