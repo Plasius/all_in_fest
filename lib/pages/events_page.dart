@@ -8,7 +8,7 @@ import 'package:realm/realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 
 import '../models/timed_event.dart';
-import '../models/open_realm.dart';
+import '../models/realm_connect.dart';
 
 class EventsPage extends StatefulWidget {
   const EventsPage({Key? key}) : super(key: key);
@@ -70,29 +70,26 @@ class _EventsPageState extends State<EventsPage> {
     eventsQuery = null;
     RealmResults<TimedEvent> eventsQ;
 
-    Configuration eventsConfig = Configuration.flexibleSync(
-        RealmConnect.currentUser!, [TimedEvent.schema]);
-    Realm eventsRealm = Realm(eventsConfig);
-
     if (_selectedDate == "" && _selectedStage == "Minden színpad") {
-      eventsQ = eventsRealm.all<TimedEvent>();
+      eventsQ = RealmConnect.realm.all<TimedEvent>();
     } else if (_selectedDate == "" && _selectedStage != "Minden színpad") {
-      eventsQ = eventsRealm.all<TimedEvent>().query(
+      eventsQ = RealmConnect.realm.all<TimedEvent>().query(
           "stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     } else if (_selectedDate != "" && _selectedStage == "Minden színpad") {
-      eventsQ =
-          eventsRealm.all<TimedEvent>().query("date CONTAINS '$_selectedDate'");
+      eventsQ = RealmConnect.realm
+          .all<TimedEvent>()
+          .query("date CONTAINS '$_selectedDate'");
     } else {
-      eventsQ = eventsRealm.all<TimedEvent>().query(
+      eventsQ = RealmConnect.realm.all<TimedEvent>().query(
           "date CONTAINS '$_selectedDate' and stage CONTAINS '$_selectedStage' and name CONTAINS '${_searchText.text.toString()}'");
     }
 
-    SubscriptionSet subscriptions = eventsRealm.subscriptions;
+    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(eventsQ, name: "events", update: true);
+      mutableSubscriptions.add(eventsQ, name: "Event", update: true);
     });
 
-    await eventsRealm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     //sort the events based start time
     eventsQuery = eventsQ.toList();

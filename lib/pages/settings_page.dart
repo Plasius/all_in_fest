@@ -1,5 +1,5 @@
 import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 
 import '../models/image.dart';
 import '../models/message.dart';
-import 'menu_sidebar.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -59,20 +58,22 @@ class _SettingsPageState extends State<SettingsPage> {
 
     var user = userQuery[0];
 
-    setState(() {
-      currentUser = user;
-    });
+    if (mounted == true) {
+      setState(() {
+        currentUser = user;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-            drawer: MenuBar(
-                imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
-                userName:
-                    currentUser != null ? currentUser?.name : "Jelentkezz be!"),
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back_ios),
+              ),
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               /*leading: const Icon(
           Icons.menu,
@@ -236,6 +237,7 @@ class _SettingsPageState extends State<SettingsPage> {
     if (RealmConnect.currentUser != null) {
       RealmConnect.currentUser?.logOut();
       RealmConnect.currentUser = null;
+      RealmConnect.realm.close();
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -248,8 +250,9 @@ class _SettingsPageState extends State<SettingsPage> {
     if (email_1.text.isEmpty == false &&
         password_1.text == password_2.text &&
         password_1.text.isEmpty == false) {
-      EmailPasswordAuthProvider authProvider =
-          EmailPasswordAuthProvider(RealmConnect.app);
+      var app = App(AppConfiguration('application-0-bjnqv'));
+
+      EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
       await authProvider.callResetPasswordFunction(
           email_1.text, password_1.text,
           functionArgs: []);
@@ -338,7 +341,7 @@ class _SettingsPageState extends State<SettingsPage> {
         .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
     SubscriptionSet matchSubscription = matchesRealm.subscriptions;
     matchSubscription.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
     //delete user matches
     await matchesRealm.subscriptions.waitForSynchronization();

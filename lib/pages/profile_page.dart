@@ -3,7 +3,7 @@
 import 'dart:convert';
 
 import 'package:all_in_fest/models/image.dart';
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:all_in_fest/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -12,8 +12,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:realm/realm.dart';
-
-import 'menu_sidebar.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -54,14 +52,11 @@ class _ProfilePageState extends State<ProfilePage> {
     return MaterialApp(
         home: Scaffold(
             resizeToAvoidBottomInset: false,
-            drawer: MenuBar(
-                imageProvider: provider != null
-                    ? provider!
-                    : const AssetImage("lib/assets/user.png"),
-                userName: RealmConnect.currentUser != null
-                    ? userName
-                    : "Jelentkezz be!"),
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back_ios),
+              ),
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               actions: [
                 Center(
@@ -226,20 +221,16 @@ class _ProfilePageState extends State<ProfilePage> {
         var image = UserImage(pickedFile.path.split("/").last,
             base64Encode(_cmpressed_image), RealmConnect.currentUser.id);
 
-        Configuration config = Configuration.flexibleSync(
-            RealmConnect.currentUser, [UserImage.schema]);
-        Realm realm = Realm(config);
-
-        imageQuery = realm.all<UserImage>();
-        SubscriptionSet messageSubscriptions = realm.subscriptions;
+        imageQuery = RealmConnect.realm.all<UserImage>();
+        SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
         messageSubscriptions.update((mutableSubscriptions) {
           mutableSubscriptions.add(imageQuery, name: "Image", update: true);
         });
-        await realm.subscriptions.waitForSynchronization();
+        await RealmConnect.realm.subscriptions.waitForSynchronization();
 
         await RealmConnect.realmDeleteImage();
 
-        realm.write(() => realm.add(image));
+        RealmConnect.realm.write(() => RealmConnect.realm.add(image));
 
         setState(() {});
       } catch (e) {
@@ -273,20 +264,16 @@ class _ProfilePageState extends State<ProfilePage> {
         var image = UserImage(pickedFile.path.split("/").last,
             base64Encode(_cmpressed_image), RealmConnect.currentUser.id);
 
-        Configuration config = Configuration.flexibleSync(
-            RealmConnect.currentUser, [UserImage.schema]);
-        Realm realm = Realm(config);
-
-        imageQuery = realm.all<UserImage>();
-        SubscriptionSet messageSubscriptions = realm.subscriptions;
+        imageQuery = RealmConnect.realm.all<UserImage>();
+        SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
         messageSubscriptions.update((mutableSubscriptions) {
           mutableSubscriptions.add(imageQuery, name: "Image", update: true);
         });
-        await realm.subscriptions.waitForSynchronization();
+        await RealmConnect.realm.subscriptions.waitForSynchronization();
 
         await RealmConnect.realmDeleteImage();
 
-        realm.write(() => realm.add(image));
+        RealmConnect.realm.write(() => RealmConnect.realm.add(image));
         setState(() {});
       } catch (e) {
         print(e.runtimeType);
@@ -307,22 +294,20 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> saveProfile() async {
     //get user id and realm connection
     var uid = RealmConnect.currentUser.id;
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
 
-    var userQuery = realm.all<user_model.User>().query("_id == '$uid'");
-    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    var userQuery =
+        RealmConnect.realm.all<user_model.User>().query("_id == '$uid'");
+    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     //update name
     if (uid != null) {
       user_model.User myUser = userQuery[0];
       if (nameController.text.isNotEmpty && bioController.text.isNotEmpty) {
-        realm.write(() => {
+        RealmConnect.realm.write(() => {
               myUser.name = nameController.text,
               myUser.bio = bioController.text
             });
@@ -333,7 +318,7 @@ class _ProfilePageState extends State<ProfilePage> {
           (Route<dynamic> route) => false,
         );
       } else if (nameController.text.isNotEmpty && bioController.text.isEmpty) {
-        realm.write(() => {myUser.name = nameController.text});
+        RealmConnect.realm.write(() => {myUser.name = nameController.text});
         Fluttertoast.showToast(msg: 'Név frissítve.');
         Navigator.pushAndRemoveUntil(
           context,
@@ -341,7 +326,7 @@ class _ProfilePageState extends State<ProfilePage> {
           (Route<dynamic> route) => false,
         );
       } else if (nameController.text.isEmpty && bioController.text.isNotEmpty) {
-        realm.write(() => {myUser.bio = bioController.text});
+        RealmConnect.realm.write(() => {myUser.bio = bioController.text});
         Fluttertoast.showToast(msg: 'Bio frissítve.');
         Navigator.pushAndRemoveUntil(
           context,
@@ -367,19 +352,15 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void loadProfile() async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-
-    var userQuery = realm
+    var userQuery = RealmConnect.realm
         .all<user_model.User>()
         .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
-    SubscriptionSet userSubscriptions = realm.subscriptions;
+    SubscriptionSet userSubscriptions = RealmConnect.realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     var user = userQuery[0];
     print(user.name);

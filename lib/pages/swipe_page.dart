@@ -3,7 +3,7 @@
 import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:all_in_fest/pages/home_page.dart';
 import 'package:all_in_fest/pages/matches_page.dart';
@@ -14,8 +14,6 @@ import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
-
-import 'menu_sidebar.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
@@ -33,17 +31,15 @@ class _SwipePageState extends State<SwipePage> {
   user_model.User? currentUser;
 
   void getProfiles() async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-    RealmResults<user_model.User> _profiles = realm.all<user_model.User>();
+    RealmResults<user_model.User> _profiles =
+        RealmConnect.realm.all<user_model.User>();
 
-    SubscriptionSet subscriptions = realm.subscriptions;
+    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(_profiles, name: "User", update: true);
     });
 
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     var profileShuffle = _profiles.toList();
     for (int i = 0; i < profileShuffle.length; i++) {
@@ -53,19 +49,17 @@ class _SwipePageState extends State<SwipePage> {
       profileShuffle[a] = profileShuffle[b];
       profileShuffle[b] = temp;
     }
-    Configuration config2 =
-        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
-    Realm realm2 = Realm(config2);
-    RealmResults<Match> _matches = realm2
+
+    RealmResults<Match> _matches = RealmConnect.realm
         .all<Match>()
         .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
-    SubscriptionSet subscriptions2 = realm2.subscriptions;
+    SubscriptionSet subscriptions2 = RealmConnect.realm.subscriptions;
     subscriptions2.update((mutableSubscriptions) {
-      mutableSubscriptions.add(_matches, name: "Matches", update: true);
+      mutableSubscriptions.add(_matches, name: "Match", update: true);
     });
 
-    await realm2.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     //szures
     var ignoreList = <String>[RealmConnect.currentUser.id];
@@ -266,19 +260,15 @@ class _SwipePageState extends State<SwipePage> {
   }
 
   void loadProfile() async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-
-    var userQuery = realm
+    var userQuery = RealmConnect.realm
         .all<user_model.User>()
         .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
-    SubscriptionSet userSubscriptions = realm.subscriptions;
+    SubscriptionSet userSubscriptions = RealmConnect.realm.subscriptions;
     userSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     var user = userQuery[0];
     print(user.name);
@@ -308,11 +298,11 @@ class _SwipePageState extends State<SwipePage> {
     return MaterialApp(
       title: 'Welcome to Flutter',
       home: Scaffold(
-          drawer: MenuBar(
-              imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
-              userName:
-                  currentUser != null ? currentUser?.name : "Jelentkezz be!"),
           appBar: AppBar(
+            leading: IconButton(
+              onPressed: () => Navigator.pop(context),
+              icon: const Icon(Icons.arrow_back_ios),
+            ),
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
             /*leading: const Icon(
                 Icons.menu,
@@ -391,32 +381,25 @@ class _SwipePageState extends State<SwipePage> {
         user2: otherUser,
         lastActivity: DateTime.now().millisecondsSinceEpoch);
 
-    Configuration config =
-        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
-    Realm realm = Realm(config);
-
-    final matchQuery = realm.all<Match>();
-    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    final matchQuery = RealmConnect.realm.all<Match>();
+    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
-    realm.write(() {
-      realm.add(_match);
+    RealmConnect.realm.write(() {
+      RealmConnect.realm.add(_match);
     });
 
-    Configuration config2 = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm2 = Realm(config2);
-
-    final userQuery =
-        realm2.all<user_model.User>().query("_id CONTAINS '$otherUser'");
-    SubscriptionSet userSubsriptions = realm.subscriptions;
+    final userQuery = RealmConnect.realm
+        .all<user_model.User>()
+        .query("_id CONTAINS '$otherUser'");
+    SubscriptionSet userSubsriptions = RealmConnect.realm.subscriptions;
     userSubsriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(userQuery, name: "User", update: true);
     });
-    await realm2.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     Navigator.push(
         context,

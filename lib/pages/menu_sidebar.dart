@@ -1,4 +1,4 @@
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/pages/events_page.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:all_in_fest/pages/map_page.dart';
@@ -24,19 +24,6 @@ class MenuBar extends StatelessWidget {
         // Remove padding
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(
-            accountName: Text(userName!),
-            accountEmail: null,
-            currentAccountPicture: Container(
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image:
-                      DecorationImage(image: imageProvider, fit: BoxFit.cover)),
-            ),
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(232, 107, 62, 1),
-            ),
-          ),
           ListTile(
             title: const Text('Főoldal'),
             leading: const Icon(Icons.home),
@@ -87,7 +74,7 @@ class MenuBar extends StatelessWidget {
             title: const Text('Kilépés'),
             leading: const Icon(Icons.exit_to_app),
             onTap: () => {
-              RealmConnect.app.currentUser.logOut,
+              RealmConnect.currentUser.logOut,
               Navigator.push(context,
                   MaterialPageRoute(builder: (context) => const LoginPage()))
             },

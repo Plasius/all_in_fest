@@ -1,7 +1,8 @@
 // ignore_for_file: library_prefixes, implementation_imports, avoid_print
 
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/pages/login_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
@@ -9,6 +10,7 @@ import 'package:all_in_fest/models/user.dart' as user;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/token.dart';
 import 'profile_page.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -389,8 +391,7 @@ class _RegisterPageState extends State<RegisterPage> {
       return;
     }
 
-    AppConfiguration appConfig = AppConfiguration("application-0-bjnqv");
-    App app = App(appConfig);
+    var app = App(AppConfiguration("application-0-bjnqv"));
 
     EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
 
@@ -400,12 +401,31 @@ class _RegisterPageState extends State<RegisterPage> {
     Credentials emailPwCredentials = Credentials.emailPassword(
         emailController.text, passwordController.text);
 
-    await app.logIn(emailPwCredentials);
+    RealmConnect.currentUser = await app.logIn(emailPwCredentials);
 
     if (app.currentUser != null) {
-      RealmConnect.app = app;
-      RealmConnect.currentUser = app.currentUser;
+      RealmConnect();
+      //create token for current device
+      String? tokenString = await FirebaseMessaging.instance.getToken();
 
+      final tokenQuery = RealmConnect.realm
+          .query<Token>("_id CONTAINS '${RealmConnect.currentUser.id}'");
+      SubscriptionSet tokenSubscriptions = RealmConnect.realm.subscriptions;
+      tokenSubscriptions.update((mutableSubscriptions) {
+        mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
+      });
+
+      await RealmConnect.realm.subscriptions.waitForSynchronization();
+
+      if (tokenQuery.isEmpty) {
+        Token t = Token(RealmConnect.currentUser.id);
+        t.token = tokenString;
+        RealmConnect.realm.write(() => RealmConnect.realm.add(t));
+      } else {
+        RealmConnect.realm.write(() => tokenQuery[0].token = tokenString);
+      }
+
+      //save emailpasscombo
       final prefs = await SharedPreferences.getInstance();
       await prefs.setStringList('EmailPassword',
           <String>[emailController.text, passwordController.text]);
@@ -415,18 +435,14 @@ class _RegisterPageState extends State<RegisterPage> {
           bio: "Always all in",
           since: DateTime.now().millisecondsSinceEpoch);
 
-      Configuration config = Configuration.flexibleSync(
-          RealmConnect.currentUser!, [user.User.schema]);
-      Realm realm = Realm(config);
-
-      final userQuery = realm.all<user.User>();
-      SubscriptionSet subscriptions = realm.subscriptions;
+      final userQuery = RealmConnect.realm.all<user.User>();
+      SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
       subscriptions.update((mutableSubscriptions) {
         mutableSubscriptions.add(userQuery, name: "User", update: true);
       });
-      await realm.subscriptions.waitForSynchronization();
+      await RealmConnect.realm.subscriptions.waitForSynchronization();
 
-      realm.write(() => {realm.add(_user)});
+      RealmConnect.realm.write(() => {RealmConnect.realm.add(_user)});
 
       Navigator.pushAndRemoveUntil(
         context,

@@ -1,12 +1,14 @@
 // ignore_for_file: avoid_print
 
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/pages/register_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/token.dart';
 import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -234,20 +236,17 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   login() async {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    var app = App(appConfig);
-
     if (emailController.text.isEmpty || passwordController.text.isEmpty) {
       Fluttertoast.showToast(msg: "Nem megfelelően kitöltött mezők.");
       return;
     }
 
-    RealmConnect.app = app;
     Credentials emailPwCredentials = Credentials.emailPassword(
         emailController.text, passwordController.text);
 
     try {
-      await app.logIn(emailPwCredentials);
+      await App(AppConfiguration('application-0-bjnqv'))
+          .logIn(emailPwCredentials);
     } catch (e) {
       Fluttertoast.showToast(
           msg: "Nem sikerült bejelentkezni.",
@@ -261,21 +260,38 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (app.currentUser != null) {
-      RealmConnect.app = app;
-      RealmConnect.currentUser = app.currentUser;
+    RealmConnect();
+    //create token for current device
+    String? tokenString = await FirebaseMessaging.instance.getToken();
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList('EmailPassword',
-          <String>[emailController.text, passwordController.text]);
+    if (tokenString != null) {
+      final tokenQuery = RealmConnect.realm!
+          .query<Token>("_id CONTAINS '${RealmConnect.currentUser.id}'");
+      SubscriptionSet tokenSubscriptions = RealmConnect.realm.subscriptions;
+      tokenSubscriptions.update((mutableSubscriptions) {
+        mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
+      });
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => const MyHomePage()),
-        (Route<dynamic> route) => false,
-      );
+      await RealmConnect.realm.subscriptions.waitForSynchronization();
 
-      Fluttertoast.showToast(msg: 'Sikeres bejelentkezés.');
+      if (tokenQuery.isEmpty) {
+        Token t = Token(RealmConnect.currentUser.id);
+        t.token = tokenString;
+        RealmConnect.realm.write(() => RealmConnect.realm.add(t));
+      } else {
+        RealmConnect.realm.write(() => tokenQuery[0].token = tokenString);
+      }
     }
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('EmailPassword',
+        <String>[emailController.text, passwordController.text]);
+
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const MyHomePage()),
+      (Route<dynamic> route) => false,
+    );
+
+    Fluttertoast.showToast(msg: 'Sikeres bejelentkezés.');
   }
 }

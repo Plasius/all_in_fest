@@ -4,25 +4,38 @@ import 'dart:convert';
 
 import 'package:all_in_fest/models/image.dart';
 import 'package:all_in_fest/models/message.dart';
+import 'package:all_in_fest/models/match.dart';
+import 'package:all_in_fest/models/timed_event.dart';
+import 'package:all_in_fest/models/token.dart';
+import 'package:all_in_fest/models/user.dart' as userData;
 import 'package:flutter/material.dart';
 import 'package:realm/realm.dart';
-import 'package:realm/src/user.dart' as realmUser;
-import 'package:all_in_fest/models/user.dart' as user;
 
 class RealmConnect {
-  static var app;
-  static var currentUser;
+  static var currentUser = null;
+  static var realm = null;
+  static bool initialized = false;
 
-  static void realmOpen() async {
-    var appConfig = AppConfiguration("application-0-bjnqv");
-    app = App(appConfig);
+  RealmConnect() {
+    if (App(AppConfiguration("application-0-bjnqv")).currentUser != null) {
+      realm = Realm(Configuration.flexibleSync(
+          App(AppConfiguration("application-0-bjnqv")).currentUser!, [
+        UserImage.schema,
+        Message.schema,
+        Match.schema,
+        TimedEvent.schema,
+        Token.schema,
+        userData.User.schema
+      ]));
+
+      currentUser = App(AppConfiguration("application-0-bjnqv")).currentUser;
+
+      initialized = true;
+    }
   }
 
   static Future<MemoryImage?> realmGetImage(String userID) async {
     RealmResults<UserImage> imageQuery;
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [UserImage.schema]);
-    Realm realm = Realm(config);
     imageQuery = realm.all<UserImage>().query("user CONTAINS '$userID'");
 
     SubscriptionSet subscriptions = realm.subscriptions;
@@ -43,9 +56,6 @@ class RealmConnect {
 
   static realmDeleteImage() async {
     RealmResults<UserImage> imageQuery;
-    Configuration config =
-        Configuration.flexibleSync(currentUser, [UserImage.schema]);
-    Realm realm = Realm(config);
     imageQuery = realm
         .all<UserImage>()
         .query("user CONTAINS '${RealmConnect.currentUser.id}'");
@@ -62,33 +72,9 @@ class RealmConnect {
     }
   }
 
-  static void realmRegister(
-      String email, String password, user.User _user) async {
-    EmailPasswordAuthProvider authProvider = EmailPasswordAuthProvider(app);
-    await authProvider.registerUser(email, password);
-    Credentials emailPwCredentials = Credentials.emailPassword(email, password);
-    realmUser.User currentUser = await app.logIn(emailPwCredentials);
-
-    Configuration config =
-        Configuration.flexibleSync(currentUser, [user.User.schema]);
-    Realm realm = Realm(config);
-
-    final userQuery = realm.all<user.User>();
-    SubscriptionSet subscriptions = realm.subscriptions;
-    subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    realm.write(() => {realm.add(_user)});
-  }
-
   static realmLogin(String email, String password) async {}
 
   static void realmSendMessage(Message _message) async {
-    Configuration config =
-        Configuration.flexibleSync(currentUser, [Message.schema]);
-    Realm realm = Realm(config);
     final messageQuery = realm.all<Message>();
     SubscriptionSet messageSubscriptions = realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {

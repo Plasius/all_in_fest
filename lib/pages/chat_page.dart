@@ -5,7 +5,7 @@ import 'dart:convert';
 
 import 'package:all_in_fest/models/match.dart' as swipeMatch;
 import 'package:all_in_fest/models/message.dart';
-import 'package:all_in_fest/models/open_realm.dart';
+import 'package:all_in_fest/models/realm_connect.dart';
 import 'package:all_in_fest/models/user.dart' as user;
 import 'package:all_in_fest/pages/home_page.dart';
 import 'package:flutter/cupertino.dart';
@@ -13,8 +13,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:realm/realm.dart';
 
+import 'package:http/http.dart' as http;
+
 import '../models/image.dart';
 import '../models/match.dart' as match;
+import '../models/token.dart';
 
 class ChatPage extends StatefulWidget {
   const ChatPage(
@@ -36,6 +39,7 @@ class _ChatPageState extends State<ChatPage> {
   var partnerImage;
   var partnerName;
   var firstTime;
+  String? token;
   bool firstLoad = true;
 
   TextEditingController messageInput = TextEditingController();
@@ -48,19 +52,22 @@ class _ChatPageState extends State<ChatPage> {
   //initializes partnerImage and partnerName
   loadPartnerNameAndImage() async {
     RealmResults<UserImage> imageQuery;
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [UserImage.schema]);
-    Realm realm = Realm(config);
-    imageQuery = realm
+    RealmResults<Token> tokenQuery;
+    imageQuery = RealmConnect.realm
         .all<UserImage>()
         .query("user CONTAINS '${widget.partnerUser.userID}'");
+    tokenQuery = RealmConnect.realm
+        .query<Token>("_id CONTAINS '${widget.partnerUser.userID}'");
 
-    SubscriptionSet subscriptions = realm.subscriptions;
+    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+      mutableSubscriptions.add(tokenQuery, name: "Token", update: true);
     });
 
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
+
+    if (tokenQuery.isEmpty == false) token = tokenQuery[0].token;
 
     if (imageQuery.toList().isEmpty == false) {
       var picdata = imageQuery[0];
@@ -75,19 +82,17 @@ class _ChatPageState extends State<ChatPage> {
   //initializes messages
   loadMessages() async {
     RealmResults<Message> messageQuery;
-    Configuration config =
-        Configuration.flexibleSync(RealmConnect.currentUser, [Message.schema]);
-    Realm realm = Realm(config);
-    messageQuery = realm.all<Message>().query(
+    messageQuery = RealmConnect.realm.all<Message>().query(
         "matchID CONTAINS '${widget.partnerUser.userID}' AND matchID CONTAINS '${RealmConnect.currentUser?.id.toString()}'");
 
-    SubscriptionSet subscriptions = realm.subscriptions;
+    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
 
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
+    int previousMessageNum = messages.length;
     messages = messageQuery.toList();
 
     messages.sort(
@@ -115,6 +120,12 @@ class _ChatPageState extends State<ChatPage> {
         scrollController.jumpTo(scrollController.position.maxScrollExtent);
       });
       firstLoad = false;
+    }
+
+    if (previousMessageNum < messages.length) {
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      });
     }
   }
 
@@ -489,20 +500,16 @@ class _ChatPageState extends State<ChatPage> {
   }
 
   void sendMessage(String? text) async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [Message.schema, match.Match.schema]);
-    Realm realm = Realm(config);
-
-    final messageQuery = realm.all<Message>();
-    final matchesQuery = realm.all<match.Match>().query(
+    final messageQuery = RealmConnect.realm.all<Message>();
+    final matchesQuery = RealmConnect.realm.all<match.Match>().query(
         "_id CONTAINS '${widget.match.user2}' AND _id CONTAINS '${widget.match.user1}'");
 
-    SubscriptionSet messageSubscriptions = realm.subscriptions;
+    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
-      mutableSubscriptions.add(matchesQuery, name: "Matches", update: true);
+      mutableSubscriptions.add(matchesQuery, name: "Match", update: true);
     });
-    await realm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     final _message = Message(ObjectId().toString(),
         from: RealmConnect.currentUser.id,
@@ -510,10 +517,14 @@ class _ChatPageState extends State<ChatPage> {
         datetime: DateTime.now().millisecondsSinceEpoch,
         matchID: widget.match.matchID);
 
-    realm.write(() {
-      realm.add(_message);
+    RealmConnect.realm.write(() {
+      RealmConnect.realm.add(_message);
       matchesQuery[0].lastActivity = DateTime.now().millisecondsSinceEpoch;
     });
+
+    sendPushNotification();
+
+    print('sending');
 
     messageInput.clear();
     FocusManager.instance.primaryFocus?.unfocus();
@@ -527,32 +538,48 @@ class _ChatPageState extends State<ChatPage> {
 
   Future<void> deleteOptions() async {
     RealmResults<Message> messageQuery;
-    Configuration messageConfig =
-        Configuration.flexibleSync(RealmConnect.currentUser, [Message.schema]);
-    Realm messageRealm = Realm(messageConfig);
-    messageQuery = messageRealm
+    messageQuery = RealmConnect.realm
         .all<Message>()
         .query("matchID CONTAINS '${widget.match.matchID}'");
-    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
+    SubscriptionSet messageSubscriptions = RealmConnect.realm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(messageQuery, name: "Message", update: true);
     });
-    await messageRealm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     var matchQuery;
-    Configuration matchConfig = Configuration.flexibleSync(
-        RealmConnect.currentUser, [swipeMatch.Match.schema]);
-    Realm matchesRealm = Realm(matchConfig);
-    matchQuery = matchesRealm
+    matchQuery = RealmConnect.realm
         .all<swipeMatch.Match>()
         .query("_id CONTAINS '${widget.match.matchID}'");
-    SubscriptionSet matchSubscription = matchesRealm.subscriptions;
+    SubscriptionSet matchSubscription = RealmConnect.realm.subscriptions;
     matchSubscription.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
     });
-    await matchesRealm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
-    messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
-    matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
+    RealmConnect.realm
+        .write(() => {RealmConnect.realm.deleteMany(messageQuery)});
+    RealmConnect.realm.write(() => {RealmConnect.realm.deleteMany(matchQuery)});
+  }
+
+  Future<void> sendPushNotification() async {
+    if (token == null) return;
+    var response =
+        await http.post(Uri.parse('https://fcm.googleapis.com/fcm/send'),
+            headers: <String, String>{
+              'Content-Type': 'application/json',
+              'Authorization': 'key='
+                  'AAAANcIFl6A:APA91bEjrwzaHdiGzC1D_xaidEuAMvUmEmlbzD3Ehl9hj-zArI4-1WlPdDiCeb8hTLmJbcTF0aSrXAOeQBuOJ-pzl_YAFMnXoYD3-d4ogHnBYw-HS_wHAPmi1fwYr751quwV2UkoOdd-',
+            },
+            body: jsonEncode({
+              "data": {},
+              "to": token,
+              "notification": {
+                "title": "Kapás van!",
+                "body": "Üzeneted érkezett.",
+              }
+            }));
+
+    print(response.body);
   }
 }

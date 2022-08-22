@@ -1,7 +1,8 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
+import 'dart:convert';
+
 import 'package:all_in_fest/models/match.dart';
-import 'package:all_in_fest/models/open_realm.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
 import 'package:all_in_fest/pages/chat_page.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,8 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:realm/realm.dart';
 
-import 'menu_sidebar.dart';
+import '../models/image.dart';
+import '../models/realm_connect.dart';
 
 class MatchesPage extends StatefulWidget {
   const MatchesPage({Key? key}) : super(key: key);
@@ -20,7 +22,7 @@ class MatchesPage extends StatefulWidget {
 
 class _MatchesPageState extends State<MatchesPage> {
   var photos = [];
-  var matchQuery;
+  var matches = <Match>[];
   var matchedProfiles = <user_model.User>[];
   bool ready = false;
   user_model.User? currentUser;
@@ -29,23 +31,30 @@ class _MatchesPageState extends State<MatchesPage> {
   void loadMatches() async {
     Fluttertoast.showToast(msg: 'A beszélgetések betöltés alatt.');
 
-    Configuration matchConfig =
-        Configuration.flexibleSync(RealmConnect.currentUser, [Match.schema]);
-    Realm matchesRealm = Realm(matchConfig);
-    matchQuery = matchesRealm
-        .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
+    var matchQuery = RealmConnect.realm
+        .query<Match>("_id CONTAINS '${RealmConnect.currentUser.id}'");
 
-    SubscriptionSet subscriptions = matchesRealm.subscriptions;
+    var userQuery = RealmConnect.realm.all<user_model.User>();
+
+    RealmResults<UserImage> imageQuery = RealmConnect.realm.all<UserImage>();
+
+    SubscriptionSet subscriptions = RealmConnect.realm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Matches", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
+      mutableSubscriptions.add(userQuery, name: "User", update: true);
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
     });
     //get matches for the current logged in user
-    await matchesRealm.subscriptions.waitForSynchronization();
+    await RealmConnect.realm.subscriptions.waitForSynchronization();
 
     //sort the matches based on last activity
-    matchQuery = (matchQuery as RealmResults<Match>).toList();
-    (matchQuery as List<Match>).sort(
+
+    matches = <Match>[];
+    for (var match in matchQuery) {
+      matches.add(match);
+    }
+
+    matches.sort(
       (a, b) {
         if (a.lastActivity != null && b.lastActivity != null) {
           if (a.lastActivity! < b.lastActivity!) {
@@ -58,41 +67,36 @@ class _MatchesPageState extends State<MatchesPage> {
       },
     );
 
-    print(matchQuery.length);
-
-    Configuration userConfig = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm userRealm = Realm(userConfig);
-    var users = userRealm.all<user_model.User>();
-
-    SubscriptionSet subscriptions2 = userRealm.subscriptions;
-    subscriptions2.update((mutableSubscriptions) {
-      mutableSubscriptions.add(users, name: "Users", update: true);
-    });
-
-    //get all the user profiles
-    await userRealm.subscriptions.waitForSynchronization();
+    print(matches.length);
 
     //go through matches to find corresponding profile
-    for (int i = 0; i < matchQuery.length; i++) {
+    for (int i = 0; i < matches.length; i++) {
       //if we are user 2
-      if (matchQuery[i].user2 == RealmConnect.currentUser.id) {
+      if (matches[i].user2 == RealmConnect.currentUser!.id) {
         print("if");
         user_model.User matchedProfile =
-            users.query("_id CONTAINS '${matchQuery[i].user1}'")[0];
+            userQuery.query("_id CONTAINS '${matches[i].user1}'")[0];
         matchedProfiles.add(matchedProfile);
         var matchedProfileImage =
-            await RealmConnect.realmGetImage(matchedProfile.userID);
-        photos.add(matchedProfileImage);
+            imageQuery.query("user CONTAINS '${matchedProfile.userID}'");
+        if (matchedProfileImage.isEmpty == false) {
+          photos.add(MemoryImage(base64Decode(matchedProfileImage[0].data)));
+        } else {
+          photos.add(null);
+        }
       } else {
         //if we are user 1
         print("else");
         var matchedProfile =
-            users.query("_id CONTAINS '${matchQuery[i].user2}'")[0];
+            userQuery.query("_id CONTAINS '${matches[i].user2}'")[0];
         matchedProfiles.add(matchedProfile);
         var matchedProfileImage =
-            await RealmConnect.realmGetImage(matchedProfile.userID);
-        photos.add(matchedProfileImage);
+            imageQuery.query("user CONTAINS '${matchedProfile.userID}'");
+        if (matchedProfileImage.isEmpty == false) {
+          photos.add(MemoryImage(base64Decode(matchedProfileImage[0].data)));
+        } else {
+          photos.add(null);
+        }
       }
     }
 
@@ -102,36 +106,7 @@ class _MatchesPageState extends State<MatchesPage> {
   @override
   initState() {
     super.initState();
-
-    Future.delayed(Duration.zero, () => {loadMatches()});
-    Future.delayed(Duration.zero, () => {loadProfile(), getPic()});
-  }
-
-  Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.currentUser.id);
-  }
-
-  void loadProfile() async {
-    Configuration config = Configuration.flexibleSync(
-        RealmConnect.currentUser, [user_model.User.schema]);
-    Realm realm = Realm(config);
-
-    var userQuery = realm
-        .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.currentUser.id}'");
-
-    SubscriptionSet userSubscriptions = realm.subscriptions;
-    userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await realm.subscriptions.waitForSynchronization();
-
-    var user = userQuery[0];
-    print(user.name);
-
-    setState(() {
-      currentUser = user;
-    });
+    loadMatches();
   }
 
   @override
@@ -141,12 +116,12 @@ class _MatchesPageState extends State<MatchesPage> {
         debugShowCheckedModeBanner: false,
         title: 'Welcome to Flutter',
         home: Scaffold(
-            drawer: MenuBar(
-                imageProvider: pic ?? const AssetImage("lib/assets/user.png"),
-                userName:
-                    currentUser != null ? currentUser?.name : "Jelentkezz be!"),
             resizeToAvoidBottomInset: false,
             appBar: AppBar(
+              leading: IconButton(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.arrow_back_ios),
+              ),
               elevation: 0,
               backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
               /*leading: const Icon(
@@ -178,7 +153,7 @@ class _MatchesPageState extends State<MatchesPage> {
                                   MaterialPageRoute(
                                       builder: (context) => ChatPage(
                                             partnerUser: matchedProfiles[index],
-                                            match: matchQuery[index],
+                                            match: matches[index],
                                             firstTimeImm: false,
                                           )));
                             },
@@ -197,13 +172,15 @@ class _MatchesPageState extends State<MatchesPage> {
                                         width: size.width * 0.24,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          image: photos[index] == null
+                                          image: photos.isEmpty
                                               ? const DecorationImage(
                                                   image: AssetImage(
                                                       "lib/assets/user.png"),
                                                   fit: BoxFit.fill)
                                               : DecorationImage(
-                                                  image: photos[index],
+                                                  image: photos[index] ??
+                                                      const AssetImage(
+                                                          "lib/assets/user.png"),
                                                   fit: BoxFit.fill),
                                         ),
                                       ),
@@ -233,11 +210,14 @@ class _MatchesPageState extends State<MatchesPage> {
                                               padding: EdgeInsets.only(
                                                   bottom: size.width * 0.01625),
                                               child: Text(
-                                                DateFormat('HH:mm').format(DateTime
-                                                    .fromMicrosecondsSinceEpoch(
-                                                        matchQuery[index]
-                                                                .lastActivity *
-                                                            1000)),
+                                                matches.isEmpty
+                                                    ? "no time"
+                                                    : DateFormat('HH:mm')
+                                                        .format(DateTime
+                                                            .fromMicrosecondsSinceEpoch(
+                                                                matches[index]
+                                                                        .lastActivity! *
+                                                                    1000)),
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
