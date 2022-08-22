@@ -26,6 +26,8 @@ class _EventsPageState extends State<EventsPage> {
   ImageProvider? pic;
   user_model.User? currentUser;
 
+  late Realm eventsRealm;
+
   List<Text> stages = [
     const Text("Minden színpad"),
     const Text("E.ON Mainstage"),
@@ -44,6 +46,13 @@ class _EventsPageState extends State<EventsPage> {
     selectToday();
 
     Future.delayed(Duration.zero, () => {loadEvents()});
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    eventsRealm.close();
+    super.dispose();
   }
 
   void selectToday() {
@@ -69,7 +78,7 @@ class _EventsPageState extends State<EventsPage> {
 
     eventsQuery = null;
 
-    Realm eventsRealm =
+    eventsRealm =
         await RealmConnect.getRealm([TimedEvent.schema], 'EventEvent');
     RealmResults<TimedEvent> eventsQ;
 
