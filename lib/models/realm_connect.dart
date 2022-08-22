@@ -16,7 +16,10 @@ class RealmConnect {
       List<SchemaObject> list, String realmName) async {
     return Realm(Configuration.flexibleSync(realmUser, list,
         path: await absolutePath(
-            "db_${DateTime.now().millisecondsSinceEpoch.toString()}.realm")));
+            "db_${DateTime.now().millisecondsSinceEpoch.toString()}.realm"),
+        syncErrorHandler: (p0) => {},
+        syncClientResetErrorHandler:
+            SyncClientResetErrorHandler(((code) => {}))));
   }
 
   static Future<MemoryImage?> realmGetImage(String userID) async {
