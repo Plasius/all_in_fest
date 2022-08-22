@@ -76,11 +76,14 @@ class _EventsPageState extends State<EventsPage> {
   void loadEvents() async {
     Fluttertoast.showToast(msg: 'Események betöltés alatt.');
 
-    eventsQuery = null;
-
+    try {
+      eventsRealm.close();
+    } catch (e) {}
     eventsRealm =
         await RealmConnect.getRealm([TimedEvent.schema], 'EventEvent');
     RealmResults<TimedEvent> eventsQ;
+
+    eventsQuery = null;
 
     if (_selectedDate == "" && _selectedStage == "Minden színpad") {
       eventsQ = eventsRealm.all<TimedEvent>();
