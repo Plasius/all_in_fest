@@ -48,13 +48,6 @@ class _EventsPageState extends State<EventsPage> {
     Future.delayed(Duration.zero, () => {loadEvents()});
   }
 
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    eventsRealm.close();
-    super.dispose();
-  }
-
   void selectToday() {
     DateTime aug26 = DateTime(2022, 8, 26);
     DateTime aug27 = DateTime(2022, 8, 27);
@@ -76,9 +69,6 @@ class _EventsPageState extends State<EventsPage> {
   void loadEvents() async {
     Fluttertoast.showToast(msg: 'Események betöltés alatt.');
 
-    try {
-      eventsRealm.close();
-    } catch (e) {}
     eventsRealm =
         await RealmConnect.getRealm([TimedEvent.schema], 'EventEvent');
     RealmResults<TimedEvent> eventsQ;

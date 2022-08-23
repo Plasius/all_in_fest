@@ -25,8 +25,7 @@ class _MatchesPageState extends State<MatchesPage> {
   var matches = <Match>[];
   var matchedProfiles = <user.User>[];
 
-  late Realm matchRealm;
-  late Realm userRealm;
+  late Realm userMatchRealm;
   late Realm imageRealm;
 
   bool ready = false;
@@ -34,35 +33,24 @@ class _MatchesPageState extends State<MatchesPage> {
   var pic;
 
   void loadMatches() async {
-    Fluttertoast.showToast(msg: 'A beszélgetések betöltés alatt.');
+    Fluttertoast.showToast(
+        msg: 'A beszélgetések betöltés alatt.', toastLength: Toast.LENGTH_LONG);
 
-    userRealm = await RealmConnect.getRealm([user.User.schema], 'MatchUser');
-    RealmResults<user.User> userQuery = userRealm.all<user.User>();
-    SubscriptionSet userSub = userRealm.subscriptions;
+    userMatchRealm = await RealmConnect.getRealm(
+        [user.User.schema, Match.schema], 'MatchUser');
+
+    RealmResults<user.User> userQuery = userMatchRealm.all<user.User>();
+    RealmResults<Match> matchQuery = userMatchRealm
+        .query<Match>("_id CONTAINS '${RealmConnect.realmUser.id}'");
+
+    SubscriptionSet userSub = userMatchRealm.subscriptions;
     userSub.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
+      mutableSubscriptions.add(userQuery, name: "MatchUser", update: true);
+      mutableSubscriptions.add(matchQuery, name: "MatchMatch", update: true);
     });
-    await userRealm.subscriptions.waitForSynchronization();
-
-    imageRealm = await RealmConnect.getRealm([UserImage.schema], 'MatchImage');
-    RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
-    SubscriptionSet imageSub = imageRealm.subscriptions;
-    imageSub.update((mutableSubscriptions) {
-      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
-    });
-    await imageRealm.subscriptions.waitForSynchronization();
-
-    matchRealm = await RealmConnect.getRealm([Match.schema], 'MatchMatch');
-    RealmResults<Match> matchQuery =
-        matchRealm.query<Match>("_id CONTAINS '${RealmConnect.realmUser.id}'");
-    SubscriptionSet matchSub = matchRealm.subscriptions;
-    matchSub.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
-    });
-    await matchRealm.subscriptions.waitForSynchronization();
+    await userMatchRealm.subscriptions.waitForSynchronization();
 
     //sort the matches based on last activity
-
     matches = matchQuery.toList();
     matches.sort(
       (a, b) {
@@ -84,29 +72,45 @@ class _MatchesPageState extends State<MatchesPage> {
       //if we are user 2
       if (matches[i].user2 == RealmConnect.realmUser.id) {
         print("if");
-        user.User matchedProfile =
-            userQuery.query("_id CONTAINS '${matches[i].user1}'")[0];
-        matchedProfiles.add(matchedProfile);
-        var matchedProfileImage =
-            imageQuery.query("user CONTAINS '${matchedProfile.userID}'");
-        if (matchedProfileImage.isEmpty == false) {
-          photos.add(MemoryImage(base64Decode(matchedProfileImage[0].data)));
-        } else {
+        RealmResults<user.User> profiles =
+            userQuery.query("_id CONTAINS '${matches[i].user1}'");
+        if (profiles.isEmpty == false) {
+          matchedProfiles.add(profiles[0]);
           photos.add(null);
         }
       } else {
         //if we are user 1
         print("else");
-        var matchedProfile =
-            userQuery.query("_id CONTAINS '${matches[i].user2}'")[0];
-        matchedProfiles.add(matchedProfile);
-        var matchedProfileImage =
-            imageQuery.query("user CONTAINS '${matchedProfile.userID}'");
-        if (matchedProfileImage.isEmpty == false) {
-          photos.add(MemoryImage(base64Decode(matchedProfileImage[0].data)));
-        } else {
+        RealmResults<user.User> profiles =
+            userQuery.query("_id CONTAINS '${matches[i].user2}'");
+        if (profiles.isEmpty == false) {
+          matchedProfiles.add(profiles[0]);
           photos.add(null);
         }
+      }
+    }
+
+    setState(() {
+      loadImages();
+    });
+  }
+
+  void loadImages() async {
+    imageRealm = await RealmConnect.getRealm([UserImage.schema], 'MatchImage');
+    RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
+    SubscriptionSet imageSub = imageRealm.subscriptions;
+    imageSub.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+    await imageRealm.subscriptions.waitForSynchronization();
+
+    for (var i = 0; i < matchedProfiles.length; i++) {
+      var matchedProfileImage =
+          imageQuery.query("user CONTAINS '${matchedProfiles[i].userID}'");
+      if (matchedProfileImage.isEmpty == false) {
+        photos[i] = MemoryImage(base64Decode(matchedProfileImage[0].data));
+      } else {
+        photos[i] = null;
       }
     }
 
@@ -116,7 +120,9 @@ class _MatchesPageState extends State<MatchesPage> {
   @override
   initState() {
     super.initState();
-    loadMatches();
+    Future.delayed(Duration.zero, () {
+      loadMatches();
+    });
   }
 
   @override

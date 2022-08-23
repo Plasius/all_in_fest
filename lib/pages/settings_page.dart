@@ -1,5 +1,6 @@
 import 'package:all_in_fest/models/match.dart';
 import 'package:all_in_fest/models/realm_connect.dart';
+import 'package:all_in_fest/models/token.dart';
 import 'package:all_in_fest/pages/login_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -287,66 +288,57 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> deleteUser() async {
-    Configuration userConfig = Configuration.flexibleSync(
-        RealmConnect.realmUser, [user_model.User.schema]);
-    Realm userRealm = Realm(userConfig);
-    var userQuery = userRealm
+    Realm realm = await RealmConnect.getRealm([
+      user_model.User.schema,
+      Token.schema,
+      Message.schema,
+      Match.schema,
+      UserImage.schema
+    ], 'SettingsAll');
+
+    var userQuery = realm
         .all<user_model.User>()
         .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
-    SubscriptionSet userSubscriptions = userRealm.subscriptions;
-    userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await userRealm.subscriptions.waitForSynchronization();
-    if (userQuery.isEmpty == false) {
-      userRealm.write(() => {userRealm.deleteMany(userQuery)});
-    }
 
-    Realm imageRealm =
-        await RealmConnect.getRealm([UserImage.schema], 'SettingsImage');
-    RealmResults<UserImage> imageQuery = imageRealm
+    RealmResults<UserImage> imageQuery = realm
         .all<UserImage>()
         .query("user CONTAINS '${RealmConnect.realmUser.id}'");
-    SubscriptionSet imageSubscriptions = imageRealm.subscriptions;
-    imageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
-    });
-    await imageRealm.subscriptions.waitForSynchronization();
-    if (imageQuery.isEmpty == false) {
-      imageRealm.write(() => {imageRealm.deleteMany(imageQuery)});
-    }
-    imageRealm.close();
 
-    Realm messageRealm =
-        await RealmConnect.getRealm([Message.schema], 'SettingsMessage');
-    RealmResults<Message> messageQuery = messageRealm
+    RealmResults<Message> messageQuery = realm
         .all<Message>()
         .query("matchID CONTAINS '${RealmConnect.realmUser.id.toString()}'");
-    SubscriptionSet messageSubscriptions = messageRealm.subscriptions;
-    messageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(messageQuery, name: "Message", update: true);
+
+    RealmResults<Match> matchQuery =
+        realm.all<Match>().query("_id CONTAINS '${RealmConnect.realmUser.id}'");
+
+    SubscriptionSet subscriptions = realm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(userQuery, name: "SettingsUser", update: true);
+      mutableSubscriptions.add(imageQuery, name: "SettingsImage", update: true);
+      mutableSubscriptions.add(messageQuery,
+          name: "SettingsMessage", update: true);
+      mutableSubscriptions.add(matchQuery, name: "Settingsmatch", update: true);
     });
-    //delete user messages
-    await messageRealm.subscriptions.waitForSynchronization();
+
+    await realm.subscriptions.waitForSynchronization();
+
+    if (userQuery.isEmpty == false) {
+      realm.write(() => {realm.deleteMany(userQuery)});
+    }
+
+    if (imageQuery.isEmpty == false) {
+      realm.write(() => {realm.deleteMany(imageQuery)});
+    }
 
     if (messageQuery.isEmpty == false) {
-      messageRealm.write(() => {messageRealm.deleteMany(messageQuery)});
+      realm.write(() => {realm.deleteMany(messageQuery)});
     }
 
-    Realm matchesRealm =
-        await RealmConnect.getRealm([Match.schema], 'SettingsMatch');
-    RealmResults<Match> matchQuery = matchesRealm
-        .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
-    SubscriptionSet matchSubscription = matchesRealm.subscriptions;
-    matchSubscription.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
-    });
-    //delete user matches
-    await matchesRealm.subscriptions.waitForSynchronization();
     if (matchQuery.isEmpty == false) {
-      matchesRealm.write(() => {matchesRealm.deleteMany(matchQuery)});
+      realm.write(() => {realm.deleteMany(matchQuery)});
     }
+
+    realm.close();
 
     await RealmConnect.realmUser.app.removeUser(RealmConnect.realmUser);
 

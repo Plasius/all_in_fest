@@ -243,21 +243,16 @@ class _ProfilePageState extends State<ProfilePage> {
 
         imageRealm.write(() => imageRealm.add(image));
 
-        setState(() {});
+        setState(() {
+          provider = MemoryImage(base64Decode(image.data));
+          flag = true;
+        });
       } catch (e) {
         print(e.runtimeType);
       }
     } else {
-      print('No image selected.');
+      Fluttertoast.showToast(msg: 'No image selected.');
     }
-
-    var img =
-        imageQuery.query("user CONTAINS '${RealmConnect.realmUser.id}'")[0];
-
-    setState(() {
-      provider = MemoryImage(base64Decode(img.data));
-      flag = true;
-    });
   }
 
   Future imgFromCamera() async {
@@ -288,21 +283,16 @@ class _ProfilePageState extends State<ProfilePage> {
         await RealmConnect.realmDeleteImage();
 
         imageRealm.write(() => imageRealm.add(image));
-        setState(() {});
+        setState(() {
+          provider = MemoryImage(base64Decode(image.data));
+          flag = true;
+        });
       } catch (e) {
         print(e.runtimeType);
       }
     } else {
-      print('No image selected.');
+      Fluttertoast.showToast(msg: 'No image selected.');
     }
-
-    var img =
-        imageQuery.query("user CONTAINS '${RealmConnect.realmUser.id}'")[0];
-
-    setState(() {
-      provider = MemoryImage(base64Decode(img.data));
-      flag = true;
-    });
   }
 
   Future<void> saveProfile() async {

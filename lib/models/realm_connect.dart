@@ -24,8 +24,8 @@ class RealmConnect {
 
   static Future<MemoryImage?> realmGetImage(String userID) async {
     Realm imageRealm = await getRealm([UserImage.schema], 'RealmImageGet');
-    RealmResults<UserImage> imageQuery;
-    imageQuery = imageRealm.all<UserImage>().query("user CONTAINS '$userID'");
+    RealmResults<UserImage> imageQuery =
+        imageRealm.all<UserImage>().query("user CONTAINS '$userID'");
 
     SubscriptionSet subscriptions = imageRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {

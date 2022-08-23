@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print
 
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:all_in_fest/models/match.dart';
@@ -14,6 +15,8 @@ import 'package:realm/realm.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:swipe_cards/swipe_cards.dart';
 import 'package:all_in_fest/models/user.dart' as user_model;
+
+import '../models/image.dart';
 
 class SwipePage extends StatefulWidget {
   const SwipePage({Key? key}) : super(key: key);
@@ -30,20 +33,24 @@ class _SwipePageState extends State<SwipePage> {
   var pic;
   user_model.User? currentUser;
 
-  late Realm userRealm;
-  late Realm matchRealm;
+  late Realm userMatchRealm;
 
   void getProfiles() async {
-    userRealm =
-        await RealmConnect.getRealm([user_model.User.schema], 'SwipeUser');
-    RealmResults<user_model.User> userQuery = userRealm.all<user_model.User>();
+    userMatchRealm = await RealmConnect.getRealm(
+        [user_model.User.schema, Match.schema], 'SwipeUser');
+    RealmResults<user_model.User> userQuery =
+        userMatchRealm.all<user_model.User>();
+    RealmResults<Match> _matches = userMatchRealm
+        .all<Match>()
+        .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
 
-    SubscriptionSet subscriptions = userRealm.subscriptions;
+    SubscriptionSet subscriptions = userMatchRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
+      mutableSubscriptions.add(userQuery, name: "SwipeUser", update: true);
+      mutableSubscriptions.add(_matches, name: "SwipeMatch", update: true);
     });
 
-    await userRealm.subscriptions.waitForSynchronization();
+    await userMatchRealm.subscriptions.waitForSynchronization();
 
     var profileShuffle = userQuery.toList();
     for (int i = 0; i < profileShuffle.length; i++) {
@@ -53,18 +60,6 @@ class _SwipePageState extends State<SwipePage> {
       profileShuffle[a] = profileShuffle[b];
       profileShuffle[b] = temp;
     }
-
-    matchRealm = await RealmConnect.getRealm([Match.schema], 'SwipeMatch');
-    RealmResults<Match> _matches = matchRealm
-        .all<Match>()
-        .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
-
-    SubscriptionSet subscriptions2 = matchRealm.subscriptions;
-    subscriptions2.update((mutableSubscriptions) {
-      mutableSubscriptions.add(_matches, name: "Match", update: true);
-    });
-
-    await matchRealm.subscriptions.waitForSynchronization();
 
     //szures
     var ignoreList = <String>[RealmConnect.realmUser.id];
@@ -78,7 +73,6 @@ class _SwipePageState extends State<SwipePage> {
     }
 
     //limit to 10
-
     Map<String, MemoryImage> photosMap =
         await loadImages(profileShuffle, ignoreList);
 
@@ -260,44 +254,17 @@ class _SwipePageState extends State<SwipePage> {
     setState(() {});
   }
 
-  Future<void> getPic() async {
-    pic = await RealmConnect.realmGetImage(RealmConnect.realmUser.id);
-  }
-
-  void loadProfile() async {
-    userRealm =
-        await RealmConnect.getRealm([user_model.User.schema], 'SwipeUserLoad');
-    var userQuery = userRealm
-        .all<user_model.User>()
-        .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
-
-    SubscriptionSet userSubscriptions = userRealm.subscriptions;
-    userSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await userRealm.subscriptions.waitForSynchronization();
-
-    var user = userQuery[0];
-    print(user.name);
-
-    setState(() {
-      currentUser = user;
-    });
-  }
-
   @override
   void initState() {
     super.initState();
     //getMatches();
     Future.delayed(Duration.zero, () {
-      loadProfile();
       if (loaded == false) {
         getProfiles();
       }
 
       _matchEngine = MatchEngine(swipeItems: _swipeItems);
     });
-    getPic();
   }
 
   @override
@@ -311,10 +278,6 @@ class _SwipePageState extends State<SwipePage> {
               icon: const Icon(Icons.arrow_back_ios),
             ),
             backgroundColor: const Color.fromRGBO(232, 107, 62, 1),
-            /*leading: const Icon(
-                Icons.menu,
-                color: Colors.white,
-              ),*/
             title: const Image(
               image: AssetImage("lib/assets/logo.png"),
               height: 50,
@@ -387,27 +350,26 @@ class _SwipePageState extends State<SwipePage> {
         user1: RealmConnect.realmUser.id,
         user2: otherUser,
         lastActivity: DateTime.now().millisecondsSinceEpoch);
-    matchRealm = await RealmConnect.getRealm([Match.schema], 'SwipeMatchLiked');
-    final matchQuery = matchRealm.all<Match>();
-    SubscriptionSet messageSubscriptions = matchRealm.subscriptions;
+
+    userMatchRealm = await RealmConnect.getRealm(
+        [Match.schema, user_model.User.schema], 'SwipeMatchLiked');
+
+    final matchQuery = userMatchRealm.all<Match>();
+    final userQuery = userMatchRealm
+        .all<user_model.User>()
+        .query("_id CONTAINS '$otherUser'");
+
+    SubscriptionSet messageSubscriptions = userMatchRealm.subscriptions;
     messageSubscriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(matchQuery, name: "Match", update: true);
+      mutableSubscriptions.add(matchQuery,
+          name: "SwipeMatchLiked", update: true);
+      mutableSubscriptions.add(userQuery, name: "SwipeUserLiked", update: true);
     });
-    await matchRealm.subscriptions.waitForSynchronization();
+    await userMatchRealm.subscriptions.waitForSynchronization();
 
-    matchRealm.write(() {
-      matchRealm.add(_match);
+    userMatchRealm.write(() {
+      userMatchRealm.add(_match);
     });
-
-    userRealm =
-        await RealmConnect.getRealm([user_model.User.schema], 'SwipeUserLiked');
-    final userQuery =
-        userRealm.all<user_model.User>().query("_id CONTAINS '$otherUser'");
-    SubscriptionSet userSubsriptions = userRealm.subscriptions;
-    userSubsriptions.update((mutableSubscriptions) {
-      mutableSubscriptions.add(userQuery, name: "User", update: true);
-    });
-    await userRealm.subscriptions.waitForSynchronization();
 
     Navigator.push(
         context,
@@ -447,18 +409,31 @@ class _SwipePageState extends State<SwipePage> {
         fontSize: 16.0);
   }
 
-  loadImages(
+  Future<Map<String, MemoryImage>> loadImages(
       List<user_model.User> profileShuffle, List<String> ignoreList) async {
     Map<String, MemoryImage> photosMap = {};
+
+    Realm imageRealm =
+        await RealmConnect.getRealm([UserImage.schema], 'SwipeImageGet');
+    RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
+
+    SubscriptionSet subscriptions = imageRealm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+
+    await imageRealm.subscriptions.waitForSynchronization();
 
     for (user_model.User profile in profileShuffle) {
       if (ignoreList.contains(profile.userID)) continue;
 
-      MemoryImage? potentialImage =
-          await RealmConnect.realmGetImage(profile.userID.toString());
+      imageQuery = imageRealm.query("user CONTAINS '${profile.userID}'");
 
-      if (potentialImage != null) {
-        photosMap[profile.userID.toString()] = potentialImage;
+      UserImage potentialImage;
+      if (imageQuery.toList().isEmpty == false) {
+        potentialImage = imageQuery[0];
+        photosMap[profile.userID.toString()] =
+            MemoryImage(base64Decode(potentialImage.data));
       }
     }
 
