@@ -38,8 +38,10 @@ class _SwipePageState extends State<SwipePage> {
   void getProfiles() async {
     userMatchRealm = await RealmConnect.getRealm(
         [user_model.User.schema, Match.schema], 'SwipeUser');
+
     RealmResults<user_model.User> userQuery =
         userMatchRealm.all<user_model.User>();
+
     RealmResults<Match> _matches = userMatchRealm
         .all<Match>()
         .query("_id CONTAINS '${RealmConnect.realmUser.id}'");
@@ -417,6 +419,21 @@ class _SwipePageState extends State<SwipePage> {
         await RealmConnect.getRealm([UserImage.schema], 'SwipeImageGet');
     RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
 
+    String queryString = '';
+    for (var i = 0; i < profileShuffle.length; i++) {
+      if (ignoreList.contains(profileShuffle[i].userID)) continue;
+
+      if (queryString == '') {
+        queryString += "user CONTAINS '${profileShuffle[i].userID}'";
+      } else {
+        queryString += " OR user CONTAINS '${profileShuffle[i].userID}'";
+      }
+    }
+
+    print(queryString);
+
+    imageQuery = imageRealm.query(queryString);
+
     SubscriptionSet subscriptions = imageRealm.subscriptions;
     subscriptions.update((mutableSubscriptions) {
       mutableSubscriptions.add(imageQuery, name: "Image", update: true);
@@ -424,15 +441,10 @@ class _SwipePageState extends State<SwipePage> {
 
     await imageRealm.subscriptions.waitForSynchronization();
 
-    for (user_model.User profile in profileShuffle) {
-      if (ignoreList.contains(profile.userID)) continue;
-
-      imageQuery = imageRealm.query("user CONTAINS '${profile.userID}'");
-
-      UserImage potentialImage;
-      if (imageQuery.toList().isEmpty == false) {
+    if (imageQuery.toList().isEmpty == false) {
+      for (UserImage potentialImage in imageQuery) {
         potentialImage = imageQuery[0];
-        photosMap[profile.userID.toString()] =
+        photosMap[potentialImage.user] =
             MemoryImage(base64Decode(potentialImage.data));
       }
     }

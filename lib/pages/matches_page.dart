@@ -21,7 +21,7 @@ class MatchesPage extends StatefulWidget {
 }
 
 class _MatchesPageState extends State<MatchesPage> {
-  var photos = [];
+  var photosMap = {};
   var matches = <Match>[];
   var matchedProfiles = <user.User>[];
 
@@ -76,7 +76,7 @@ class _MatchesPageState extends State<MatchesPage> {
             userQuery.query("_id CONTAINS '${matches[i].user1}'");
         if (profiles.isEmpty == false) {
           matchedProfiles.add(profiles[0]);
-          photos.add(null);
+          photosMap[matches[i].user1] = null;
         }
       } else {
         //if we are user 1
@@ -85,7 +85,7 @@ class _MatchesPageState extends State<MatchesPage> {
             userQuery.query("_id CONTAINS '${matches[i].user2}'");
         if (profiles.isEmpty == false) {
           matchedProfiles.add(profiles[0]);
-          photos.add(null);
+          photosMap[matches[i].user2] = null;
         }
       }
     }
@@ -95,6 +95,7 @@ class _MatchesPageState extends State<MatchesPage> {
     });
   }
 
+  /*
   void loadImages() async {
     imageRealm = await RealmConnect.getRealm([UserImage.schema], 'MatchImage');
     RealmResults<UserImage> imageQuery = imageRealm.all<UserImage>();
@@ -111,6 +112,41 @@ class _MatchesPageState extends State<MatchesPage> {
         photos[i] = MemoryImage(base64Decode(matchedProfileImage[0].data));
       } else {
         photos[i] = null;
+      }
+    }
+
+    setState(() {});
+  }*/
+
+  Future<void> loadImages() async {
+    Realm imageRealm =
+        await RealmConnect.getRealm([UserImage.schema], 'MatchesImageGet');
+
+    String queryString = '';
+    for (var i = 0; i < matchedProfiles.length; i++) {
+      if (queryString == '') {
+        queryString += "user CONTAINS '${matchedProfiles[i].userID}'";
+      } else {
+        queryString += " OR user CONTAINS '${matchedProfiles[i].userID}'";
+      }
+    }
+
+    print(queryString);
+
+    RealmResults<UserImage> imageQuery = imageRealm.query(queryString);
+
+    SubscriptionSet subscriptions = imageRealm.subscriptions;
+    subscriptions.update((mutableSubscriptions) {
+      mutableSubscriptions.add(imageQuery, name: "Image", update: true);
+    });
+
+    await imageRealm.subscriptions.waitForSynchronization();
+
+    if (imageQuery.toList().isEmpty == false) {
+      for (UserImage potentialImage in imageQuery) {
+        potentialImage = imageQuery[0];
+        photosMap[potentialImage.user] =
+            MemoryImage(base64Decode(potentialImage.data));
       }
     }
 
@@ -195,13 +231,18 @@ class _MatchesPageState extends State<MatchesPage> {
                                         width: size.width * 0.24,
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
-                                          image: photos.isEmpty
+                                          image: photosMap[
+                                                      matchedProfiles[index]
+                                                          .userID] ==
+                                                  null
                                               ? const DecorationImage(
                                                   image: AssetImage(
                                                       "lib/assets/user.png"),
                                                   fit: BoxFit.fill)
                                               : DecorationImage(
-                                                  image: photos[index] ??
+                                                  image: photosMap[
+                                                          matchedProfiles[index]
+                                                              .userID] ??
                                                       const AssetImage(
                                                           "lib/assets/user.png"),
                                                   fit: BoxFit.fill),

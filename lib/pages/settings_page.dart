@@ -109,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         color: Colors.purple,
                         fontSize: 14,
                         fontWeight: FontWeight.bold),
-                    hintText: 'radev.anthony@uni-corvinus.hu',
+                    hintText: 'bejelentkezett@emailcim.hu',
                     hintStyle: TextStyle(
                         color: Colors.grey.withOpacity(0.3),
                         fontSize: 18,
